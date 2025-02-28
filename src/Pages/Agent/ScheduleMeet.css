@@ -1,0 +1,29 @@
+/* Ensure borders are added to the date cells */
+:where(.css-dev-only-do-not-override-1wwf28x).ant-picker-calendar
+  .ant-picker-content
+  td {
+  position: relative;
+  min-width: 24px;
+  font-weight: normal;
+  height: 90px;
+  
+  border: 1px solid lightgray; /* Add a light border around the date cells */
+  border-radius: 50%; /* Optional: makes the border circular */
+  margin: 2px; /* Optional: space between cells */
+}
+
+/* Add a hover effect for the dates */
+:where(.css-dev-only-do-not-override-1wwf28x).ant-picker-calendar
+  .ant-picker-content
+  td:hover {
+  border-color: #52c41a;
+}
+.ant-collapse-item > .ant-collapse-header {
+  background-color: #0d416b !important;
+  color: white !important; 
+  padding: 12px 16px !important; 
+  font-weight: bold; 
+  line-height: 1.57; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+}

@@ -1,0 +1,63 @@
+.wishlist {
+  padding: 20px;
+  position: relative; 
+ }
+ 
+ .property-card {
+  border-radius: 8px;
+  height: auto; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+ }
+ 
+ .property-card img {
+  height: 200px; 
+  object-fit: cover; 
+ }
+ 
+ .property-card .ant-card-meta {
+  text-align: center; 
+ }
+ 
+ .property-card .property-detail {
+  color: black; 
+  margin: 0; 
+  font-size: 14px;
+ }
+ 
+ .property-card .ant-card-actions {
+  margin-top: auto; 
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+ }
+ 
+ .property-card .ant-btn-primary {
+  width: 100%; 
+ }
+ 
+ /* Updated styles for empty state */
+ .empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Move content to the right */
+  height: calc(100vh - 40px); /* Adjust height based on layout, e.g., 100vh minus any header or padding */
+  background-image: url('https://res.cloudinary.com/ddv2y93jq/image/upload/v1726132834/ahln5il3phrmgs7qzy0k.png'); /* Replace with your image path */
+  /* background-size: cover; */
+  background-position: center;
+  text-align: right; /* Align text to the right */
+  color: #000; /* Set text color to black */
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute;
+  background-repeat: no-repeat;
+  top: -10px;
+  /* right: -40px; */
+  width: 100%;
+  padding: 20px; /* Add some padding to ensure text is not too close to the edges */ 
+  height: 98.5vh; 
+  margin-left: -10px;
+ }
+ 

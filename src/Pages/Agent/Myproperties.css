@@ -1,0 +1,30 @@
+.propCard.ant-card .ant-card-body {
+    padding:0px !important
+}
+
+@keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .marquee-text {
+    display: inline-block;
+    animation: marquee 30s linear infinite; 
+    background: linear-gradient(45deg, #0d416b, #004d00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 8px rgba(13, 65, 107, 0.7), 
+                 0 0 16px rgba(13, 65, 107, 0.5),
+                 0 0 24px rgba(13, 65, 107, 0.3); 
+  }

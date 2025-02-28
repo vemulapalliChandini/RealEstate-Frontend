@@ -1,0 +1,13 @@
+.financial-assistant-container {
+  background-image: url("https://res.cloudinary.com/ddv2y93jq/image/upload/v1726148236/spu1btxrb0s5hvwvk1td.png");
+  background-size: cover;
+  background-position: center;
+  color: black;
+  padding: 20px;
+  min-height: 80vh;
+}
+
+.ant-menu-horizontal > .ant-menu-item {
+  color: rgb(0, 0, 0) !important;
+}
+

@@ -1,0 +1,36 @@
+.inputStyle {
+  width: 70%;
+  border: 1px solid #d9d9d9;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.account {
+  margin: -10px;
+  text-align: center;
+}
+
+.spanTag {
+  color: #1890ff;
+  cursor: pointer;
+  margin-left: 18px;
+}
+
+.formItem {
+  margin-top: 20px;
+  margin-right: 80px;
+  float: right;
+}
+
+.formTag {
+  max-width: 400;
+  margin-left: -20px;
+}
+
+.input {
+  width: 70%;
+}
+
+.para {
+  text-align: center;
+}

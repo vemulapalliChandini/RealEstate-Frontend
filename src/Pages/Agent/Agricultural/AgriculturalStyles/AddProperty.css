@@ -1,0 +1,148 @@
+.ant-form-item-explain {
+  color: red;
+  font-size: 14px ; 
+  margin-top: 9%;
+  }
+  .road .ant-form-item-explain {
+  margin-top: 20%;
+  }
+.cardStyle {
+  padding: 20px;
+  max-width: 60%;
+  border: 1px solid black;
+  margin: auto;
+ }
+ .card2 {
+  border: "1px solid #808080";
+  padding: 20px;
+  margin-bottom: 20px;
+ }
+ 
+ .card3 {
+  border: "1px solid #808080";
+  padding: 20px;
+ }
+ .custom-container {
+  margin-top: -3%;
+  padding: 5px;
+  padding-top: 5px;
+  text-align: center;
+  font-weight: bold;
+  background-color:white;
+  color:  #0d416b; 
+}
+ 
+ .div1 {
+  display: flex;
+  gap: 20px;
+ }
+ .divStyle {
+  display: flex;
+  gap: 30px;
+ }
+ 
+ .div2 {
+  display: flex;
+  align-items: center;
+ }
+ 
+ .div3 {
+  display: flex;
+  gap: 10px;
+ }
+ 
+ .div4 {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+ }
+ 
+ .span {
+  margin-left: 10px;
+ }
+ .span2 {
+  margin-right: 10px;
+ }
+ 
+ .form {
+  margin: 0;
+ }
+ 
+ .select {
+  width: 200px;
+ }
+ 
+ .widthStyle {
+  width: 150px;
+ }
+ 
+ .rowStyling2 {
+  margin-bottom: -18px;
+ }
+ .rowStyle {
+  margin-bottom: 18px;
+ }
+ 
+ .colStyling2 {
+  margin-bottom: 16px;
+ }
+ 
+ .image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  width: "100%";
+ }
+ 
+ .colStyle {
+  display: none;
+ }
+ 
+ .sp {
+  margin-right: 5px;
+ }
+ 
+ .formStyling {
+  text-align: center;
+  margin-top: 30px;
+ }
+ .input-box {
+  background-color: transparent;
+  border: 1px solid lightgray;
+ }
+ .input-box:hover {
+  background-color: white;
+  border: 1px solid lightgray;
+ }
+ .input-box1:read-only :disabled {
+  background-color: white;
+  border: 1px solid lightgray;
+ }
+ .input-number {
+  background-color: white;
+  border: 1px solid lightgray;
+ }
+ .input-number:hover {
+  background-color: white;
+  border: 1px solid lightgray;
+ }
+ .input-number-custom {
+  background-color: white;
+  border: 1px solid lightgray;
+ }
+ 
+ .select-custom {
+  background-color: white !important;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+ }
+ .select-custom .ant-select-selector {
+  background-color: white !important;
+  border-radius: 4px;
+ }
+ .select-custom .ant-select-dropdown {
+  background-color: white !important;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  
+ }

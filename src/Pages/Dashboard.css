@@ -1,0 +1,20 @@
+.ant-menu-dark.ant-menu-inline .ant-menu-sub.ant-menu-inline {
+  background: rgb(13, 65, 107);
+  color: black;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: rgb(13, 65, 107) !important;
+  font-weight: bold !important;
+  font-size: 15px;
+}
+/* Custom styles for Ant Design Breadcrumb links */
+:where(.css-dev-only-do-not-override-1wwf28x).ant-breadcrumb a {
+  color: #0d416b !important; /* Force color to black */
+  transition: color 0.2s;
+  padding: 0 4px;
+  border-radius: 4px;
+  height: 22px;
+  display: inline-block;
+  margin-inline: -4px;
+}

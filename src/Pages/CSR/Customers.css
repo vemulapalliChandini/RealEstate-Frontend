@@ -1,0 +1,39 @@
+:where(.css-dev-only-do-not-override-1wwf28x).ant-table-wrapper
+  .ant-table-container
+  table
+  > thead
+  > tr:first-child
+  > *:first-child {
+  background: #0d416b !important; /* Replace with your desired color */
+  border-start-start-radius: 8px !important;
+  color: white !important; /* Ensures the text color also changes */
+}
+:where(.css-dev-only-do-not-override-1wwf28x).ant-modal .ant-modal-close-x {
+  display: flex !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  line-height: 32px !important;
+  justify-content: center !important;
+  text-transform: none !important;
+  text-rendering: auto !important;
+ 
+}
+:where(.css-dev-only-do-not-override-1wwf28x).ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-1wwf28x).ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > td {
+  transition: background 0.2s, border-color 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: rgba(159, 159, 167, 0.23);
+}
+:where(.css-dev-only-do-not-override-1wwf28x).ant-table-wrapper 
+  .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before, 
+:where(.css-dev-only-do-not-override-1wwf28x).ant-table-wrapper 
+  .ant-table-thead > tr > td:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+    position: static !important; /* Override absolute positioning */
+    content: none !important;   /* Remove the content entirely */
+}

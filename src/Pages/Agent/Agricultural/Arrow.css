@@ -1,0 +1,59 @@
+.slick-prev,
+.slick-next {
+ color: black !important;
+ font-size: 40px !important;
+ font-weight: bold !important;
+}
+
+.getComm.ant-card {
+ background-color: white;
+ position: relative;
+ overflow: hidden;
+ transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.getComm.ant-card::before {
+ content: "";
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 300%;
+ height: 300%;
+ background-color: #edeff1;
+ z-index: 0;
+
+ transition: transform 2s ease, background-color 0.2s ease; 
+ transform: translate(-100%, -100%);
+}
+
+.getComm.ant-card * {
+ position: relative;
+ z-index: 1;
+}
+
+
+.getComm.ant-card:hover::before {
+ transform: translate(0, 0); 
+ transition: transform 2s ease, background-color 0.2s ease; 
+}
+
+.getComm.ant-card:hover {
+ transform: translateY(-5px) scale(1.105) translateZ(0);
+ transition: all 0.8s ease;
+ box-shadow: 0 24px 36px rgba(0, 0, 0, 0.11),
+ 0 24px 46px var(--box-shadow-color);
+}
+
+
+.getComm.ant-card:hover ~ .ant-card::before {
+ background-color: white;
+}
+
+
+.getComm.ant-card:not(:hover)::before {
+ transition: background-color 0.1s ease;
+ background-color: white; 
+}
+
+
+

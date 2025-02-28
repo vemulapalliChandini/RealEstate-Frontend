@@ -1,0 +1,6 @@
+.eye-overlay {
+    display: none;
+}
+.ant-avatar:hover + .eye-overlay {
+    display: block;
+}

@@ -1,0 +1,161 @@
+.hero-section {
+  text-align: center;
+}
+
+.glass-card {
+  position: relative;
+  transform: perspective(1000px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: perspective(1000px) translateY(-10px);
+  box-shadow: 0 10px 20px rgba(168, 50, 80, 0.274);
+}
+
+.subscription-card {
+  background: rgba(81, 144, 196, 0.274);
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  min-height: 450px;
+}
+
+.plan-star {
+  font-size: 1.2rem;
+  color: #ffdd00;
+}
+
+.plan-price {
+  margin-bottom: 15px;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #ddd;
+  margin-left: 20%;
+}
+
+.feature-item {
+  margin-bottom: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.feature-icon {
+  margin-right: 8px;
+}
+
+.subscription-card:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 30px rgba(199, 191, 191, 0.5), 0 4px 20px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05) translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .glass-card {
+    transform: none;
+  }
+}
+
+/*  Right side things... */
+
+.landing-page-buyer-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #000000, #888282);
+
+  height: 103.3%;
+  margin-left: -1%;
+  margin-top: -5%;
+  margin-right: -1%;
+  margin-bottom: -1%;
+  padding: 20px;
+}
+
+.landing-page-buyer {
+  width: 68%;
+}
+
+.hover-info {
+  width: 30%;
+  background: rgba(85, 83, 83, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 106%;
+  margin-top: -2%;
+}
+
+.info-box {
+  text-align: center;
+  /* margin-top: -18%; */
+  margin-top: -5%;
+}
+
+.info-placeholder {
+  text-align: center;
+}
+
+.property-card {
+  background: #4e4b4b;
+  border-radius: 8px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.property-card .ant-card-body {
+  padding: 10px;
+}
+
+/*  new code from here */
+
+.property-image-container {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  overflow: hidden;
+}
+
+.property-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.price-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 75%;
+  /* background-color: rgba(23, 184, 224, 0.6); */
+  /* background-color:  rgba(0, 0, 0, 0.274); */
+  background-color: goldenrod;
+  /* background-color: black; */
+  border-radius: 10%;
+
+  text-align: center;
+  padding: 8px;
+  height: 30%;
+}
+
+.property-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.icon {
+  color: #1890ff; /* Ant Design primary color */
+  font-size: 16px;
+}

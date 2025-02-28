@@ -1,0 +1,110 @@
+
+.img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.UserOutlined {
+  margin-right: 5px;
+}
+
+.spanTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 60%;
+  margin-left: 5%;
+  color: black;
+}
+
+.checkCircleFilled {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.buttonTag {
+  background: linear-gradient(135deg, #6243e1, #04befe);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  margin-top: 5%;
+  float: right;
+}
+
+.PropertyStyle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectedProperty {
+  display: flex;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.image2 {
+  width: 100%;
+  height: 300px;
+  object-fit: fill;
+}
+
+.rowStyle {
+  margin-bottom: 20px;
+  border: 1px solid #f0f2f5;
+  width: 100%;
+}
+
+.cardStyle3 {
+  margin-bottom: 20px;
+  border: 1px solid #f0f2f5;
+  width: 100%;
+  height: 90%;
+}
+
+.GlobalOutlined {
+  margin-right: 2px;
+}
+
+
+.empty-state3 {
+  margin-left: 15%;
+  background-image: url("https://res.cloudinary.com/ddv2y93jq/image/upload/v1726578536/ifrurqjqii5rvj1trvm3.png");
+  background-position: center;
+  position: absolute;
+  background-repeat: no-repeat;
+  width: 50%;
+  height: 50%;
+}
+
+.overlay {
+  filter:grayscale(50%);
+  position: relative;
+  overflow: hidden; 
+ }
+ 
+ .overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: 50%;
+  margin-left:30px;
+  margin-top: 50px;
+  background-image: url('https://res.cloudinary.com/ddv2y93jq/image/upload/v1726241479/sold-3-removebg-preview_f6dvcp.png'); /* URL of the Sold image */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 10; 
+  pointer-events: none; 
+ }
+
+ .ant-slider-horizontal {
+  margin-left: 29% !important;
+  width: 71% !important;
+}
