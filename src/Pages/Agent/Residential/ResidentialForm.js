@@ -7,14 +7,12 @@ import {
   TileLayer,
   Marker,
   useMapEvents,
-  Popup,
 } from "react-leaflet";
 
 import L from "leaflet";
 
 import OwnerDetails from "./OwnerDetails";
 
-import UploadPhotos from "./UploadPhotos";
 
 
 import Amenities from "./Amenities";
@@ -39,7 +37,6 @@ import { InfoCircleOutlined, DeleteOutlined, EnvironmentOutlined, UploadOutlined
 import { useTranslation } from "react-i18next";
 import CurrentLocation from "../currentLocation";
 import { FaArrowLeft } from "react-icons/fa";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
 
 

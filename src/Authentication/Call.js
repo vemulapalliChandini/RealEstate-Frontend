@@ -5,18 +5,12 @@ import {
     PhoneOutlined,
     MailOutlined,
     UserOutlined,
-    FieldTimeOutlined,
 } from "@ant-design/icons";
 import { _post } from "../Service/apiClient";
-
 const { Option } = Select;
-
 const Call = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // Use Form hook to get form instance
     const [form] = Form.useForm();
-
     const handleSubmit = async (values) => {
         try {
             const res = await _post(
@@ -39,7 +33,6 @@ const Call = () => {
             alert("An error occurred while submitting the form.");
         }
     };
-
     return (
         <div
             style={{
@@ -97,8 +90,6 @@ const Call = () => {
             >
                 Request a Call Back
             </Button>
-
-            {/* Modal from Ant Design */}
             <Modal
                 title={
                     <>
@@ -111,25 +102,7 @@ const Call = () => {
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 width={400}
-                // height={400}
-                footer={[
-                    // <Button
-                    //   key="submit"
-                    //   type="primary"
-                    //   form="contactForm"
-                    //   htmlType="submit"
-                    //   style={{
-                    //     backgroundColor: "#0d416b",
-                    //     color: "#fff",
-                    //     borderRadius: "5px",
-                    //     padding: "10px 20px",
-                    //     marginRight: "30%",
-                    //     marginTop: "-20%",
-                    //   }}
-                    // >
-                    //   Request a Call Back
-                    // </Button>,
-                ]}
+               
             >
                 <Card
                     bordered={false}
@@ -142,7 +115,7 @@ const Call = () => {
                     <Form
                         id="contactForm"
                         layout="vertical"
-                        form={form} // Attach form instance here
+                        form={form} 
                         onFinish={handleSubmit}
                         initialValues={{
                             name: "",
@@ -159,7 +132,6 @@ const Call = () => {
                         >
                             <Input prefix={<UserOutlined />} placeholder="Enter your name" />
                         </Form.Item>
-
                         <Form.Item
                             label="Phone Number"
                             name="phone"
@@ -176,7 +148,6 @@ const Call = () => {
                                 placeholder="Enter phone number"
                             />
                         </Form.Item>
-
                         <Form.Item
                             label="Email Address"
                             name="email"
@@ -187,7 +158,6 @@ const Call = () => {
                         >
                             <Input prefix={<MailOutlined />} placeholder="Enter email" />
                         </Form.Item>
-
                         <Form.Item
                             label="What Defines You Best"
                             name="roleName"
@@ -199,7 +169,6 @@ const Call = () => {
                                 <Option value="Agent">Agent</Option>
                             </Select>
                         </Form.Item>
-
                         <Form.Item
                             label="Time of Availability"
                             name="timeOfAvailability"
@@ -234,11 +203,9 @@ const Call = () => {
                     >
                         Request a Call Back
                     </Button>
-
                 </Card>
             </Modal>
         </div>
     );
 };
-
 export default Call;

@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Typography, Spin, Empty, Tag, Badge } from "antd";
+import { Row, Col, Card, Spin, Empty, Badge } from "antd";
 import { _get } from "../Service/apiClient";
-
 const { Meta } = Card;
-
-const { Title, Text } = Typography;
-
 const Options = () => {
   const [landDetails, setLandDetails] = useState([]);
-
   useEffect(() => {
     getData();
   }, []);
@@ -25,18 +20,16 @@ const Options = () => {
   };
   const formatPrice = (price) => {
     if (price >= 1_00_00_000) {
-      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
+      return (price / 1_00_00_000).toFixed(1) + "Cr"; 
     } else if (price >= 1_00_000) {
-      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
+      return (price / 1_00_000).toFixed(1) + "L"; 
     } else if (price >= 1_000) {
-      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
+      return (price / 1_000).toFixed(1) + "k"; 
     } else {
-      return price.toString(); // Display as is for smaller values
+      return price.toString();
     }
   };
-
   const badgeStyle = {
-    // backgroundColor: "#ff4d4f",
     backgroundColor: "rgb(33,101,155)",
     color: "white",
     fontSize: "20px",
@@ -48,13 +41,6 @@ const Options = () => {
     border: "solid 2px",
 
   };
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 5000); // Simulate a 2-second load
-    return () => clearTimeout(timer);
-  }, []);
-
   const keyframes = `
     @keyframes slideBackForth {
       0% {
@@ -68,10 +54,6 @@ const Options = () => {
       }
     }
   `;
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
-
   return (
     <div style={{ display: "flex" }}>
       <div style={{ display: "flex" }}>
@@ -79,7 +61,6 @@ const Options = () => {
 
         <Badge count={<span style={badgeStyle}>New Launch</span>} />
       </div>
-
       <div style={{ width: "8%", margin: "-2% 0% 0% 3%" }}>
         {landDetails.length === 0 ? (
           <div
@@ -135,46 +116,11 @@ const Options = () => {
                         >
                           {item.propertyType === "Agricultural land" && (
                             <Card
-                              // title={
-                              //   <div
-                              //     style={{
-                              //       display: "flex",
-                              //       justifyContent: "space-between",
-                              //     }}
-                              //   >
-                              //     <span
-                              //       style={{
-                              //         maxWidth: "10ch",
-                              //         overflow: "hidden",
-                              //         textOverflow: "ellipsis",
-                              //         whiteSpace: "nowrap",
-                              //         display: "inline-block",
-                              //         fontWeight: "bold",
-                              //       }}
-                              //     >
-                              //       {" "}
-                              //       {item.landDetails.title}
-                              //     </span>
-
-                              //     <Tag
-                              //       style={{
-                              //         color: "white",
-                              //         border: "none",
-                              //         marginLeft: "10px",
-                              //         marginTop: "2px",
-                              //         borderRadius: "12px",
-                              //         padding: "0 8px",
-                              //         backgroundColor: "rgb(33,101,155)",
-                              //       }}
-                              //     >
-                              //       ₹{formatPrice(item.landDetails.totalPrice)}
-                              //     </Tag>
-                              //   </div>
-                              // }
                               hoverable
                               className="card-items"
                               cover={
                                 <img
+                                alt="Agricultural Land"
                                   src={
                                     item.landDetails.images &&
                                       item.landDetails.images.length > 0
@@ -196,13 +142,12 @@ const Options = () => {
                               }
                               style={{
                                 width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Add box shadow
-                                borderRadius: "8px", // Smooth border radius
-                                transition: "transform 0.2s ease-in-out", // For hover effect
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+                                borderRadius: "8px", 
+                                transition: "transform 0.2s ease-in-out",
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                            
                             >
                               <Meta
                                 description={
@@ -229,71 +174,8 @@ const Options = () => {
                               />
                             </Card>
                           )}
-
                           {item.propertyType === "Commercial" && (
                             <Card
-                              // title={
-                              //   <div
-                              //     style={{
-                              //       display: "flex",
-                              //       justifyContent: "space-between",
-                              //     }}
-                              //   >
-                              //     <span
-                              //       style={{
-                              //         maxWidth: "10ch",
-                              //         overflow: "hidden",
-                              //         textOverflow: "ellipsis",
-                              //         whiteSpace: "nowrap",
-                              //         display: "inline-block",
-                              //         fontWeight: "bold",
-                              //       }}
-                              //     >
-                              //       {" "}
-                              //       {item.propertyTitle}
-                              //     </span>
-
-                              //     <Tag
-                              //       style={{
-                              //         color: "white",
-                              //         border: "none",
-                              //         marginLeft: "20px",
-                              //         backgroundColor: "rgb(33,101,155)",
-                              //         marginTop: "2px",
-                              //         borderRadius: "12px",
-                              //         padding: "0 8px",
-                              //       }}
-                              //     >
-                              //       {item.propertyDetails.landDetails.rent
-                              //         .totalAmount ? (
-                              //         <>
-                              //           <span>Rent: ₹</span>
-                              //           {formatPrice(
-                              //             item.propertyDetails.landDetails.rent
-                              //               .totalAmount
-                              //           )}
-                              //         </>
-                              //       ) : item.propertyDetails.landDetails.lease
-                              //           .totalAmount ? (
-                              //         <>
-                              //           <span>Lease: ₹</span>
-                              //           {formatPrice(
-                              //             item.propertyDetails.landDetails.lease
-                              //               .totalAmount
-                              //           )}
-                              //         </>
-                              //       ) : (
-                              //         <>
-                              //           <span>Sell: ₹</span>
-                              //           {formatPrice(
-                              //             item.propertyDetails.landDetails.sell
-                              //               .totalAmount
-                              //           )}
-                              //         </>
-                              //       )}
-                              //     </Tag>
-                              //   </div>
-                              // }
                               hoverable
                               className="card-items"
                               cover={
@@ -311,13 +193,12 @@ const Options = () => {
                               }
                               style={{
                                 width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Add box shadow
-                                borderRadius: "8px", // Smooth border radius
-                                transition: "transform 0.2s ease-in-out", // For hover effect
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+                                borderRadius: "8px",
+                                transition: "transform 0.2s ease-in-out", 
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                            // style={{backgroundColor:"rgb(224, 236, 243)"}}
                             >
                               <Meta
                                 description={
@@ -383,44 +264,8 @@ const Options = () => {
                               />
                             </Card>
                           )}
-
                           {item.propertyType === "Layout" && (
                             <Card
-                              // title={
-                              //   <div
-                              //     style={{
-                              //       display: "flex",
-                              //       justifyContent: "space-between",
-                              //     }}
-                              //   >
-                              //     <span
-                              //       style={{
-                              //         maxWidth: "10ch",
-                              //         overflow: "hidden",
-                              //         textOverflow: "ellipsis",
-                              //         whiteSpace: "nowrap",
-                              //         display: "inline-block",
-                              //         fontWeight: "bold",
-                              //       }}
-                              //     >
-                              //       {item.layoutDetails.layoutTitle}
-                              //     </span>
-
-                              //     <Tag
-                              //       style={{
-                              //         color: "white",
-                              //         backgroundColor: "rgb(33,101,155)",
-                              //         border: "none",
-                              //         marginLeft: "52px",
-                              //         marginTop: "2px",
-                              //         borderRadius: "12px",
-                              //         padding: "0 8px",
-                              //       }}
-                              //     >
-                              //       ₹{formatPrice(item.layoutDetails.plotPrice)}
-                              //     </Tag>
-                              //   </div>
-                              // }
                               hoverable
                               className="card-items"
                               cover={
@@ -438,9 +283,9 @@ const Options = () => {
                               }
                               style={{
                                 width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Add box shadow
-                                borderRadius: "8px", // Smooth border radius
-                                transition: "transform 0.2s ease-in-out", // For hover effect
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+                                borderRadius: "8px", 
+                                transition: "transform 0.2s ease-in-out", 
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -487,46 +332,8 @@ const Options = () => {
                               />
                             </Card>
                           )}
-
                           {item.propertyType === "Residential" && (
                             <Card
-                              // title={
-                              //   <div
-                              //     style={{
-                              //       display: "flex",
-                              //       justifyContent: "space-between",
-                              //     }}
-                              //   >
-                              //     <span
-                              //       style={{
-                              //         maxWidth: "10ch",
-                              //         overflow: "hidden",
-                              //         textOverflow: "ellipsis",
-                              //         whiteSpace: "nowrap",
-                              //         display: "inline-block",
-                              //         fontWeight: "bold",
-                              //       }}
-                              //     >
-                              //       {item.propertyDetails.apartmentName}
-                              //     </span>
-
-                              //     <Tag
-                              //       style={{
-                              //         color: "black",
-                              //         border: "none",
-                              //         marginLeft: "22px",
-                              //         marginTop: "1px",
-                              //         borderRadius: "12px",
-                              //         padding: "0 8px",
-                              //       }}
-                              //     >
-                              //       {item.propertyDetails.type}: ₹
-                              //       {formatNumberWithCommas(
-                              //         item.propertyDetails.totalCost
-                              //       )}
-                              //     </Tag>
-                              //   </div>
-                              // }
                               hoverable
                               className="card-items"
                               cover={
@@ -560,9 +367,9 @@ const Options = () => {
                               }
                               style={{
                                 width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Add box shadow
-                                borderRadius: "8px", // Smooth border radius
-                                transition: "transform 0.2s ease-in-out", // For hover effect
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+                                borderRadius: "8px", 
+                                transition: "transform 0.2s ease-in-out", 
                               }}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -573,23 +380,17 @@ const Options = () => {
                                     <Row
                                       gutter={[16, 0]}
                                       style={{
-                                        // marginBottom: "-5%",
                                         color: "#1a1918",
                                       }}
                                     >
-                                      <Col span={24}>
-                                        
+                                      <Col span={24}>                                     
                                           <strong>
                                           {item.propertyDetails.apartmentName}
-                                          </strong>{" "}
-                                        
-                                      </Col>
-                                      
+                                          </strong>{" "}                                   
+                                      </Col>                                     
                                       <Col span={24}>
-                                        <p>
-                                         
-                                            {item.address.district}
-                                          
+                                        <p>                                        
+                                            {item.address.district}                                         
                                         </p>
                                       </Col>
                                       <Col span={10} style={{color:"#0D416B"}}>
@@ -600,8 +401,7 @@ const Options = () => {
                                           </p>
                                         </p>
                                       </Col>
-                                      <Col span={14} style={{color:"#0D416B"}}>
-                                 
+                                      <Col span={14} style={{color:"#0D416B"}}>                                 
                                       ₹{formatPrice(
                                       item.propertyDetails.totalCost
                                     )}

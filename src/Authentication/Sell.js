@@ -3,11 +3,9 @@ import { Row, Col, Card, Button } from "antd";
 import Option from "./Option";
 import { useNavigate } from "react-router-dom";
 import LoginPage from "./LoginPage";
-
 const Sell = () => {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const navigate = useNavigate();
-
   const handleLoginClose = () => {
     setIsLoginVisible(false);
   };
@@ -20,13 +18,11 @@ const Sell = () => {
       setText((prev) => prev + fullText[index]);
       index += 1;
       if (index === fullText.length) {
-        clearInterval(interval); // Stop when the full text is displayed
+        clearInterval(interval); 
       }
-    }, 100); // Adjust the speed of the animation (milliseconds)
-
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    }, 100); 
+    return () => clearInterval(interval); 
   }, []);
-
   return (
     <>
       <LoginPage
@@ -34,10 +30,8 @@ const Sell = () => {
         handleLoginClose={handleLoginClose}
       />
       <Row gutter={[16, 16]}>
-        {/* Left Column: Image with Text Overlay */}
         <Col xs={24} md={24}>
           <div style={{ position: "relative", width: "100%", height: "350px" }}>
-            {/* Image */}
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLVwu6zklJzYJwUAkXsV4mqAS9Zc6dzH4RmA&s"
               alt="Dream Home"
@@ -56,12 +50,11 @@ const Sell = () => {
                 left: 0,
                 width: "100%",
                 height: "440px",
-                backgroundColor: "rgba(0, 0, 0, 0.3)", // Black color with opacity
+                backgroundColor: "rgba(0, 0, 0, 0.3)", 
                 borderRadius: "10px",
                 marginTop: "-2%",
               }}
             />
-            {/* Overlay Text */}
             <div
               style={{
                 position: "absolute",
@@ -80,9 +73,9 @@ const Sell = () => {
                   fontSize: "28px",
                   fontWeight: "bold",
                   margin: 0,
-                  whiteSpace: "nowrap", // Prevents the text from wrapping
-                  overflow: "hidden",   // Hides the overflow until it appears
-                  display: "inline-block", // Keeps the text as a block so we can manipulate it
+                  whiteSpace: "nowrap", 
+                  overflow: "hidden", 
+                  display: "inline-block", 
                 }}
               >
                 {text}
@@ -91,7 +84,6 @@ const Sell = () => {
           </div>
         </Col>
       </Row>
-
       <div style={{ padding: "20px", marginTop: "20px" }}>
         <Card
           hoverable
@@ -118,7 +110,7 @@ const Sell = () => {
               marginLeft: "40%",
               marginBottom: "2%",
             }}
-            onClick={() => navigate("/findanagent")} // Use an arrow function to pass the navigate action
+            onClick={() => navigate("/findanagent")} 
           >
             Find Agents
           </button>
@@ -126,14 +118,8 @@ const Sell = () => {
         <h1 style={{ fontWeight: "bold", marginLeft: "25%", fontSize: "40px" }}>
           Post Your Property Here in 3 Simple Steps
         </h1>
-
         <Row gutter={[16, 16]} style={{ marginLeft: "3%" }}>
-          {/* Left Column: Image */}
-
-
-          {/* Right Column: Text and Button */}
           <Col xs={5} md={8} xl={8}>
-
             <p style={{ fontSize: "18px", color: "black", marginTop: "10px", marginRight: "27%" }}>
               <b>01.Add Details Of your Property</b><br></br>
               <p>Tell us the Unique Features of the Property such that the users can attract and also all the details about your property</p>
@@ -178,10 +164,9 @@ const Sell = () => {
         </h1>
         <Option />
         <Row gutter={[16, 16]} style={{ marginTop: "5%", paddingLeft: "100px", paddingRight: "100px" }}>
-          {/* First Column */}
           <Col xs={24} md={12} style={{ position: "relative" }}>
             <img
-              src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064152/download_njkmni.jpg" // Replace with your image URL
+              src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064152/download_njkmni.jpg" 
               alt="Dream Home"
               style={{
                 width: "100%",
@@ -191,10 +176,10 @@ const Sell = () => {
                 transition: "transform 0.3s ease-in-out",
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+                e.target.style.transform = "scale(1.1)"; 
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+                e.target.style.transform = "scale(1)"; 
               }}
             />
             <div
@@ -213,7 +198,6 @@ const Sell = () => {
               <p style={{ marginBottom: "10px" }}>
                 Offering an ideal location for growth and success. Grab this opportunity to own the future.
               </p>
-
               <button
                 style={{
                   padding: "8px 15px",
@@ -231,8 +215,6 @@ const Sell = () => {
               </button>
             </div>
           </Col>
-
-          {/* Second Column */}
           <Col xs={24} md={12} style={{ position: "relative" }}>
             <img
               src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064098/modern-house_yk2s61.png" // Replace with your image URL
@@ -246,10 +228,10 @@ const Sell = () => {
 
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+                e.target.style.transform = "scale(1.1)";
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+                e.target.style.transform = "scale(1)";
               }}
             />
             <div
@@ -287,7 +269,6 @@ const Sell = () => {
           </Col>
         </Row>
         <Row gutter={[16, 16]} style={{ marginTop: "3%", paddingLeft: "100px", paddingRight: "100px" }}>
-          {/* First Column */}
           <Col xs={24} md={12} style={{ position: "relative" }}>
             <img
               src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738065207/images_3_ool8ul.jpg" // Replace with your image URL
@@ -300,10 +281,10 @@ const Sell = () => {
                 transition: "transform 0.3s ease-in-out",
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+                e.target.style.transform = "scale(1.1)";
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+                e.target.style.transform = "scale(1)";
               }}
             />
             <div
@@ -340,8 +321,6 @@ const Sell = () => {
               </button>
             </div>
           </Col>
-
-          {/* Second Column */}
           <Col xs={24} md={12} style={{ position: "relative" }}>
             <img
               src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738065241/sprawling-agricultural-farm-featuring-fields-of-crops-ai-generated-photo_osvwfp.jpg" // Replace with your image URL
@@ -355,10 +334,10 @@ const Sell = () => {
 
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+                e.target.style.transform = "scale(1.1)"; 
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+                e.target.style.transform = "scale(1)"; 
               }}
             />
             <div

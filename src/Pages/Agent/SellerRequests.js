@@ -6,7 +6,6 @@ import {
   Avatar,
   Button,
   Modal,
-  Popover,
   Empty,
   Pagination,
   Grid,
@@ -16,38 +15,27 @@ import {
   CalendarOutlined,
   PhoneOutlined,
 } from "@ant-design/icons";
-import { _post, _get, _put } from "../../Service/apiClient";
+import { _get, _put } from "../../Service/apiClient";
 import Tabs from "./AppointmentTabs";
-import { Input, Select } from "antd";
+import {  Select } from "antd";
 import { useTranslation } from "react-i18next";
 const { Option } = Select;
 const { useBreakpoint } = Grid;
 
 const SellerRequests = () => {
   const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
-  const [isAppointmentModalVisible, setIsAppointmentModalVisible] =
-    useState(false);
-
+  const { t } = useTranslation();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [isPropertyModalVisible, setIsPropertyModalVisible] = useState(false);
-  const [selectedSeller, setSelectedSeller] = useState(null);
-  const [selectedProperty, setSelectedProperty] = useState(null);
   const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState(null);
   const [detailsVisible, setDetailsVisible] = useState({});
-  const [names, setNames] = useState([]);
-  const [filteredNames, setFilteredNames] = useState([]);
   useEffect(() => {
     localStorage.setItem("form", false);
     fetchUserData(3);
   }, []);
-  const [selectedName, setSelectedName] = useState("@");
   const [selectedStatus, setSelectedStatus] = useState("@");
   const [searchLocation, setSearchLocation] = useState("");
-  const handleSelect = (value) => {
-    console.log("Selected name:", value);
-  };
+
   const fetchUserData = async (status) => {
     try {
       const response = await _get(`/booking/getbookingsbystatus/2/${status}`);
@@ -87,13 +75,6 @@ const SellerRequests = () => {
     }
   };
 
-  const handleAppointmentSubmit = (_id) => {
-    return () => {
-      updateBookingStatus(_id, 2);
-      setIsAppointmentModalVisible(false);
-      setSelectedSeller(null);
-    };
-  };
 
   const handleYesClick = (userId, _id) => {
     updateBookingStatus(_id, 1);
@@ -101,16 +82,6 @@ const SellerRequests = () => {
 
   const handleNoClick = (userId, _id) => {
     updateBookingStatus(_id, -1);
-  };
-
-  const handleCancel = () => {
-    setIsAppointmentModalVisible(false);
-    setSelectedSeller(null);
-  };
-
-  const showAppointmentModal = (seller) => {
-    setSelectedSeller(seller);
-    setIsAppointmentModalVisible(true);
   };
 
   function formatDate(dateString) {

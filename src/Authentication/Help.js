@@ -1,37 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card } from "antd";
-import Call from "./Call";
-import { Modal, Button, Input, Select, Form } from "antd";
+import {  Button, Input, Select, Form } from "antd";
 import {
     PhoneOutlined,
     MailOutlined,
     UserOutlined,
-    FieldTimeOutlined,
 } from "@ant-design/icons";
 import { _post } from "../Service/apiClient";
-
 const { Option } = Select;
 const Help = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // Use Form hook to get form instance
     const [form] = Form.useForm();
   const [text, setText] = useState('');
   const fullText = "If you have any queries.....contact us through 9898998291";
-
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
       setText((prev) => prev + fullText[index]);
       index += 1;
       if (index === fullText.length) {
-        clearInterval(interval); // Stop when the full text is displayed
+        clearInterval(interval);
       }
-    }, 100); // Adjust the speed of the animation (milliseconds)
-    
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
-
     const handleSubmit = async (values) => {
         try {
             const res = await _post(
@@ -40,12 +31,8 @@ const Help = () => {
                 "Your request has been submitted successfully!",
                 "There was an issue submitting your request."
             );
-
             if (res?.status === 200 || res?.status === 201) {
-                // Reset form fields after successful submission
                 form.resetFields();
-
-                setIsModalOpen(false);
             } else {
                 alert("There was an issue submitting your request.");
             }
@@ -57,10 +44,8 @@ const Help = () => {
     return (
         <>
          <Row gutter={[16, 16]}>
-                {/* Left Column: Image with Text Overlay */}
                 <Col xs={24} md={24}>
   <div style={{ position: "relative", width: "100%", height: "350px" }}>
-    {/* Image */}
     <img
       src="https://img.freepik.com/free-vector/tiny-real-estate-agents-with-clients-near-houses-line-growing-upwards-homes-increasing-price-buildings-constructions-flat-vector-illustration-real-estate-property-growth-concept_74855-25362.jpg"
       alt="Dream Home"
@@ -72,8 +57,6 @@ const Help = () => {
         marginTop: "-2%",
       }}
     />
-
-    {/* Black Overlay */}
     <div
       style={{
         position: "absolute",
@@ -81,13 +64,11 @@ const Help = () => {
         left: 0,
         width: "100%",
         height: "411px",
-        backgroundColor: "rgba(0, 0, 0, 0.4)", // Black color with opacity
+        backgroundColor: "rgba(0, 0, 0, 0.4)", 
         borderRadius: "10px",
         marginTop: "-2%",
       }}
     />
-
-    {/* Overlay Text */}
     <div
       style={{
         position: "absolute",
@@ -106,7 +87,6 @@ const Help = () => {
     </div>
   </div>
 </Col>
-
               </Row>
         <Row
             gutter={[16, 16]}
@@ -114,7 +94,6 @@ const Help = () => {
             align="top"
             style={{ marginTop: 100, marginLeft: 30, marginBottom: 10 }}
         >
-            {/* Card 1: Top Agents */}
             <Col span={6}>
                 <Card
                     style={{
@@ -141,7 +120,6 @@ const Help = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -156,8 +134,6 @@ const Help = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 2: Marketing Experts */}
             <Col span={6}>
                 <Card
                     style={{
@@ -185,8 +161,7 @@ const Help = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
-                            marginTop: "70%",
+                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
@@ -200,8 +175,6 @@ const Help = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 3: Top Property Listings */}
             <Col span={6}>
                 <Card
                     style={{
@@ -229,7 +202,6 @@ const Help = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -244,8 +216,6 @@ const Help = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 4: Variety of Properties */}
             <Col span={6}>
                 <Card
                     style={{
@@ -273,7 +243,6 @@ const Help = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -312,7 +281,7 @@ const Help = () => {
       backgroundColor: "#f0f0f0",
       padding: "10px",
       borderRadius: "5px",
-      width: "48%", // Adjust width to fit two items in a row
+      width: "48%", 
     }}
   >
     <p>
@@ -326,7 +295,7 @@ const Help = () => {
       backgroundColor: "#f0f0f0",
       padding: "10px",
       borderRadius: "5px",
-      width: "48%", // Adjust width to fit two items in a row
+      width: "48%",
     }}
   >
     <p>
@@ -335,9 +304,6 @@ const Help = () => {
     <p>+91-120-6637501</p>
   </div>
 </div>
-
-           
-            {/* Modal from Ant Design */}
             
                 <Card
                     bordered={false}
@@ -451,12 +417,9 @@ const Help = () => {
                     >
                         Request a Call Back
                     </Button>
-
                 </Card>
-        
         </Card>
         </>
     );
 };
-
 export default Help;

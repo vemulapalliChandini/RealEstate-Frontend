@@ -27,9 +27,7 @@ import {
 } from "@ant-design/icons";
 
 import moment from "moment";
-import { _get, _post } from "../../Service/apiClient";
-import { Span } from "@chakra-ui/react";
-import { useLocation } from 'react-router-dom';
+import { _get } from "../../Service/apiClient";
 const { Text } = Typography;
 
 const AssignedProperties = ({ selectedAgentId }) => {
@@ -39,46 +37,42 @@ const AssignedProperties = ({ selectedAgentId }) => {
     const [selectedProperties, setSelectedProperties] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [isDateFiltered, setIsDateFiltered] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("");
     const [nameSearchQuery2, setNameSearchQuery2] = useState("");
     const userId = localStorage.getItem("userId");
     const role = localStorage.getItem("role");
-    const location = useLocation();
-    const { id } = location.state || {}; // Get id from state
 
     
-
-    const fetchData = async (date) => {
-        try {
-            const endpoint = date
-                ? `/marketingAgent/assignedProperty/${userId}/${role}?assignedDate=${date}`
-                : `/marketingAgent/assignedProperty/${userId}/${role}`;
-
-            const response = await _get(endpoint);
-
-            console.log(response.data);
-            if (response?.data?.data) {
-                setProperties(response.data.data);
-            } else {
-                setProperties([]);
-                message.error("Failed to fetch properties. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error fetching properties:", error);
-            setProperties([]);
-        }
-    };
-
     useEffect(() => {
-
+        const fetchData = async (date) => {
+            try {
+                const endpoint = date
+                    ? `/marketingAgent/assignedProperty/${userId}/${role}?assignedDate=${date}`
+                    : `/marketingAgent/assignedProperty/${userId}/${role}`;
+    
+                const response = await _get(endpoint);
+    
+                console.log(response.data);
+                if (response?.data?.data) {
+                    setProperties(response.data.data);
+                } else {
+                    setProperties([]);
+                    message.error("Failed to fetch properties. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching properties:", error);
+                setProperties([]);
+            }
+        };
+    
         if (userId) {
             fetchData(selectedDate);
         } else {
             message.warning("User ID is missing. Please log in again.");
         }
-    }, [userId,selectedDate]);
+    }, [userId, selectedDate,role]);  // ✅ fetchData is removed from dependencies
+    
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -116,8 +110,7 @@ const AssignedProperties = ({ selectedAgentId }) => {
 
     const handleDateChange = (date) => {
         setSelectedDate(date ? date.format("YYYY-MM-DD") : null);
-        setIsDateFiltered(!!date); // Marks if date is selected
-    };
+        };
 
     const nameSearch2 = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : "";
     const isPropertyIdSearch = /\d/.test(nameSearch2);
@@ -150,55 +143,16 @@ const AssignedProperties = ({ selectedAgentId }) => {
             return;
         }
 
-        const selectedDetails = selectedProperties.map((id) => {
-            const property = properties.find((item) => item.propertyId === id);
-            return {
-                name: property.landTitle,
-                district: property.address.district,
-                price: property.price,
-                size: property.size,
-                imageUrl: property.images[0],
-            };
-        });
+       
 
-        const contactValue =
-            contactType === "email"
-                ? "priyabattsinghbadal@gmail.com"
-                : contactType === "whatsapp"
-                    ? "9949775665"
-                    : "default_value";
+       
 
-        const requestBody = {
-            propertyData: {
-                properties: selectedDetails,
-            },
-            customerData: {
-                name: "Sneha",
-                contactType: contactType,
-                contactValue: contactValue,
-            },
-        };
+       
 
-        const apiUrl = "/customer/shareProperty";
-        setIsLoading(true);
+     
         setLoadingMessage("Sending...");
 
-        try {
-            const response = await _post(
-                apiUrl,
-                requestBody,
-                `Properties shared successfully via ${contactType === "email" ? "Email" : "WhatsApp"
-                }!`
-            );
-            setIsLoading(false);
-
-
-        } catch (error) {
-            setIsLoading(false);
-            message.error(
-                `An error occurred while sharing properties via ${contactType}.`
-            );
-        }
+     
     };
 
     return (

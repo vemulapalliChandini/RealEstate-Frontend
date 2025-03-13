@@ -1,13 +1,6 @@
 
-
-
-
-
-
-
 import React from "react";
 import { Card } from "antd";
-
 const RealEstate = () => {
   return (
     <div
@@ -19,12 +12,6 @@ const RealEstate = () => {
         marginRight:"50%",
       }}
     >
-      {/* Common Line */}
-
-     
- 
-
-     
       {[
         {
           title: "Agriculture",
@@ -53,12 +40,10 @@ const RealEstate = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            margin: "0 20px", // Space between cards
+            margin: "0 20px", 
             zIndex: 1,
           }}
         >
-         
-          {/* Card */}
           <Card
             style={{
               width: "110px",
@@ -66,9 +51,9 @@ const RealEstate = () => {
               backgroundColor:"rgb(0, 0, 0, 0.5)",
               color:"white",
               borderRadius: "8px",
-              border: "1px solid #ddd", // Border styling
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Subtle shadow for the card
-              overflow: "hidden", // Ensure image doesn't overflow the card
+              border: "1px solid #ddd",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", 
+              overflow: "hidden", 
             }}
           >
             {" "}
@@ -77,7 +62,7 @@ const RealEstate = () => {
                 fontSize: "14px",
                 fontWeight: "bold",
                 color: "white",
-                textTransform: "capitalize", // Capitalize the text
+                textTransform: "capitalize", 
                 marginTop: "-30%",
                 fontFamily: "'Pacifico', cursive",
               }}
@@ -85,11 +70,11 @@ const RealEstate = () => {
               {card.title}
             </div>
             <img
-              src={card.imageUrl} // Use the specific image URL
-              alt={card.title} // Alt text for the image
+              src={card.imageUrl} 
+              alt={card.title}
               style={{
-                width: "210%", // Make the image cover the full width of the card
-                height: "100%", // Make the image cover the full height of the card
+                width: "210%", 
+                height: "100%",
                 objectFit: "cover",
                 marginLeft: "-40%",
               }}
@@ -100,7 +85,6 @@ const RealEstate = () => {
     </div>
   );
 };
-
 export default RealEstate;
 
 

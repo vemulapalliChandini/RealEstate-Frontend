@@ -1,16 +1,14 @@
 
 import React, { useEffect, useState } from "react";
-import { Table, Input, Space, Modal, Col, Row, Card } from "antd";
+import { Table, Input, Modal, Col, Row, Card } from "antd";
 import { _get } from "../../Service/apiClient";
 import {
     UserOutlined,
     MailOutlined,
     PhoneOutlined,
     ApartmentOutlined,
-    // WorkOutlined,
     UnorderedListOutlined,
     DollarOutlined,
-    HomeOutlined,
     CheckCircleOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
@@ -18,7 +16,6 @@ import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
-const { Search } = Input;
 
 function CustomerDetails() {
     const [customerData, setCustomerData] = useState([]);
@@ -48,7 +45,7 @@ function CustomerDetails() {
         };
 
         fetchCustomerDetails();
-    }, []);
+    }, [id]);
     const formatPhoneNumber = (phoneNumber) => {
         if (!phoneNumber) return "";
         const cleaned = phoneNumber.replace(/\D/g, ""); // Remove non-digit characters
@@ -175,12 +172,12 @@ function CustomerDetails() {
             title: "Action",
             key: "action",
             render: (_, record) => (
-                <a
+                <p
                     onClick={() => handleMoreClick(record)}
                     style={{ color: "#0d416b", cursor: "pointer" }}
                 >
                     More
-                </a>
+                </p>
             ),
             align: "center",
             onHeaderCell: () => ({

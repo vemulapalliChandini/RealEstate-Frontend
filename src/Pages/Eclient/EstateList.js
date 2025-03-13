@@ -6,9 +6,7 @@ import {
   Button,
   Spin,
   Empty,
-  Modal,
-  Grid,
-  Pagination,
+  Modal,  Pagination,
 } from "antd";
 import {
   EnvironmentOutlined,
@@ -21,9 +19,6 @@ import { _get } from "../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import EstateDetails from "./EstateDetails";
 import Agents from "./Agents";
-
-const { useBreakpoint } = Grid;
-
 const EstateList = () => {
   const { t } = useTranslation();
   const [estates, setEstates] = useState(null);
@@ -34,7 +29,6 @@ const EstateList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedData, setPaginatedData] = useState([]);
   const targetCardRef = useRef(null);
-  const screens = useBreakpoint();
 
   useEffect(() => {
     fetchEstates();

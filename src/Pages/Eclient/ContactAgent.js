@@ -6,17 +6,14 @@ import {
   Input,
   Button,
   Modal,
-  Grid,
 } from "antd";
 import moment from "moment";
 import { _post } from "../../Service/apiClient";
 import { useTranslation } from "react-i18next";
-const { useBreakpoint } = Grid;
 
 const ContactAgent = ({ isModalVis, setIsModalVis, estate, agent }) => {
   const [form] = Form.useForm();
-  const { t, i18n } = useTranslation();
-  const screens = useBreakpoint();
+  const { t } = useTranslation();
   const disablePastDates = (current) => {
     return current && current < moment().startOf("day");
   };

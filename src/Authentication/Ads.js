@@ -1,6 +1,5 @@
 import React from "react";
 import { Row, Col, Card } from "antd";
-
 const Ads = () => {
     return (
         <Row
@@ -9,7 +8,6 @@ const Ads = () => {
             align="top"
             style={{ marginTop: 100, marginLeft: 30, marginBottom: 10 }}
         >
-            {/* Card 1: Top Agents */}
             <Col span={6}>
                 <Card
                     style={{
@@ -35,7 +33,7 @@ const Ads = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -50,8 +48,6 @@ const Ads = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 2: Marketing Experts */}
             <Col span={6}>
                 <Card
                     style={{
@@ -78,7 +74,7 @@ const Ads = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
+                         
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -93,8 +89,6 @@ const Ads = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 3: Top Property Listings */}
             <Col span={6}>
                 <Card
                     style={{
@@ -121,7 +115,7 @@ const Ads = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
+                          
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -136,8 +130,6 @@ const Ads = () => {
                     </div>
                 </Card>
             </Col>
-
-            {/* Card 4: Variety of Properties */}
             <Col span={6}>
                 <Card
                     style={{
@@ -164,7 +156,7 @@ const Ads = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            //   backgroundColor: "rgba(0, 0, 0, 0.4)",
+                       
                             marginTop: "70%",
                             display: "flex",
                             justifyContent: "center",
@@ -182,5 +174,4 @@ const Ads = () => {
         </Row>
     );
 };
-
 export default Ads;

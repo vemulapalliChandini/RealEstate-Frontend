@@ -1,9 +1,7 @@
 import React from 'react';
-import { Form, Input, Button, Typography, message } from 'antd';
-import axios from "axios"
-import { _get, _post } from "./Service/apiClient";
+import { Form, Input, Button, Typography } from 'antd';
+import {  _post } from "./Service/apiClient";
 const { Title } = Typography;
-
 function ResetPassword() {
     const [form] = Form.useForm();
     const onFinish = async (values) => {
@@ -25,9 +23,6 @@ function ResetPassword() {
         } catch (error) {
         }
     };
-
-
-
     const validateConfirmPassword = ({ getFieldValue }) => ({
         validator(_, value) {
             if (!value || getFieldValue('password') === value) {

@@ -17,7 +17,7 @@ const SellerHome = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const targetCardRef = useRef(null);
   const [data, setData] = useState([]);
   useEffect(() => {
@@ -80,7 +80,7 @@ const SellerHome = () => {
       >
         <TabPane tab="Agriculture" key="agriculture">
           {data !== null && activeTab === "agriculture" ? (
-            data.length != 0 ? (
+            data.length !== 0 ? (
               <>
                 <Row gutter={16} style={{ padding: "20px", paddingTop: "0px" }}>
                   {paginatedData.map((item, index) => (
@@ -101,7 +101,7 @@ const SellerHome = () => {
                           width: "97%",
                           margin: 0,
                           boxShadow: "#c3e3f7 0px 5px 10px",
-                          border: item.status != 0 && "1px solid #979ba1",
+                          border: item.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 10 }}
                         onClick={() => handleCardClick(item)}
@@ -273,7 +273,7 @@ const SellerHome = () => {
         </TabPane>
         <TabPane tab="Commercial" key="commercial">
           {data !== null && activeTab === "commercial" ? (
-            data.length != 0 ? (
+            data.length !== 0 ? (
               <>
                 <Row gutter={16} style={{ padding: "20px", paddingTop: "0px" }}>
                   {paginatedData.map((property, index) => (
@@ -294,7 +294,7 @@ const SellerHome = () => {
                           width: "97%",
                           margin: 0,
                           boxShadow: "#c3e3f7 0px 5px 10px",
-                          border: property.status != 0 && "1px solid #979ba1",
+                          border: property.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 10 }}
                         onClick={() => handleCardClick(property)}
@@ -315,7 +315,7 @@ const SellerHome = () => {
                               {property.propertyTitle}
                             </div>
 
-                            {property.propertyDetails.uploadPics.length != 0 ? (
+                            {property.propertyDetails.uploadPics.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={property.propertyDetails.uploadPics[0]}
@@ -576,7 +576,7 @@ const SellerHome = () => {
         </TabPane>
         <TabPane tab="Layout" key="layout">
           {data !== null && activeTab === "layout" ? (
-            data.length != 0 ? (
+            data.length !== 0 ? (
               <>
                 <Row gutter={16} style={{ padding: "20px", paddingTop: "0px" }}>
                   {paginatedData.map((property) => (
@@ -597,7 +597,7 @@ const SellerHome = () => {
                           width: "97%",
                           margin: 0,
                           boxShadow: "#c3e3f7 0px 5px 10px",
-                          border: property.status != 0 && "1px solid #979ba1",
+                          border: property.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 10 }}
                         onClick={() => handleCardClick(property)}
@@ -619,7 +619,7 @@ const SellerHome = () => {
                               {property.layoutDetails.layoutTitle}
                             </div>
 
-                            {property.uploadPics.length != 0 ? (
+                            {property.uploadPics.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={property.uploadPics[0]}
@@ -787,7 +787,7 @@ const SellerHome = () => {
         </TabPane>
         <TabPane tab="Residential" key="residential">
           {data !== null && activeTab === "residential" ? (
-            data.length != 0 ? (
+            data.length !== 0 ? (
               <>
                 <Row gutter={16} style={{ padding: "20px", paddingTop: "0px" }}>
                   {paginatedData.map((product, index) => (
@@ -808,7 +808,7 @@ const SellerHome = () => {
                           width: "97%",
                           margin: 0,
                           boxShadow: "#c3e3f7 0px 5px 10px",
-                          border: product.status != 0 && "1px solid #979ba1",
+                          border: product.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 10 }}
                         onClick={() => handleCardClick(product)}
@@ -834,7 +834,7 @@ const SellerHome = () => {
                               {product.propertyDetails.apartmentName}
                             </div>
 
-                            {product.propPhotos.length != 0 ? (
+                            {product.propPhotos.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={product.propPhotos[0]}

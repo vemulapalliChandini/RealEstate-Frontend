@@ -1,21 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Layout,
   Card,
   Input,
   Row,
   Col,
   Button,
-  Carousel,
   Grid,
-  Divider,
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import LoginPage from "./LoginPage";
-import HeaderWithTabs from "./HeaderWithTabs";
-
 import NewFooter from "./NewFooter";
-import NewHeader from "./NewHeader";
 import "./Styles/LandingPageEx.css";
 import "./Styles/FooterStyle.css";
 import { Empty } from "antd";
@@ -24,49 +18,33 @@ import Options from "./Options";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faMapMarkerAlt, faRuler } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
-import img1 from "../images/landing1.jpeg";
-import img2 from "../images/landing2.jpeg";
-import img3 from "../images/landing5.jpeg";
-import img4 from "../images/landing8.jpeg";
-import RealEstate from "./RealEstate";
-
 const { Search } = Input;
-const { Meta } = Card;
-const { Content } = Layout;
 const { useBreakpoint } = Grid;
 
 const LandingPageEx = () => {
   const screens = useBreakpoint();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // State to control visibility
-
   const [searchQuery, setSearchQuery] = useState("");
   const [landDetails, setLandDetails] = useState([]);
   const [defaultLandDetails, setDefaultLandDetails] = useState([]);
-
-  // const [activeTab, setActiveTab] = useState(null);
-
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState(0);
-
+  let isVisible=true;
   const formatPrice = (price) => {
     if (price == null) {
-      return "N/A"; // Return 'N/A' or any other default value for invalid prices
+      return "N/A";
     }
-
     if (price >= 1_00_00_000) {
-      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
+      return (price / 1_00_00_000).toFixed(1) + "Cr";
     } else if (price >= 1_00_000) {
-      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
+      return (price / 1_00_000).toFixed(1) + "L"; 
     } else if (price >= 1_000) {
-      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
+      return (price / 1_000).toFixed(1) + "k"; 
     } else {
-      return price.toString(); // Display as is for smaller values
+      return price.toString(); 
     }
   };
-
   const rowRef = useRef(null);
-
   const categories = [
     t("landing.agricultural"),
     t("landing.commercial"),
@@ -74,16 +52,13 @@ const LandingPageEx = () => {
     t("landing.residential"),
     t("landing.estateManagement"),
   ];
-  const [imageUrls, setImageUrls] = useState([img1, img2, img3, img4]);
-  useEffect(() => {
+    useEffect(() => {
     fetchData();
     const interval = setInterval(() => {
       setActiveCategory((prev) => (prev + 1) % categories.length);
     }, 2000);
-
     return () => clearInterval(interval);
   }, [categories.length]);
-
   const fetchData = async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
@@ -103,13 +78,12 @@ const LandingPageEx = () => {
         console.error("Error fetching data:", error);
       });
   };
-  const handleSearch = (value) => {
-    if (rowRef.current && searchQuery != "") {
+  const handleSearch = () => {
+    if (rowRef.current && searchQuery !== "") {
       rowRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     filterImages(searchQuery);
   };
-
   const filterImages = (query) => {
     if (query.trim() === "") {
       setLandDetails(defaultLandDetails);
@@ -120,14 +94,11 @@ const LandingPageEx = () => {
       setLandDetails(filtered);
     }
   };
-
   const handleLoginClose = () => {
     setIsLoginVisible(false);
   };
-
   return (
     <>
-
       <LoginPage
         visible={isLoginVisible}
         handleLoginClose={handleLoginClose}
@@ -138,31 +109,28 @@ const LandingPageEx = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           marginTop: "-10%",
-          height: "65vh", // Ensure it covers the full height of the viewport
-          position: "relative", // To stack elements correctly
+          height: "65vh",
+          position: "relative", 
         }}
       >
-        {/* Black overlay */}
-        <div
+                <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.3)", // Black overlay with opacity
-            zIndex: 1, // Place overlay beneath content
+            backgroundColor: "rgba(0, 0, 0, 0.3)", 
+            zIndex: 1, 
           }}
         ></div>
-
-        {/* Content section that should be visible on top of the overlay */}
         <div
           style={{
             position: "relative",
-            top: "28%", // Adjust to place the content properly on the screen
+            top: "28%",
             textAlign: "center",
-            zIndex: 2, // Ensure content is above the overlay
-            color: "white", // Text color for visibility
+            zIndex: 2, 
+            color: "white",
           }}
         >
           {isVisible && (
@@ -175,7 +143,7 @@ const LandingPageEx = () => {
                 marginTop: "7%",
                 marginLeft: "35%",
                 borderRadius: "10px",
-                zIndex: 2, // Ensure content is above overlay
+                zIndex: 2,
                 flex: 1
               }}
             >
@@ -183,7 +151,7 @@ const LandingPageEx = () => {
                 id="typing-text"
                 className="typing-animation color-animation"
                 style={{
-                  color: "white", // Highlighted text color
+                  color: "white", 
                   fontSize: "33px",
                   fontWeight: "bold",
                   marginLeft: "2%",
@@ -213,17 +181,15 @@ const LandingPageEx = () => {
           )}
 
         </div>
-
-        {/* The Explore button */}
         <div
           className="options"
           style={{
             position: "relative",
-            top: "46%", // Adjust to position button properly
+            top: "40%", 
             left: "26%",
             margin: "0 auto",
             textAlign: "center",
-            zIndex: 2, // Ensure content is above overlay
+            zIndex: 2, 
           }}
         >
           <div
@@ -231,8 +197,7 @@ const LandingPageEx = () => {
             style={{
               position: "relative",
               top: "-60%",
-              // left: "31%",
-              left: "-15%",
+              left: "4%",
               margin: "0 auto",
               textAlign: "center",
               zIndex: 2,
@@ -262,18 +227,13 @@ const LandingPageEx = () => {
               ))}
             </div>
           </div>
-          {/* <div style={{ marginTop: "-8%" }}>
-      <RealEstate />
-    </div> */}
         </div>
       </div>
-      {/* <Ads /> */}
       <Card style={{ position: "relative", borderRadius: "8px", marginBottom: "10%" }}>
-        {/* Background Image Card */}
-        <div style={{ position: "relative", height: "300px" }}>
+                <div style={{ position: "relative", height: "300px" }}>
           <img
             alt="Card background"
-            src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738848138/Screenshot_from_2025-02-06_18-51-17_wnrfce.png" // Replace with your image URL
+            src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738848138/Screenshot_from_2025-02-06_18-51-17_wnrfce.png" 
             style={{
               width: "50%",
               height: "100%",
@@ -282,15 +242,14 @@ const LandingPageEx = () => {
               transform: "scaleX(-1)",
             }}
           />
-          {/* Left Side Color Overlay */}
           <div
             style={{
               position: "absolute",
               top: 0,
               left: 0,
-              width: "50%", // Takes half of the width
+              width: "50%", 
               height: "100%",
-              backgroundColor: "rgb(221 190 144 / 70%)", // Set desired color
+              backgroundColor: "rgb(221 190 144 / 70%)", 
             }}
           ></div>
           <div
@@ -298,7 +257,7 @@ const LandingPageEx = () => {
               position: "absolute",
               top: 0,
               left: 0,
-              width: "50%", // Takes half of the width
+              width: "50%", 
               height: "100%",
               fontSize: "30px",
               marginLeft: "10%",
@@ -307,8 +266,6 @@ const LandingPageEx = () => {
             }}
           ><b>Explore Our Services</b></div>
         </div>
-
-        {/* Card content on top */}
         <Card
           style={{
             position: "absolute",
@@ -316,19 +273,16 @@ const LandingPageEx = () => {
             left: "124px",
             width: "80%",
             right: 0,
-            transform: "translateY(-50%)", // Centers the card vertically
+            transform: "translateY(-50%)", 
             borderRadius: "8px",
             backgroundColor: "white",
             padding: "16px",
             height: "307px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Optional shadow for depth
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
           }}
         >
-
-          {/* Row for cards */}
           <Row gutter={[16, 16]}>
-            {/* Card 1 */}
-            <Col span={8}>
+                        <Col span={8}>
               <Card
                 hoverable
                 style={{ borderRadius: "8px", overflow: "hidden", height: "110px" }}
@@ -337,7 +291,7 @@ const LandingPageEx = () => {
                   <Col span={12}>
                     <img
                       alt="Card 1"
-                      src="https://static.99acres.com/universalhp/img/hp_commercial_buy.webp" // Replace with your image URL
+                      src="https://static.99acres.com/universalhp/img/hp_commercial_buy.webp" 
                       style={{
                         width: "100%",
                         height: "100%",
@@ -354,8 +308,6 @@ const LandingPageEx = () => {
                 </Row>
               </Card>
             </Col>
-
-            {/* Card 2 */}
             <Col span={8}>
               <Card
                 hoverable
@@ -365,7 +317,7 @@ const LandingPageEx = () => {
                   <Col span={12}>
                     <img
                       alt="Card 2"
-                      src="https://static.99acres.com/universalhp/img/hp_plot_land.webp" // Replace with your image URL
+                      src="https://static.99acres.com/universalhp/img/hp_plot_land.webp" 
                       style={{
                         width: "100%",
                         height: "100%",
@@ -382,8 +334,6 @@ const LandingPageEx = () => {
                 </Row>
               </Card>
             </Col>
-
-            {/* Card 3 */}
             <Col span={8}>
               <Card
                 hoverable
@@ -411,10 +361,7 @@ const LandingPageEx = () => {
               </Card>
             </Col>
           </Row>
-
-          {/* Row for second set of cards */}
           <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-            {/* Card 4 */}
             <Col span={8}>
               <Card
                 hoverable
@@ -441,8 +388,6 @@ const LandingPageEx = () => {
                 </Row>
               </Card>
             </Col>
-
-            {/* Card 5 */}
             <Col span={8}>
               <Card
                 hoverable
@@ -452,7 +397,7 @@ const LandingPageEx = () => {
                   <Col span={12}>
                     <img
                       alt="Card 5"
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTbTNYM5Cs2PlgZ-i9Qw_3OGBYlPhiQB3SeA&s" // Replace with your image URL
+                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTbTNYM5Cs2PlgZ-i9Qw_3OGBYlPhiQB3SeA&s"
                       style={{
                         width: "100%",
                         height: "100%",
@@ -471,24 +416,18 @@ const LandingPageEx = () => {
             </Col>
           </Row>
         </Card>
-
       </Card>
-     
       <Options />
-
       <Card style={{ position: "relative", borderRadius: "8px", marginBottom: "10%",marginTop:"7%" }}>
-        {/* Background Image Card */}
         <div style={{ position: "relative", height: "300px" }}>
-
-          {/* Left Side Color Overlay */}
           <div
             style={{
               position: "absolute",
               top: 0,
               left: 0,
-              width: "100%", // Takes half of the width
+              width: "100%", 
               height: "100%",
-              backgroundColor: "rgb(221 190 144 / 70%)", // Set desired color
+              backgroundColor: "rgb(221 190 144 / 70%)", 
             }}
           ></div>
           <div
@@ -496,7 +435,7 @@ const LandingPageEx = () => {
               position: "absolute",
               top: 0,
               left: 30,
-              width: "50%", // Takes half of the width
+              width: "50%",
               height: "100%",
               fontSize: "30px",
               marginLeft: "2%",
@@ -507,47 +446,36 @@ const LandingPageEx = () => {
           Find your dream home with our expert real estate agents. Discover properties that perfectly match your lifestyle and budget!
         </p></div>
         </div>
-
-        {/* Card content on top */}
         <Card
           style={{
             position: "absolute",
             top: "71%",
             left: "70%",
-            width: "50%", // Increased card width
-            height: "400px", // Increased card height
-            transform: "translate(-50%, -50%)", // Center both vertically and horizontally
+            width: "50%", 
+            height: "400px", 
+            transform: "translate(-50%, -50%)", 
             borderRadius: "12px",
             backgroundColor: "white",
-            padding: "0", // Removed padding for a flush image fit
+            padding: "0", 
             boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-            padding:"0px" // Slightly larger shadow for better depth
           }}
         >
           <img
             alt="Card"
-            src="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg" // Replace with your image URL
+            src="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg" 
             style={{
               width: "100%",
               height: "100%",
               maxHeight:"349px",
-              objectFit: "cover", // Ensures the image covers the card without distortion
-              borderRadius: "12px", // Same border radius as the card for a seamless look
+              objectFit: "cover",
+              borderRadius: "12px",
             }}
             onClick={() => {
               setIsLoginVisible(true);
             }}
           />
         </Card>
-
       </Card>
-
-      {/*  animations  */}
-
-
-
-
-
       <h1 style={{ marginTop: "3%", marginLeft: "1%" }}><b>Recomended Projects</b></h1>
       <Row
         ref={rowRef}
@@ -559,8 +487,7 @@ const LandingPageEx = () => {
           landDetails.map((item) => (
             <Col xs={24} sm={12} md={8} lg={6} xl={6} xxl={6}>
            <div style={{ position: "relative", display: "inline-block" }}>
-  {/* Shortlist Icon */}
-  <img
+              <img
     src="https://static.99acres.com/universalapp/img/Shortlist.png"
     alt="Shortlist"
     style={{
@@ -571,12 +498,10 @@ const LandingPageEx = () => {
       height: "35px",
       borderRadius: "50%",
       padding: "4px",
-      zIndex: 10, // Ensures it's above the card
+      zIndex: 10, 
     }}
     onClick={() => setIsLoginVisible(true)}
   />
-
-  {/* Card Component */}
   <Card
     key={item._id}
     hoverable
@@ -590,7 +515,6 @@ const LandingPageEx = () => {
     }}
   >
     <Row gutter={[16, 16]}>
-      {/* Left Column - Image */}
       <Col span={10}>
         <div style={{ height: "100%", position: "relative" }}>
           <img
@@ -612,8 +536,6 @@ const LandingPageEx = () => {
           />
         </div>
       </Col>
-
-      {/* Right Column - Details */}
       <Col span={14}>
         <div style={{ padding: "16px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
@@ -633,8 +555,6 @@ const LandingPageEx = () => {
               </p>
             </Col>
           </Row>
-
-          {/* Card Footer */}
           <Col span={24}>
             <span style={{ display: "flex", alignItems: "center", color: "black" }}>
               <FontAwesomeIcon
@@ -657,7 +577,6 @@ const LandingPageEx = () => {
         </div>
       </Col>
     </Row>
-
     <div style={{ marginTop: "16px", borderTop: "1px solid rgba(39, 38, 38, 0.2)", paddingTop: "8px" }}>
       <p style={{ margin: 0, display: "flex", alignItems: "center", color: "black", fontSize: "17px" }}>
         <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: "8px", color: "#0d416b" }} />
@@ -666,9 +585,6 @@ const LandingPageEx = () => {
     </div>
   </Card>
 </div>
-
-
-
             </Col>
           ))
         ) : (
@@ -703,8 +619,7 @@ const LandingPageEx = () => {
       )}
       <Card style={{ padding: "20px", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", width: "80%", marginLeft: "9%", marginTop: "3%", backgroundColor: "#e0ecf3", height: "390px" }}>
         <Row gutter={[16, 16]}>
-          {/* Left Column */}
-          <Col span={12}>
+                    <Col span={12}>
             <h1 style={{ marginBottom: "16px", fontSize: "35px" }}><b>Register to post your property for </b><span style={{ backgroundColor: "green", color: "white", padding: "2px 6px", borderRadius: "4px" }}>FREE</span></h1>
             <h1>10K+ Listings</h1>
             <Button style={{ marginBottom: "16px", backgroundColor: "rgb(33, 101, 155)", color: "white" }}>Post Your Property Here</Button>
@@ -721,18 +636,15 @@ const LandingPageEx = () => {
               </span>
             </p>
           </Col>
-
-          {/* Right Column */}
           <Col span={12}>
             <img
-              src="https://daganghalal.blob.core.windows.net/28193/Product/1000x1000__realestate-1642669654151.jpg" // Replace with your image URL
-              alt="Property Image"
+              src="https://daganghalal.blob.core.windows.net/28193/Product/1000x1000__realestate-1642669654151.jpg" 
+              alt="Property"
               style={{ width: "59%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
             />
           </Col>
         </Row>
       </Card>
-
       <h1 style={{ marginTop: "5%", marginLeft: "5%" }}><b>Apartments , Villas and more...</b></h1>
       <Row style={{ marginLeft: "5%" }}>
         <Col span={8} style={{ position: "relative" }}>

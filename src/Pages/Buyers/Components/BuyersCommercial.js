@@ -2,16 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import moment from 'moment';
 import {
   Card,
-  Typography,
   Row,
   Col,
   Input,
-  Spin,
   Empty,
   Tooltip,
   Tag,
   Pagination,
-  Grid,
   Skeleton,
   Button,
   Modal,
@@ -19,9 +16,6 @@ import {
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
-  HeartOutlined,
-  HeartFilled,
-  EnvironmentFilled,
   InfoCircleOutlined
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -32,19 +26,15 @@ import {
   faRuler,
   faTag,
 } from "@fortawesome/free-solid-svg-icons";
-import { _post, _get, _delete, _put } from "../../../Service/apiClient";
+import { _post, _get, _put } from "../../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import Meta from "antd/es/card/Meta";
 import { toast } from "react-toastify";
 
-const { useBreakpoint } = Grid;
 export default function GetCommercial({ filters }) {
-  const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [properties, setProperties] = useState(null);
   const [filteredProperties, setFilteredProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [agentrole, setAgentRole] = useState(null);
@@ -233,18 +223,10 @@ export default function GetCommercial({ filters }) {
     try {
       const response = await _get(`/commercials/getallcommercials`);
       console.log(response.data);
-      const productsData = response.data;
-      const initialWishlist = productsData
-        .filter((property) => property.wishStatus === 1)
-        .map((property) => property._id);
-      setWishlist(initialWishlist);
       setProperties(response.data);
       setFilteredProperties(response.data);
-      // applyFilters(filters, response.data);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching properties:", error);
-      setLoading(false);
     }
   };
 

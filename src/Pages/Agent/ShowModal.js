@@ -30,13 +30,11 @@ import {
   LayoutOutlined,
   UserOutlined,
   AppstoreOutlined,
-  CalendarOutlined,
   TagsOutlined,
   GlobalOutlined,
   BorderOuterOutlined,
   MoneyCollectOutlined,
   ThunderboltOutlined,
-  DatabaseOutlined,
   NumberOutlined,
   CompassOutlined,
   ExperimentOutlined,
@@ -57,9 +55,7 @@ import {
 import "../Agent/ShowModal.css";
 import { _get, _put, _post } from "../../Service/apiClient";
 import ShowViews from "./ShowViews";
-import { Center } from "@chakra-ui/react";
-import { SecurityOutlined, StorageOutlined, WaterOutlined } from "@mui/icons-material";
-import { PowerIcon } from "lucide-react";
+import { SecurityOutlined } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
 const { Panel } = Collapse;
@@ -87,7 +83,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
     setIsEditing(true);
   };
   const formatPrice = (price) => {
-    if (price == null) {
+    if (price === null) {
       return "N/A"; // Return 'N/A' or any other default value for invalid prices
     }
 
@@ -265,9 +261,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
     return phoneNumber;
   };
 
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
+
   const hasAgricultureImages = selectedProperty.landDetails?.images?.length > 0;
   const hasAgricultureVideo = selectedProperty?.landDetails?.videos && selectedProperty.landDetails.videos.length > 0
     ? selectedProperty.landDetails.videos[0]
@@ -555,19 +549,20 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
             className="modalComm"
           >
             <Col xs={24} sm={12} md={12} lg={12} xl={12} xxl={12}>
-            {console.log("roeleole",role)}
+              {console.log("roeleole", role)}
               <Card
                 title={
                   <>
                     Owner Details
-                    {parseInt(role) === 1 || role == 3 && (
-                      
+                    {parseInt(role) === 1 || role === 3 && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
                         style={{ marginLeft: 10, marginRight: 50 }}
                         onClick={handleEditClick}
-                      />)}
+                      />
+                    )}
+
                     {isEditing && (
                       <>
                         <Button
@@ -648,7 +643,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                 title={
                   <>
                     Amenities
-                    {role == 1 || role == 3 && (
+                    {role === 1 || role === 3 && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -768,7 +763,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                   <>
                     Address
 
-                    {role == 1 || role == 3 && (
+                    {role === 1 || role === 3 && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -915,7 +910,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                   <>
                     Land Details
 
-                    {role == 1 || role == 3 && (
+                    {role === 1 || role === 3 && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"

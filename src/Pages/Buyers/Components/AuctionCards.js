@@ -4,14 +4,7 @@ import { _get,_put } from "../../../Service/apiClient";
 import dayjs from 'dayjs';
 import {
   EnvironmentOutlined,
-  UserOutlined,
-  AppstoreOutlined,
-  PlusCircleOutlined,
-  ShopOutlined,
-  BorderInnerOutlined,
-  BorderlessTableOutlined,
-  HomeOutlined,
-  CloseOutlined,
+
   InfoCircleOutlined
 } from "@ant-design/icons";
 import moment from "moment";
@@ -19,17 +12,14 @@ import { toast } from 'react-toastify';
 const AuctionCards = ({ showModalOnLoad }) => {
   const [auctions, setAuctions] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(showModalOnLoad || false);
-  const [selectedAuction, setSelectedAuction] = useState(null);
   const [selectedProperty,setSelectedProperty]=useState(null);
   const [isAuctoonViewModalVisible,setIsAuctionViewModalVisible]=useState(false);
   const [form] = Form.useForm();
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   useEffect(() => {
     console.log("Fetching auctions...");
@@ -117,7 +107,6 @@ const AuctionCards = ({ showModalOnLoad }) => {
   };
     const handleMoneyChange = (e) => {
       const value = e.target.value;
-      setEnteredMoney(value);
       if (parseFloat(value) > backendMoney) {
         setIsSubmitDisabled(false);
       } else if (parseFloat(value) > requiredBid) {
@@ -224,13 +213,11 @@ const AuctionCards = ({ showModalOnLoad }) => {
   };
 
   const showModal = (auction) => {
-    setSelectedAuction(auction);
     setIsModalVisible(true);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    setSelectedAuction(null);
     setIsAuctionViewModalVisible(false);
     setSelectedProperty(null);
   };

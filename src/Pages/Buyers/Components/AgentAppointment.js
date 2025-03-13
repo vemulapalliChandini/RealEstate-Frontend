@@ -8,31 +8,23 @@ import {
   Spin,
   Row,
   Col,
-  Modal,
+
   Select,
   Input,
-  Popover,
-  Pagination,
-  Tooltip,
-  Grid,
+  
   Empty,
   Badge,
-  Popconfirm, Table
+  Table
 } from "antd";
 
 import {
   ArrowLeftOutlined,
-  CalendarFilled,
-  ClockCircleFilled,
-  EnvironmentFilled,
-  HomeFilled,
+ 
   MessageOutlined,
-  PhoneOutlined,
+ 
   SearchOutlined,
 } from "@ant-design/icons";
-import Bookappointment from "./BookAppointment";
 
-import axios from "axios";
 
 // chatbot file import
 import Chatbot from "../../Chatbot";
@@ -44,11 +36,10 @@ import { _delete, _get } from "../../../Service/apiClient";
 // const socket = io("http://172.17.13.106:5000"); // Backend URL
 
 const { Option } = Select;
-const { Search } = Input;
 
 const AgentAppointment = ({ path }) => {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +57,6 @@ const AgentAppointment = ({ path }) => {
 
   const [curReceiver, setCurReceiver] = useState("");
   const [userId, setUserId] = useState(null);
-  const [friendId] = useState("friendUserId");
 
   useEffect(() => {
     const socket = getSocket(); 

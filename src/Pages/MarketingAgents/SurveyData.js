@@ -2,27 +2,22 @@ import React, { useEffect, useState } from "react";
 import {
   Input,
   Table,
-  Button,
   Spin,
-  Pagination,
-  message,
-  Popover,
+
   Card,
   Row,
   Col
 } from "antd";
-import { DeleteOutlined, MailOutlined } from "@ant-design/icons";
-import { _get, _delete } from "../../Service/apiClient";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
+import { MailOutlined } from "@ant-design/icons";
+import { _get } from "../../Service/apiClient";
+import { FaWhatsapp } from "react-icons/fa";
 import { PhoneOutlined } from "@mui/icons-material";
 
 export default function SurveyData() {
   const [buyer, setBuyer] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [filteredBuyers, setFilteredBuyers] = useState([]);
@@ -37,9 +32,6 @@ export default function SurveyData() {
 
   const handlePaginationChange = (page) => {
     setCurrentPage(page);
-  };
-  const handleBackToCustomers = () => {
-    navigate("/dashboard/admin/users");
   };
   const fetchbuyers = async () => {
     setLoading(true);

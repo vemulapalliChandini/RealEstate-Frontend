@@ -1,45 +1,17 @@
-import { Avatar, Modal, Spin, Table, Tabs, Tooltip } from "antd";
-import TabPane from "antd/es/tabs/TabPane";
+import { Avatar, Modal, Spin, Table, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import { _get } from "../../Service/apiClient";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
 import { FaWhatsapp } from "react-icons/fa";
 
 const ShowViews = ({ viewProp, viewsModal, setViewsModal }) => {
-  const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState("buyerViews");
-  const [totalViews, setTotalViews] = useState(null);
-  const [totalBookings, setTotalBookings] = useState(null);
+  const [activeTab] = useState("buyerViews");
   const [totalBuyerViews, setTotalBuyerViews] = useState(null);
-  const [totalBuyerBookings, setTotalBuyerBookings] = useState(null);
-  const [bookingsCount, setBookingsCount] = useState(null);
   useEffect(() => {
-    showTotalViews();
     showBuyersViews();
-    showTotalBookings();
     showBuyersBookings();
   }, [activeTab, viewProp]);
 
-  const showTotalViews = async () => {
-    try {
-      const response = await _get(`views/totalViews/${viewProp._id}`);
-      setTotalViews(`Total Views: ${response.data}`);
-      showTotalBookings();
-    } catch (error) {
-      console.error("Error fetching total views:", error);
-    }
-  };
-
-
-  const showTotalBookings = async () => {
-    try {
-      const response = await _get(`booking/totalReqsForProp/${viewProp._id}`);
-      setTotalBookings(`${response.data}`);
-    } catch (error) {
-      console.error("Error fetching total bookings:", error);
-    }
-  };
 
 
   const showBuyersBookings = async () => {
@@ -47,7 +19,6 @@ const ShowViews = ({ viewProp, viewsModal, setViewsModal }) => {
       const response = await _get(
         `booking/reqsCountFromABuyer/${viewProp._id}`
       );
-      setTotalBuyerBookings(response.data);
     } catch (error) {
       console.error("Error fetching buyer views:", error);
       setTotalBuyerViews([]);

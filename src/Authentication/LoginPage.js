@@ -475,19 +475,13 @@ import { useNavigate } from "react-router-dom";
 import { _post, _get } from "../Service/apiClient";
 import { jwtDecode } from "jwt-decode";
 import "./Styles/FloatingLabel.css";
-import { use } from "react";
-import RoleSelection from "./RoleSelection";
-
 const LoginPage = ({ visible, handleLoginClose }) => {
   const [otpCheck, setOtpCheck] = useState("");
   const [password, setPassword] = useState("");
   const [count, setCount] = useState(120);
-  const [twillioOtp, setTwillioOtp] = useState(null);
   const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const [isLoginVisible, setIsLoginVisible] = useState(true);
-  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
-  const [isOtpButtonDisabled, setIsOtpButtonDisabled] = useState(false);
   const [newLanguage, setNewLanguage] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [AfterValidation, setafterValidation] = useState("otp");
@@ -501,8 +495,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
   const usernameRef = useRef(null);
   const [isAgent, setIsAgent] = useState(false);
   useEffect(() => {
-    console.log("awedwsdweklrdjweru3wer")
-    console.log(role);
     if (usernameRef.current) {
       usernameRef.current.focus();
     }
@@ -516,14 +508,8 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         setResendOTP(true);
       }
     }
-
   }, [count]);
   let role = 0;
-  useEffect(() => {
-
-    console.log(isAgent);
-  }, [role])
-
   const navigate = useNavigate();
 
   const cleaninginputError = () => {
@@ -548,8 +534,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         `${t("login.Login Failed")}`
       );
     }
-
-
     endpoint
       .then((res) => {
         setResendOTP(false);
@@ -563,11 +547,7 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         const phoneNumber = decoded.user.phoneNumber;
         const profilePicture = decoded.user.profilePicture;
         const name = `${decoded.user.firstName} ${decoded.user.lastName}`;
-        console.log(role);
-        console.log(isAgent);
-
         localStorage.setItem("role", role);
-
         localStorage.setItem("agentrole", 0);
         localStorage.setItem("name", name);
         localStorage.setItem("userId", decoded.user.userId)
@@ -580,22 +560,7 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         if (role !== 1) {
           handleLoginClose();
         }
-        // navigate(
-        // `/dashboard/${
-        // role === 3
-        // ? "buyer"
-        // : role === 1
-        // ? "agent"
-        // : role === 4
-        // ? "eClient"
-        // : role === 0
-        // ? "admin"
-        // :"seller"
-        // }`
-        // );
-       
-
-        if(role !=1){
+        if(role !==1){
           navigate(
             `/dashboard/${role === 3
               ? "buyer"
@@ -616,7 +581,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
           console.log("sihsiwh")
           navigate("/dashboard")
         }
-
       })
       .catch((error) => {
         if (AfterValidation !== "otp") {
@@ -628,13 +592,10 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         }
       });
   };
-  const [selectedAgentRole, setSelectedAgentRole] = useState(""); // State for storing selected role
-
+  const [selectedAgentRole, setSelectedAgentRole] = useState("");
   const handleSubmit = () => {
-    
     if (selectedAgentRole) {
-      localStorage.setItem("agentrole", selectedAgentRole); // Store the selected agent role in localStorage
-   
+      localStorage.setItem("agentrole", selectedAgentRole);
     }
     if(selectedAgentRole === 11){
       localStorage.setItem("agentrole", 11);
@@ -650,17 +611,13 @@ const LoginPage = ({ visible, handleLoginClose }) => {
       setResendOTP(false);
     }
     const emailRegex = /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
-
     const phoneRegex = /^\d{10}$/;
-
     if (phoneRegex.test(inputValue)) {
       _get(`verifyPhno/${inputValue}`)
         .then((response) => {
-
           if (response.status === 200) {
             setBeforeValidation(true);
             setafterValidation("otp");
-
             setCount(120);
           }
           _post(
@@ -669,10 +626,8 @@ const LoginPage = ({ visible, handleLoginClose }) => {
             `${t("login.Otp Sent Successfully")}`,
             `${t("login.Failed to send OTP")}`
           )
-            .then((res) => {
-              setTwillioOtp(res.data.smsResponse.code);
-            })
-            .catch(() => { });
+            
+            
         })
         .catch((error) => {
           console.error(error);
@@ -681,11 +636,9 @@ const LoginPage = ({ visible, handleLoginClose }) => {
     } else if (emailRegex.test(inputValue)) {
       _get(`verifyEmail/${inputValue}`)
         .then((response) => {
-
           if (response.status === 200) {
             setBeforeValidation(true);
             setafterValidation("password");
-
           }
         })
         .catch((error) => {
@@ -700,14 +653,10 @@ const LoginPage = ({ visible, handleLoginClose }) => {
       }
     }
   };
-
   const showRegisterModal = () => {
-    setIsOtpButtonDisabled(false);
     setIsLoginVisible(false);
-    setIsRegisterModalVisible(true);
     form.resetFields();
   };
-
   const handleLoginCancel = () => {
     setResendOTP(false);
     setInputError("");
@@ -718,40 +667,31 @@ const LoginPage = ({ visible, handleLoginClose }) => {
     setBeforeValidation(false);
     form.resetFields();
     handleLoginClose();
-    setIsOtpButtonDisabled(false);
   };
-
   const handleRegisterCancel = () => {
     form.resetFields();
     setIsLoginVisible(true);
-    setIsRegisterModalVisible(false);
     handleLoginClose();
-    setIsOtpButtonDisabled(false);
   };
   const changeLanguage = (checked) => {
     let x = checked ? "te" : "en";
     i18n.changeLanguage(x);
     setNewLanguage(x);
   };
-
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds
       }`;
   };
-
   const resending = () => {
     setOtpCheck("");
     setPassword("");
     setPasswordError("");
     setOtpButtonDisable(true);
     setInputError("");
-
     form.resetFields();
-
     setResendOTP(false);
-
     _post(
       "/otp",
       { phoneNumber: inputValue },
@@ -764,7 +704,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
 
     setCount(120);
   };
-
   return (
     <>
       <Modal
@@ -793,8 +732,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
             style={{ marginLeft: "2%" }}
           />
         </div>
-
-
         {isLoginVisible ? (
           <Row>
             <Col xs={24}>
@@ -882,7 +819,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                         ) : (
                           <p></p>
                         )}
-
                         {!resendOTP ? (
                           <p style={{ textAlign: "center" }}>
                             {formatTime(count)}
@@ -897,7 +833,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                           </Button>
                         )}
                       </Form.Item>
-
                       <Button
                         onClick={passwordVerifivation}
                         disabled={otpButtonDisable}
@@ -911,7 +846,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                   </>
                 ) : !isAgent ? (
                   <>
-
                     <Form.Item name="logemail">
                       <Input.Password ref={usernameRef}
                         value={password}
@@ -927,15 +861,13 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                         className="custom-input"
                       />
                     </Form.Item>
-
-                    {emailPasswordError != "" ? (
+                   {emailPasswordError !== "" ? (
                       <p style={{ color: "red", textAlign: "center" }}>
                         {emailPasswordError}
                       </p>
                     ) : (
                       <p></p>
                     )}
-
                     <Form.Item
                       style={{ textAlign: "center" }}
                       name="emailsubmit"
@@ -957,17 +889,15 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                       <Radio.Group
                         value={selectedAgentRole}
                         onChange={(e) => setSelectedAgentRole(e.target.value)} 
-                       // Update the state with selected value
                        style={{marginLeft:"2%"}}
                       >
                         <Radio value={11}  >Buyer's Agent</Radio>
                         <Radio value={12}>Seller's Agent</Radio>
                       </Radio.Group>
                     </Form.Item>
-
                     <Form.Item style={{ textAlign: "center" }} name="agentSubmit">
                       <Button
-                        onClick={handleSubmit} // Handle the submit logic
+                        onClick={handleSubmit} 
                         type="primary"
                         htmlType="submit"
                         style={{ width: "50%" }}
@@ -976,9 +906,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                       </Button>
                     </Form.Item>
                   </>
-
-
-
                 )}
               </Form>
             </Col>
@@ -986,13 +913,10 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         ) : (
           <Registration
             setIsLoginVisible={setIsLoginVisible}
-            setIsRegisterModalVisible={setIsRegisterModalVisible}
           />
         )}
-
       </Modal>
     </>
   );
 };
-
 export default LoginPage;

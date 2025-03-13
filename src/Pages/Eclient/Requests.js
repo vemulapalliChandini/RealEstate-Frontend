@@ -9,7 +9,6 @@ import {
   Avatar,
   Pagination,
   Select,
-  Grid,
 } from "antd";
 import {
   PhoneOutlined,
@@ -18,15 +17,14 @@ import {
   ClockCircleFilled,
   CalendarFilled,
 } from "@ant-design/icons";
-import { _delete, _get, _post, _put } from "../../Service/apiClient";
+import {  _get} from "../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
-const { useBreakpoint } = Grid;
 
 const Requests = () => {
   const [filteredData, setFilteredData] = useState(null);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [requests, setRequests] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchLocation, setSearchLocation] = useState("all");
@@ -360,7 +358,6 @@ const Requests = () => {
                               background: "orange",
                               border: "none",
                               padding: "4px 10px",
-                              borderRadius: "7px",
                               fontWeight: "bold",
                               position: "absolute",
                               transform: "translateX(-50%)",
@@ -419,7 +416,6 @@ const Requests = () => {
                                 "linear-gradient(135deg, #00c853, #b2ff59)",
                               border: "none",
                               padding: "4px 10px",
-                              borderRadius: "7px",
                               fontWeight: "bold",
                               position: "absolute",
                               transform: "translateX(-50%)",
@@ -479,7 +475,6 @@ const Requests = () => {
                                 "linear-gradient(135deg, #ff5252, #ff1744)",
                               border: "none",
                               padding: "4px 10px",
-                              borderRadius: "7px",
                               fontWeight: "bold",
                               position: "absolute",
                               transform: "translateX(-50%)",

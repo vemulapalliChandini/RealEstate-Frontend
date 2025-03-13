@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Spin, Input, Empty, Card, Row, Col } from "antd";
 import { _get } from "../../Service/apiClient";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -10,12 +10,9 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { FaArrowLeft } from "react-icons/fa";
-import { border } from "@chakra-ui/react";
 
 const PropertyAssociation = () => {
     const { propertyId } = useParams();
-    const location = useLocation();
-    const propertyName = location.state?.propertyName;
     const navigate = useNavigate();
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);

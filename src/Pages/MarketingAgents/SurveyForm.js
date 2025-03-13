@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Select, Radio, InputNumber, Row, Col, Card } from "antd";
-import { _get, _post } from "../../Service/apiClient";
-import { Description } from "@mui/icons-material";
+import { Form, Input, Button, Select, Radio, Row, Col, Card } from "antd";
+import { _post } from "../../Service/apiClient";
 const { Option } = Select;
 
 const SurveyForm = () => {

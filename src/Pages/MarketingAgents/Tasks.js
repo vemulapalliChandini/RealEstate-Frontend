@@ -7,8 +7,6 @@ import {
     Col,
     Typography,
     Progress,
-    Button,
-    message,
     Input,
 } from "antd";
 import {
@@ -20,7 +18,7 @@ import {
 } from "react-icons/fa";
 import { MdLocalPrintshop } from "react-icons/md";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const Tasks = () => {
     const [tasks, setTasks] = useState([
@@ -131,8 +129,6 @@ const Tasks = () => {
                                 // backgroundColor: "rgba(173, 216, 230, 0.3)",
                                 border: "1px solid rgba(255, 255, 255, 0.2)",
                                 backgroundColor: "rgba(159, 159, 167, 0.23)",
-
-                                border: "1px solid rgba(82, 108, 130)", // Border with slight transparency
                             }}
                         >
                             <div style={{ marginBottom: "10px" }}>

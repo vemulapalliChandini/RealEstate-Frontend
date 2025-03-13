@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Tabs, Card, Row, Col, Button } from "antd";
-import { HomeOutlined, CustomerServiceOutlined } from "@ant-design/icons";
 import Call from "./Call";
 import { useTranslation } from "react-i18next";
-
 const { TabPane } = Tabs;
-
 const TabContent = ({ title, content, isVisible }) => {
-
   return (
     isVisible && (
       <Card
@@ -47,89 +43,50 @@ const TabContent = ({ title, content, isVisible }) => {
     )
   );
 };
-
 const HeaderWithTabs = ({ setIsVisible }) => {
-
-
-
   const { t, i18n } = useTranslation();
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") || 'en';
     i18n.changeLanguage(savedLanguage);
   }, [i18n]);
-
-
-
-
   const [hoveredTab, setHoveredTab] = useState(null);
-
   const [isIconClicked, setIsIconClicked] = useState(false);
-
-  const [issIconClicked, setIssIconClicked] = useState(false);
-
-
-  const containerRef = useRef(null); // Ref for the component
-
+  const containerRef = useRef(null); 
   const [activeTab, setActiveTab] = useState(null);
-
-  const [isBackButtonVisible, setIsBackButtonVisible] = useState(false); // State for back button visibility
-
-
-
+  const [isBackButtonVisible, setIsBackButtonVisible] = useState(false); 
   const handleTabChange = (key) => {
     setActiveTab(key);
-    setIsVisible(false); // Hide "Find Your Dream Property" on tab click
-    setIsBackButtonVisible(true); // Show back button when a tab is active
-
+    setIsVisible(false); 
+    setIsBackButtonVisible(true); 
   };
-
   const handleTabHover = (key) => {
     setHoveredTab(key);
   };
-
   const handleTabLeave = () => {
     setHoveredTab(null);
   };
-
   const handleIconClicks = () => {
     setIsIconClicked((prev) => !prev);
   };
-
-
-
-
-
   const handleIconClick = () => {
-    setIsIconClicked(false); // Close Call component
-    setIsVisible(true); // Show "Find Your Dream Property"
-    setActiveTab(null); // Reset active tab
-    setIsBackButtonVisible(false); // Hide back button when returning to the initial state
-
+    setIsIconClicked(false); 
+    setIsVisible(true); 
+    setActiveTab(null);
+    setIsBackButtonVisible(false);
   };
-
-
-
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setIsIconClicked(false);
         setActiveTab(null);
-        setIsBackButtonVisible(false); // Reset back button visibility on outside click
-
+        setIsBackButtonVisible(false); 
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
-
-
-
   return (
     <div style={{ padding: "0px", marginTop: "-7%" }} ref={containerRef}>
       <div
@@ -155,11 +112,8 @@ const HeaderWithTabs = ({ setIsVisible }) => {
           }}
         />
        <h2 style={{ color: "white" }}>{t("help.Help")}</h2> 
-        {/* Cross Symbol */}
       </div>
-
       {isIconClicked && <Call />}
-
       <Tabs
         activeKey={activeTab}
         onChange={handleTabChange}
@@ -198,28 +152,23 @@ const HeaderWithTabs = ({ setIsVisible }) => {
             <Col span={7}>
               <TabContent
                 title={t("headerdata.BUY")}
-                // content="Flats, Builder Floors, Independent House, Studio Apartments"
                 isVisible={activeTab === "1" || hoveredTab === "1"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.POPULAR")}
-                // content="Property in Western Mumbai, Verified Properties"
                 isVisible={activeTab === "1" || hoveredTab === "1"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.INTRODUCING")}
-                // content="Insights, Resident Reviews, Price Trends"
                 isVisible={activeTab === "1" || hoveredTab === "1"}
               />
             </Col>
           </Row>
         </TabPane>
-
-        {/* Tab for Tenants */}
         <TabPane
           tab={
             <span
@@ -241,36 +190,31 @@ const HeaderWithTabs = ({ setIsVisible }) => {
             <Col span={7}>
               <TabContent
                 title={t("headerdata.Rent")}
-                // content="Flats, Independent House, Studio Apartments"
                 isVisible={activeTab === "2" || hoveredTab === "2"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.SEARCHES")}
-                // content="Rent property in Western Mumbai, Verified Properties"
                 isVisible={activeTab === "2" || hoveredTab === "2"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.Insights")}
-                // content="Insights, Reviews, Price Trends"
                 isVisible={activeTab === "2" || hoveredTab === "2"}
               />
             </Col>
           </Row>
         </TabPane>
-
-        {/* Tab for Dealers/Builders */}
         <TabPane
           tab={
             <span
               style={{
                 backgroundColor: activeTab === "3" ? "#0d416b" : "",
-                borderRadius: "8px", // Rounded corners for the tab
-                padding: "8px 16px", // Padding inside the tab
-                color: activeTab === "3" ? "#fff" : "white", // White text for active tab
+                borderRadius: "8px",
+                padding: "8px 16px",
+                color: activeTab === "3" ? "#fff" : "white", 
               }}
             >
               <strong>{t("header.Dealers/Builders")}</strong>
@@ -284,38 +228,30 @@ const HeaderWithTabs = ({ setIsVisible }) => {
             <Col span={7}>
               <TabContent
                 title={t("headerdata.Dealer")}
-                // content="Post Property, Dealer Services"
                 isVisible={activeTab === "3" || hoveredTab === "3"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.RESEARCH")}
-                // content="Email us at services"
                 isVisible={activeTab === "3" || hoveredTab === "3"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.RESEARCH")}
-                // content="Email us at services"
                 isVisible={activeTab === "3" || hoveredTab === "3"}
               />
             </Col>
           </Row>
         </TabPane>
-
-        {/* Tab for Agents */}
         <TabPane
           tab={
             <span
               style={{
                 backgroundColor: activeTab === "4" ? "#0d416b" : "",
-
                 borderRadius: "8px",
-
                 padding: "8px 16px",
-
                 color: activeTab === "4" ? "#fff" : "white",
               }}
             >
@@ -330,28 +266,24 @@ const HeaderWithTabs = ({ setIsVisible }) => {
             <Col span={7}>
               <TabContent
                 title={t("headerdata.AGENT")}
-                // content="Insights on properties, grow your business"
                 isVisible={activeTab === "4" || hoveredTab === "4"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.TOOLS")}
-                // content="Discover tools, marketing resources"
                 isVisible={activeTab === "4" || hoveredTab === "4"}
               />
             </Col>
             <Col span={7}>
               <TabContent
                 title={t("headerdata.RESOURCES")}
-                // content="Discover tools, marketing resources"
                 isVisible={activeTab === "4" || hoveredTab === "4"}
               />
             </Col>
           </Row>
         </TabPane>
       </Tabs>
-      {/* Back Button */}
       {isBackButtonVisible && (
         <span
           style={{

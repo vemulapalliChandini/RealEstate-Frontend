@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Layout,
   Card,
   Input,
   Row,
@@ -12,10 +11,6 @@ import {
 import { SearchOutlined } from "@ant-design/icons";
 import LoginPage from "./LoginPage";
 import HeaderWithTabs from "./HeaderWithTabs";
-
-
-import NewFooter from "./NewFooter";
-import NewHeader from "./NewHeader";
 import "./Styles/LandingPage.css";
 import "./Styles/FooterStyle.css";
 import { Empty } from "antd";
@@ -28,53 +23,33 @@ import img1 from "../images/landing1.jpeg";
 import img2 from "../images/landing2.jpeg";
 import img3 from "../images/landing5.jpeg";
 import img4 from "../images/landing8.jpeg";
-
 const { Search } = Input;
 const { Meta } = Card;
-const { Content } = Layout;
 const { useBreakpoint } = Grid;
-
-
-
 const LandingPage = () => {
   const screens = useBreakpoint();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // State to control visibility
-
+  const [isVisible, setIsVisible] = useState(true); 
   const [searchQuery, setSearchQuery] = useState("");
   const [landDetails, setLandDetails] = useState([]);
   const [defaultLandDetails, setDefaultLandDetails] = useState([]);
-
-  // const [activeTab, setActiveTab] = useState(null);
-
-
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState(0);
 
   const formatPrice = (price) => {
     if (price == null) {
-      return "N/A"; // Return 'N/A' or any other default value for invalid prices
+      return "N/A"; 
     }
-
     if (price >= 1_00_00_000) {
-      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
+      return (price / 1_00_00_000).toFixed(1) + "Cr"; 
     } else if (price >= 1_00_000) {
-      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
+      return (price / 1_00_000).toFixed(1) + "L"; 
     } else if (price >= 1_000) {
-      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
+      return (price / 1_000).toFixed(1) + "k"; 
     } else {
-      return price.toString(); // Display as is for smaller values
+      return price.toString(); 
     }
   };
-
-
-
-
-
-
-
-
-
   const rowRef = useRef(null);
   const categories = [
     t("landing.agricultural"),
@@ -83,7 +58,7 @@ const LandingPage = () => {
     t("landing.residential"),
     t("landing.estateManagement"),
   ];
-  const [imageUrls, setImageUrls] = useState([img1, img2, img3, img4]);
+  const [imageUrls] = useState([img1, img2, img3, img4]);
   useEffect(() => {
     fetchData();
     const interval = setInterval(() => {
@@ -110,13 +85,12 @@ const LandingPage = () => {
         console.error("Error fetching data:", error);
       });
   };
-  const handleSearch = (value) => {
-    if (rowRef.current && searchQuery != "") {
+  const handleSearch = () => {
+    if (rowRef.current && searchQuery !== "") {
       rowRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     filterImages(searchQuery);
   };
-
   const filterImages = (query) => {
     if (query.trim() === "") {
       setLandDetails(defaultLandDetails);
@@ -127,30 +101,16 @@ const LandingPage = () => {
       setLandDetails(filtered);
     }
   };
-
   const handleLoginClose = () => {
     setIsLoginVisible(false);
   };
  
   return (
     <>
-      {/* <NewHeader
-        setIsLoginVisible={setIsLoginVisible}
-        isLoginVisible={isLoginVisible}
-      /> */}
-   
         <LoginPage
           visible={isLoginVisible}
           handleLoginClose={handleLoginClose}
         />
-
-        {/* <Content
-          style={{
-            marginTop: "30px",
-          }}
-        > */}
-
-          {/* ffff */}
           <div className="background">
 
             <Carousel autoplay dots={false} infinite={true}>
@@ -171,14 +131,12 @@ const LandingPage = () => {
                       width: "100%",
                       height: screens.xs ? "330px" : "450px",
                       objectFit: "cover",
-                      filter: index === 1 ? "grayscale(40%)" : "none", // Apply grayscale to the first image
+                      filter: index === 1 ? "grayscale(40%)" : "none", 
                     }}
                   />
                 </div>
               ))}
-            </Carousel>;
-            {/* chcek1 */}
-            {/* Conditional Rendering for "Find Your Dream Property" */}
+            </Carousel>   
             <div
               style={{
                 position: "relative",
@@ -189,63 +147,6 @@ const LandingPage = () => {
               }}
             >
               <HeaderWithTabs setIsVisible={setIsVisible} />
-
-              {/* <div
-                style={{
-                  backgroundColor: "rgba(0, 0, 0, 0.6)",
-                  padding: "20px",
-                  maxWidth: screens.xs ? "230px" : "450px",
-                  margin: "0 auto",
-                  borderRadius: "10px",
-                  boxSizing: "border-box",
-                }}
-              >
-                <div
-                  style={{
-                    marginLeft: "8%",
-                    fontSize: screens.xs ? "0.6rem" : "1.1rem",
-                  }}
-                >
-                  <h1
-                    id="typing-text"
-                    className="typing-animation color-animation"
-                  >
-                    {t("landing.findYourDreamProperty")}
-                  </h1>
-                </div>
-                <div className="searchbar">
-                  <Search
-                    style={{
-                      width: "70%",
-                    }}
-                    placeholder={t("landing.searchPlaceholder")}
-                    allowClear
-                    icon={SearchOutlined}
-                    size="large"
-                    className="landingSearch"
-                    value={searchQuery}
-                    onSearch={handleSearch}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                    }}
-                  />
-                </div>
-              </div>  */}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div>
             {isVisible && (
               <div
@@ -292,16 +193,11 @@ const LandingPage = () => {
                 </div>
               </div>
             )}
-
-
-            {/* chcek1 */}
-
             <div
               className="options"
               style={{
                 position: "relative",
                 top: "-60%",
-                // left: "31%",
                 left: "26%",
                 margin: "0 auto",
                 textAlign: "center",
@@ -314,7 +210,6 @@ const LandingPage = () => {
               >
                 {categories[activeCategory]}
               </button>
-
               <div className="multi-option-buttons">
                 {categories.map((category, index) => (
                   <button
@@ -333,12 +228,7 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-
-          {/* <h1>hello </h1> */}
           <Options />
-
-          {/* <Ads /> */}
-
           <Row
             ref={rowRef}
             className="cards-container"
@@ -375,24 +265,6 @@ const LandingPage = () => {
                             setIsLoginVisible(true);
                           }}
                         />
-
-                        {/* <div
-className="price-tag"
-style={{
-position: "absolute",
-top: "10px",
-left: "12px",
-right: "40px",
-backgroundColor: "#329da8",
-color: "white",
-padding: "5px 16px",
-borderRadius: "5px",
-}}
->
-₹{formatNumberWithCommas(item.price)}
-</div> */}
-
-
                         <div
                           className="price-tag"
 
@@ -511,9 +383,6 @@ borderRadius: "5px",
               </Button>
             </div>
           )}
-        {/* </Content>
-      </Layout>
-      <NewFooter /> */}
     </>
   );
 };

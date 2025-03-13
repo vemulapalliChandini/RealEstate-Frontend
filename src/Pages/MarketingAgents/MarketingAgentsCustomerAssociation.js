@@ -26,15 +26,13 @@ import { _get, _post } from "../../Service/apiClient";
 import { FaWhatsapp } from "react-icons/fa";
 
 import {
-    DeleteOutlined,
-    EllipsisOutlined,
+ 
     MoreOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import ShowModal from "../Agent/ShowModal";
 import { FaArrowLeft } from "react-icons/fa";
-import { border } from "@chakra-ui/react";
 const { Option } = Select;
 
 const MarketingAgentsCustomerAssociation = () => {
@@ -393,13 +391,9 @@ const MarketingAgentsCustomerAssociation = () => {
                 },
             }),
         },
-
-
-
         {
             title: "Action",
             key: "action",
-            align: "center",
             render: (_, record) => {
                 const menu = (
                     <Menu>

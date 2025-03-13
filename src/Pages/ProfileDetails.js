@@ -6,9 +6,7 @@ import {
   Card,
   Row,
   Col,
-  notification,
   Spin,
-  Tooltip,
   Progress,
   Modal,
   Popover,
@@ -37,7 +35,7 @@ const ProfileDetails = () => {
   const [initialValues, setInitialValues] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [userTitle, setUserTitle] = useState("");
@@ -65,7 +63,7 @@ const ProfileDetails = () => {
         setInitialValues(initial);
         form.setFieldsValue(initial);
         setProfilePhoto(data.profilePicture || defaultProfilePhoto);
-        setSelectedFileName(data.profilePicture != "" ? true : false);
+        setSelectedFileName(data.profilePicture !== "" ? true : false);
         console.log(selectedFileName);
         const title = data.firstName + " " + data.lastName;
         setUserTitle(title);
@@ -73,7 +71,7 @@ const ProfileDetails = () => {
       .catch((error) => {
         console.error("Error fetching profile data:", error);
       });
-  }, [isEditing]);
+  }, [isEditing,form,selectedFileName]);
   const formatPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return "";
     const cleaned = phoneNumber.replace(/\D/g, "");
@@ -113,9 +111,7 @@ const ProfileDetails = () => {
   };
 
   const handleUpdate = async (values) => {
-    const tokenData = localStorage.getItem(
-      `token${localStorage.getItem("role")}`
-    );
+  
     const updatedData = {
       firstName: values.firstName,
       lastName: values.lastName,
@@ -193,8 +189,6 @@ const ProfileDetails = () => {
       (hasPasswordChange && passwordsMatch)
     );
   };
-
-  const [tooltipVisible, setTooltipVisible] = useState(false);
   return (
     <>
       <Modal
@@ -500,7 +494,7 @@ const ProfileDetails = () => {
                               rules={[
                                 {
                                   pattern:
-                                    /^(?=[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Z][A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{7,14}$/,
+/^(?=[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};:'"\\|,.<>/?])[A-Z][A-Za-z\d!@#$%^&*()_+\-=[\]{};:'"\\|,.<>/?]{7,14}$/,
                                   message: "please Enter Strong Password",
                                 },
                               ]}
@@ -508,8 +502,6 @@ const ProfileDetails = () => {
                               <Input.Password
                                 onChange={(e) => setShowConfirmPassword(!!e.target.value)}
                                 placeholder={t("profile.enterNewPass")}
-                                onFocus={() => setTooltipVisible(true)}
-                                onBlur={() => setTooltipVisible(false)}
                               />
                             </Form.Item>
                           </Col>

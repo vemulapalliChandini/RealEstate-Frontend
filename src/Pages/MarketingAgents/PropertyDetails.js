@@ -1,17 +1,13 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Table, Input, Space, Modal, Row, Col,Card } from "antd";
+import { Table, Input, Row, Col,Card } from "antd";
 import { _get } from "../../Service/apiClient";
 import { useParams } from "react-router-dom";
 import ShowModal from "../Agent/ShowModal";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { SearchOutlined } from "@mui/icons-material";
-import { MoneyCollectOutlined } from "@ant-design/icons";
-
-const { Search } = Input;
-
 function PropertyDetails() {
     const { id } = useParams();
     const [propertyData, setPropertyData] = useState([]);
@@ -19,7 +15,6 @@ function PropertyDetails() {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const navigate = useNavigate();
@@ -339,12 +334,12 @@ function PropertyDetails() {
             title: "Action",
             key: "activity",
             render: (_, record) => (
-                <a
+                <p
                     onClick={() => handleMoreClick(record)} // Open the modal on click
                     style={{ color: "#0d416b", cursor: "pointer" }}
                 >
                     More
-                </a>
+                </p>
             ),
             align: "center",
             onHeaderCell: () => ({

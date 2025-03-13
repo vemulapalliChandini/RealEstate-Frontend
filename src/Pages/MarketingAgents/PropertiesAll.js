@@ -4,7 +4,6 @@ import {
     Col,
     Card,
     Empty,
-    Button,
     message,
     Pagination,
     Select,
@@ -15,9 +14,8 @@ import { FaWhatsapp } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRuler, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import { _get, _post } from "../../Service/apiClient";
+import { _get,  } from "../../Service/apiClient";
 import Meta from "antd/es/card/Meta";
-import { useNavigate } from "react-router-dom";
 import ShowModal from "../Agent/ShowModal";
 
 const { Option } = Select;
@@ -27,16 +25,12 @@ function PropertiesAll() {
     const [filteredProperties, setFilteredProperties] = useState([]);
     const [selectedProperties, setSelectedProperties] = useState(new Set());
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedType, setSelectedType] = useState("All");
     const [searchLocation, setSearchLocation] = useState("");
     const [searchAgent, setSearchAgent] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
-    const [data, setData] = useState(null);
-
     const itemsPerPage = 8;
     const rowRef = useRef(null);
-    const navigate = useNavigate();
 
     const Id = localStorage.getItem("userId");
 
@@ -73,11 +67,8 @@ function PropertiesAll() {
             return updatedSet;
         });
     };
-
-
     const filterByType = (type) => {
-        setSelectedType(type);
-        if (type === "All") {
+                if (type === "All") {
             setFilteredProperties(landDetails);
         } else {
             setFilteredProperties(
@@ -135,8 +126,6 @@ function PropertiesAll() {
 
     const handleCardClick = async (property) => {
         console.log("peroio");
-        fetchPropetiesData(property.type);
-
         await _get(
             `property/getpropbyid/${property.propertyType}/${property.propertyId}`
         ).then((response) => {
@@ -146,15 +135,7 @@ function PropertiesAll() {
 
         console.log(selectedProperty);
     };
-    const fetchPropetiesData = async (path) => {
-        console.log("called");
-        try {
-            const response = await _get(`/fields/${path}`);
-            setData(response.data.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
+   
     const formatNumberWithCommas = (num) => {
         return new Intl.NumberFormat("en-IN").format(num);
     };
@@ -165,50 +146,16 @@ function PropertiesAll() {
             return;
         }
 
-        const selectedDetails = Array.from(selectedProperties).map((id) => {
-            const property = landDetails.find((item) => item.propertyId === id);
-            return {
-                name: property.title,
-                district: property.district,
-                price: property.price,
-                size: property.size,
-                imageUrl: property.images[0],
-            };
-        });
+      
+       
 
-        const requestBody = {
-            propertyData: {
-                properties: selectedDetails,
-            },
-            customerData: {
-                name: "Sneha",
-                contactType: contactType,
-                contactValue:
-                    contactType === "email"
-                        ? "priyabattsinghbadal@gmail.com"
-                        : "9949775665",
-            },
-        };
 
-        const apiUrl = "/customer/shareProperty";
-
-        try {
-            const response = await _post(
-                apiUrl,
-                requestBody,
-                `Properties shared successfully via ${contactType === "email" ? "Email" : "WhatsApp"
-                }!`
-            );
-        } catch (error) {
-            message.error(
-                `An error occurred while sharing properties via ${contactType}.`
-            );
-        }
+      
     };
 
     useEffect(() => {
         fetchData(Id);
-    }, []);
+    }, [Id]);
 
     return (
         <div>

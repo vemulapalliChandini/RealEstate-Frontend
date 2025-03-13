@@ -6,7 +6,6 @@ import { _get, _put } from "../../Service/apiClient";
 import {
     Table,
     message,
-    Typography,
     Select,
     Input,
     Button,
@@ -19,10 +18,7 @@ import {
 
 import moment from "moment";
 import { SearchOutlined } from "@mui/icons-material";
-import { alignProperty } from "@mui/material/styles/cssUtils";
 import { FaWhatsapp } from "react-icons/fa";
-
-const { Title } = Typography;
 
 const { Option } = Select;
 const formatPhoneNumber = (phoneNumber) => {
@@ -45,7 +41,6 @@ const AssignedCustomers = () => {
 
     const [loading, setLoading] = useState(false);
 
-    const [nameSearchQuery, setNameSearchQuery] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState(""); // Search query for filtering
 
@@ -57,65 +52,63 @@ const AssignedCustomers = () => {
 
     const [selectedProperties, setSelectedProperties] = useState({});
 
-    const [selectAgent, setSelectAgent] = useState({});
-
     useEffect(() => {
         const storedSelectedProperties =
             JSON.parse(localStorage.getItem("selectedProperties")) || {};
         setSelectedProperties(storedSelectedProperties);
     }, []);
 
-    const fetchData = async (date) => {
-        setLoading(true);
-
-        try {
-            const customerResponse = await _get(
-                `/marketingAgent/getAssignedCustomers/${userId}/${role}?assignedDate=${date}`
-            );
-
-            if (
-                customerResponse.status === 204 ||
-                !customerResponse?.data?.data?.length
-            ) {
-                message.warning("No customers assigned.");
-                setCustomers([]);
-            } else {
-                setCustomers(customerResponse.data.data);
-            }
-
-            const propertyResponse = await _get(
-                `/marketingAgent/assignedProperty/${userId}/${role}?assignedDate=${date}`
-            );
-
-            console.log(propertyResponse);
-            if (
-                propertyResponse.status === 200 &&
-                propertyResponse?.data?.data?.length
-            ) {
-                const propertyList = propertyResponse.data.data.map((property) => ({
-                    id: property.propertyId,
-                    name: property.landTitle,
-                    agentName: property.agentName,
-                    agentId: property.agentId,
-                    propertyType: property.propertyType,
-                }));
-                setProperties(propertyList);
-            } else {
-                setProperties([]);
-                message.warning("No properties available for the selected date.");
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            setCustomers([]);
-            setProperties([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchData = async (date) => {
+            setLoading(true);
+            try {
+                const customerResponse = await _get(
+                    `/marketingAgent/getAssignedCustomers/${userId}/${role}?assignedDate=${date}`
+                );
+    
+                if (
+                    customerResponse.status === 204 ||
+                    !customerResponse?.data?.data?.length
+                ) {
+                    message.warning("No customers assigned.");
+                    setCustomers([]);
+                } else {
+                    setCustomers(customerResponse.data.data);
+                }
+    
+                const propertyResponse = await _get(
+                    `/marketingAgent/assignedProperty/${userId}/${role}?assignedDate=${date}`
+                );
+    
+                console.log(propertyResponse);
+                if (
+                    propertyResponse.status === 200 &&
+                    propertyResponse?.data?.data?.length
+                ) {
+                    const propertyList = propertyResponse.data.data.map((property) => ({
+                        id: property.propertyId,
+                        name: property.landTitle,
+                        agentName: property.agentName,
+                        agentId: property.agentId,
+                        propertyType: property.propertyType,
+                    }));
+                    setProperties(propertyList);
+                } else {
+                    setProperties([]);
+                    message.warning("No properties available for the selected date.");
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setCustomers([]);
+                setProperties([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
         fetchData(selectedDate.format("YYYY-MM-DD"));
-    }, [selectedDate]);
+    }, [selectedDate,role,userId]);
+    
 
     const handlePropertyChange = async (selectedPropertyNames, email) => {
         try {
@@ -228,21 +221,11 @@ const AssignedCustomers = () => {
             [email]: date,
         }));
     };
-
-    //  code for filter
-
-    const handleSearch = (e) => {
-        setSearchQuery(e.target.value);
-    };
-
     const filteredCustomers = customers.filter(
         (customer) =>
             customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             customer.phone.includes(searchQuery)
     );
-
-
-
     const columns = [
         
         {

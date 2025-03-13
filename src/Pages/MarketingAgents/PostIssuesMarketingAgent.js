@@ -8,8 +8,6 @@ import {
   Modal,
   message,
   Spin,
-  Col,
-  Row,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 

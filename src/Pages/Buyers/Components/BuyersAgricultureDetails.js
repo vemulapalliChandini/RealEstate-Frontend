@@ -1,14 +1,12 @@
 
 import React, { useEffect, useState } from "react";
-import { Row, Col, Carousel, Card, Button, Modal, Tooltip, Grid, Spin, message, Form, Input } from "antd";
+import { Row, Col, Carousel, Card, Button, Modal, Tooltip, Grid, Spin, Form, Input } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import GoogleApiWrapper from "./Map";
 import moment from "moment";
 import PropertyVR from "./PropertyVR";
 import { logEvent } from "../../../analytics";
 import "./BuyersAgriculture.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet"; // Import Leaflet
 import Confetti from 'react-confetti';
 import {
   ThunderboltOutlined,
@@ -18,8 +16,6 @@ import {
   EnvironmentOutlined,
   EnvironmentFilled,
   InfoCircleOutlined,
-  HeartFilled,
-  HeartOutlined,
 } from "@ant-design/icons";
 import Bookappointment from "./BookAppointment";
 import {
@@ -32,7 +28,7 @@ import {
   faClipboard,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { _get, _put, _delete, _post } from "../../../Service/apiClient";
+import { _get, _put, _post } from "../../../Service/apiClient";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { ThumbsUp } from "lucide-react";
 import { toast } from "react-toastify";
@@ -40,21 +36,15 @@ const { useBreakpoint } = Grid;
 
 const BuyersAgricultureDetails = () => {
   const screens = useBreakpoint();
-  const [activeButton, setActiveButton] = useState(null);
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [agents, setAgents] = useState([]);
   const [isModalVis, setIsModalVis] = useState(false);
-  const [agentId, setAgentId] = useState(null);
-  const [hovered, setHovered] = useState(false);
+  
   const [cropDetails, setCropDetails] = useState("");
-  const [agentName, setAgentName] = useState(null);
   const [userId, setUserId] = useState("");
   const [viewsCount, setViewsCount] = useState(0);
-  const [wishlist, setWishlist] = useState([]);
   const [properties, setProperties] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [ShownInterest, setShownInterest] = useState(null);
   const [showInterestButton, setShowInterestButton] = useState(false);
   const [isPropertyOnHold, setIsPropertyOnHold] = useState("");
@@ -68,7 +58,6 @@ const BuyersAgricultureDetails = () => {
   const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setisLoading] = useState(false);
   const pageSize = 4;
@@ -126,14 +115,7 @@ const BuyersAgricultureDetails = () => {
   //   setShowInterestButton(false); // Temporarily disable the button
   //   setTimeout(() => setShowInterestButton(true), 3000); // Re-enable after 2 seconds
   // };
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+ 
   const calculateInitialBid1 = (totalPrice) => {
     const bidIncrement = 500;
     const baseBid = 500;
@@ -155,7 +137,7 @@ const BuyersAgricultureDetails = () => {
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
         : selectedProperty?.auctionData?.[0]?.amount;
 
-      setReservationAmount(initialBid);
+    
       setBackendMoney(amount);
       setRequiredBid(initialBid);
       // Determine the initial state message
@@ -442,43 +424,24 @@ const BuyersAgricultureDetails = () => {
     }
   }, [localStorage.getItem("agentrole")]);
   if (loading) return <div>Loading...</div>;
-
   const updatedAt = property?.createdAt;
   console.log("Deepika", updatedAt
-
   )
-
   const daysSinceCreated = moment.utc().diff(moment(updatedAt), "days");
-  console.log("Deepikaaaaaaaaaaaaa", daysSinceCreated);
-
-
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-
   const formatNumberWithCommas = (num) => {
     return new Intl.NumberFormat("en-IN").format(num);
   };
   const handleCloseBookAppointmentModal = () => {
     setIsModalVis(false);
   };
-
   let latitude = null;
   let longitude = null;
-
   if (property?.address) {
     latitude = property.address.latitude || null;
     longitude = property.address.longitude || null;
   } else {
-    // handle the case when property or address is missing, if necessary
     console.log("Address is missing or null.");
   }
-
-
-
-
-  //  google analytics...
-
-
   const handleContactClick = () => {
     logEvent("Contact", "Consult an agent", "Agriculture Data");
   };
@@ -797,10 +760,8 @@ const BuyersAgricultureDetails = () => {
                         marginRight: "5px",
                       }}
                       onMouseEnter={() => {
-                        setHovered(true);
                         fetchCropDetails();
                       }}
-                      onMouseLeave={() => setHovered(false)}
                     >
                       <Row>
                         <Col span={24}>
@@ -1093,8 +1054,6 @@ const BuyersAgricultureDetails = () => {
                           }}
                           onClick={() => {
                             handleContactClick();
-                            setAgentId(property.userId);
-                            setAgentName(property.agentName);
                             setIsModalVis(true);
                           }}
                         >

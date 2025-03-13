@@ -1,12 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Card,
   Row,
   Col,
-  Button,
-  Spin,
-  Empty,
-  Modal,
   Grid,
   Divider,
   Carousel,
@@ -17,10 +13,8 @@ import {
   AppstoreOutlined,
   PhoneOutlined,
   AreaChartOutlined,
-  SearchOutlined,
-  MoneyCollectOutlined,
+    MoneyCollectOutlined,
   HomeOutlined,
-  MailFilled,
   MailOutlined,
   ClockCircleOutlined,
   ApartmentOutlined,
@@ -33,21 +27,14 @@ import {
   DatabaseOutlined,
   ThunderboltOutlined,
   CompassOutlined,
-  ArrowLeftOutlined,
 } from "@ant-design/icons";
-import { _get } from "../../Service/apiClient";
-import { useTranslation } from "react-i18next";
-import ContactAgent from "./ContactAgent";
-import Agents from "./Agents";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDoorOpen, faSign } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
 
 const { useBreakpoint } = Grid;
 
 const EstateDetails = ({ curEstate }) => {
   const screens = useBreakpoint();
-  const navigate = useNavigate();
   const formatPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return "";
     const cleaned = phoneNumber.replace(/\D/g, "");

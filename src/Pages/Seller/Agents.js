@@ -7,23 +7,17 @@ import {
   Pagination,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { _get, _put } from "../../Service/apiClient";
+import { _get } from "../../Service/apiClient";
 import {
   EnvironmentOutlined,
   PhoneOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
-
 const Agents = () => {
   const [agents, setAgents] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
   const itemsPerPage = pageSize;
-  const [bookModal, SetBookModal] = useState(false);
-  const [curAgent, setCurAgent] = useState(null);
-  const location = useLocation();
-
   useEffect(() => {
     fetchAgents();
   }, []);

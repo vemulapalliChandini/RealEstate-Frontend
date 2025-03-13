@@ -1,55 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { Badge, Calendar, Modal, Form, Input, Spin, Button, Row, Col, TimePicker, Card, Radio, Empty, Pagination, DatePicker, Menu, message, Select, Skeleton } from "antd";
+import { Calendar, Modal, Form, Input, Button, Row, Col, TimePicker, Card, Radio, Pagination, DatePicker, Select, Skeleton } from "antd";
 import moment from "moment";
 import { FaWhatsapp } from "react-icons/fa";
 import { _get, _post, _put } from "../../../Service/apiClient";
-import { UserOutlined, HomeOutlined, EnvironmentOutlined, MailOutlined, AppstoreOutlined, MoneyCollectOutlined, PlusCircleFilled, EyeOutlined, CommentOutlined, SearchOutlined } from "@ant-design/icons";
+import { UserOutlined, HomeOutlined, EnvironmentOutlined, MailOutlined, AppstoreOutlined, MoneyCollectOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 
-import { ScheduleOutlined } from '@ant-design/icons';
-import { faL } from "@fortawesome/free-solid-svg-icons";
-import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the styles
 import ShowModal from "../../Agent/ShowModal";
-import { propertyTypes } from "aframe";
 import AddDeal from "../../CSR/AddDeal";
 const { Option } = Select;
-const { Search } = Input;
 const BuyerDeals = ({ data }) => {
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
     const [isDealModalOpen, setIsDealModalOpen] = useState(false);
     const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedCardId, setSelectedCardId] = useState(null); // To store the selected card ID
     const [form] = Form.useForm();
-    const [meetings, setMeetings] = useState([]);
-    const [selectedMeeting, setSelectedMeeting] = useState(null);
-    const [viewOption, setViewOption] = useState('today');
-    const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
     const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-    const [details, setDetails] = useState([]);
-    const [dealId, setDealId] = useState(null);
-    const [agentId, setAgentId] = useState(null);
+    const [details] = useState([]);
+    const [dealId,] = useState(null);
+    const [agentId] = useState(null);
     const [isSold, setIsSold] = useState(false);
     const [isDateSelect, setIsDateSelect] = useState(false);
     const [isClosed, setIsClosed] = useState(false);
-    const [selectedStartTime, setSelectedStartTime] = useState(null);
-    const [selectedEndTime, setSelectedEndTime] = useState(null);
-    const [activeCardId, setActiveCardId] = useState(null);
-    const [activities, setActivites] = useState([]);
+      const [activities] = useState([]);
     const [isPropertyView, setIsPropertyView] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState([]);
     const [isViewActivities, setIsViewActivities] = useState(null);
     const [nameSearchQuery, setNameSearchQuery] = useState("");
-    const [nameSearchQuery1, setNameSearchQuery1] = useState("");
     const [nameSearchQuery2, setNameSearchQuery2] = useState("");
-    const [nameSearchQuery4, setNameSearchQuery4] = useState("");
     const [locationSearchQuery, setLocationSearchQuery] = useState("");
-    const [CustomerNames, setCustomerNames] = useState([]);
 
     const [AgentNames, setAgentNames] = useState([]);
     const [PropertyNames, setPropertyNames] = useState([]);
     const [role, setRole] = useState(parseInt(localStorage.getItem("role")));
-    const [selectedStatus, setSelectedStatus] = useState("All");
     const [isAddModalOPen, setIsAddModalOpen] = useState(false);
     const [activityType, setActivityType] = useState("");
 
@@ -58,22 +41,17 @@ const BuyerDeals = ({ data }) => {
         setActivityType(value);
         console.log("Selected Activity Type:", value); // Optional: For debugging
     };
-    const toggleMenu = (id) => {
-        setActiveCardId((prevId) => (prevId === id ? null : id));
-    };
+   
     useEffect(() => {
         const role = localStorage.getItem("role");
         setRole(Number(role));
 
 
     }, [localStorage.getItem("role")]);
-    const handleAddClick = async () => {
-        setIsAddModalOpen(true);
-    }
+   
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(2);
 
-    const [calendarForm] = Form.useForm();
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -336,7 +314,7 @@ const BuyerDeals = ({ data }) => {
 
     return (
         <>
-            <ToastContainer />
+           
             <Card
                 style={{
                     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",

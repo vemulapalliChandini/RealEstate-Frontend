@@ -14,13 +14,11 @@ import {
   Select,
   Input,
   Checkbox,
-  Spin,
   Modal, DatePicker,
   Skeleton,
   Tag
 } from "antd";
 import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-import { MdCheck, MdEmail } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRuler, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import { _get, _post } from "../../Service/apiClient";
@@ -30,21 +28,16 @@ import ShowModal from "../Agent/ShowModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MailOutlined, SearchOutlined, VerifiedUserOutlined } from "@mui/icons-material";
 import {
-  PhoneOutlined,
   // MailOutlined,
   UserOutlined,
-  FieldTimeOutlined,
 } from "@ant-design/icons";
 const { Option } = Select;
-const { Search } = Input;
 function PropertiesCSR() {
   const [landDetails, setLandDetails] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [selectedProperties, setSelectedProperties] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedType, setSelectedType] = useState("All");
-  const [searchLocation, setSearchLocation] = useState("");
-  const [searchAgent, setSearchAgent] = useState("");
+  const [selectedType] = useState("All");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [data, setData] = useState(null);

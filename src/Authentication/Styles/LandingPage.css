@@ -302,6 +302,7 @@ body {
 
   .multi-option-buttons {
     display: flex; /* Show multi-buttons for larger screens */
+    margin-left: 30%;
   }
   .options {
     position: "absolute";

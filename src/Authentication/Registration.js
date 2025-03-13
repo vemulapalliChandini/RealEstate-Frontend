@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Option } from "antd/es/mentions";
-
 import {
   Button,
   Col,
@@ -8,7 +7,6 @@ import {
   Input,
   Row,
   Select,
-  message,
   Space,
   Tooltip,
 } from "antd";
@@ -17,24 +15,21 @@ import { useTranslation } from "react-i18next";
 import "./Styles/FloatingLabel.css";
 
 function Registration({ setIsLoginVisible }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [addressDetails, setAddressDetails] = useState({
     district: "",
     mandal: "",
     village: "",
   });
-
   const [mandals, setMandals] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [villages, setVillages] = useState([]);
   const [pincode, setPincode] = useState(null);
   const [selectedMandal, setSelectedMandal] = useState("");
-
   const handlevillageChange = async (value) => {
     setAddressDetails((prev) => ({ ...prev, village: value }));
   };
-
   const handleDistrictChange = async (value) => {
     setAddressDetails((prev) => ({ ...prev, district: [value] }));
     setSelectedDistrict(true);
@@ -47,7 +42,6 @@ function Registration({ setIsLoginVisible }) {
         ...prev,
         mandal: mandalList[0] || mandals[0],
       }));
-
       const response1 = await _get(
         `/location/getvillagesbymandal/${mandalList[0]}`
       );
@@ -79,7 +73,6 @@ function Registration({ setIsLoginVisible }) {
       setVillages([]);
     }
     setPincode(pincodeValue);
-
     if (pincodeValue.length === 6) {
       try {
         const response = await _get(
@@ -160,10 +153,6 @@ function Registration({ setIsLoginVisible }) {
       label: t("registration.Seller"),
       value: "seller",
     },
-    // {
-    //   label: "CSR",
-    //   value: "csr",
-    // },
     {
       label: t("registration.Buyer"),
       value: "buyer",
@@ -173,11 +162,9 @@ function Registration({ setIsLoginVisible }) {
       value: "estateClient",
     },
   ];
-
   const submitting = async (values) => {
     delete values.confirmPassword;
     delete values.pinCode;
-
     let finalValues = {
       ...values,
       state: "Andhra Pradesh",
@@ -187,9 +174,6 @@ function Registration({ setIsLoginVisible }) {
       city: addressDetails.village,
       profilePicture:
         "https://res.cloudinary.com/ddv2y93jq/image/upload/v1726132403/zsafjroceoneetkmz5jq.webp",
-      // role: values.role === "agent" ? "1" : values.role === "seller" ? "2" : values.role === "estateClient" ? "4" : "3",
-      // pinCode: pincode === null || pincode === "" ? "000000" : pincode,
-
       role:
         values.role === "agent"
           ? "1"
@@ -224,7 +208,6 @@ function Registration({ setIsLoginVisible }) {
       }
     } catch (error) {}
   };
-
   const [tooltipVisible, setTooltipVisible] = useState(false);
   return (
     <>
@@ -353,7 +336,7 @@ function Registration({ setIsLoginVisible }) {
                       );
                     }
 
-                    return Promise.resolve(); // Valid number
+                    return Promise.resolve(); 
                   },
                 },
               ]}
@@ -629,7 +612,7 @@ function Registration({ setIsLoginVisible }) {
                         }
                         value={addressDetails.village || undefined}
                         onChange={
-                          pincode != null || pincode != ""
+                          pincode !== null || pincode !== ""
                             ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,
@@ -689,7 +672,7 @@ function Registration({ setIsLoginVisible }) {
                 },
                 {
                   pattern:
-                    /^(?=[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Z][A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{7,14}$/,
+/^(?=[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={};:'"\\|,.<>/?])[A-Z][A-Za-z\d!@#$%^&*()_+\-={};:'"\\|,.<>/?]{7,14}$/,
                   message: `${t(
                     "registration.Please enter a strong password"
                   )}`,

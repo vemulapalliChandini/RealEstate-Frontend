@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal as AntModal, Popconfirm } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";

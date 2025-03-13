@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu, Switch, Col, Typography, Row, Tag, Button, Popover, Card } from "antd";
+import { Layout, Menu, Switch, Col, Typography, Row, Popover, Card } from "antd";
 import "./Styles/NewHeader.css";
 import { UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Content } from "antd/es/layout/layout";
 import NewFooter from "./NewFooter";
 import LoginPage from "./LoginPage";
@@ -16,7 +16,6 @@ function HeaderPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // State to control visibility
   const changeLanguage = (checked) => {
     const newLanguage = checked ? "te" : "en";
     i18n.changeLanguage(newLanguage);
@@ -55,7 +54,6 @@ function HeaderPage() {
       </ul>
     </Card>
   );
-  
   const Help = (
     <Card title="If you find any difficulties:" style={{ width: 300 }}>
       <ul>

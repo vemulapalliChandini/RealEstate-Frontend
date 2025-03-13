@@ -4,41 +4,33 @@ import {
   Card,
   Row,
   Col,
-  Spin,
   Tooltip,
   Empty,
   Pagination,
-  Grid,
   Skeleton,
   Button,
   Modal,
-  Form, Input, message, DatePicker
+  Form, Input
 } from "antd";
 import {
-  HeartOutlined,
-  HeartFilled,
-  EnvironmentFilled,
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import {
   faSeedling,
-  faRoad,
   faTag,
   faRuler,
 } from "@fortawesome/free-solid-svg-icons";
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { _post, _get, _delete, _put } from "../../../Service/apiClient";
+import {  _get, _put } from "../../../Service/apiClient";
 import Meta from "antd/es/card/Meta";
 import { toast } from "react-toastify";
-const { useBreakpoint } = Grid;
 
 const BuyersAgriculture = ({ filters }) => {
-  const { t, i18n } = useTranslation();
-  const screens = useBreakpoint();
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [isAuctoonViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
@@ -48,7 +40,6 @@ const BuyersAgriculture = ({ filters }) => {
   const targetCardRef = useRef(null);
   const [agentrole, setAgentRole] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [isAuctionData, setIsAuctionData] = useState(false);
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
@@ -64,20 +55,7 @@ const BuyersAgriculture = ({ filters }) => {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+
   useEffect(() => {
     console.log("called");
     if (selectedProperty) {
@@ -316,7 +294,7 @@ const BuyersAgriculture = ({ filters }) => {
       // Frontend filtering
       if (filters.searchText) {
         const searchText = filters.searchText.toLowerCase();
-        if (searchText != "" && searchText != "all") {
+        if (searchText !== "" && searchText !== "all") {
           await fetchLocation();
           filtered = data2;
         }
@@ -425,10 +403,6 @@ const BuyersAgriculture = ({ filters }) => {
       currentPage * pageSize
     );
   }, [filteredData, currentPage, pageSize]);
-
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
   const handleViewAuction = (property) => {
     setSelectedProperty(property);
     setIsAuctionViewModalVisible(true);
@@ -468,10 +442,10 @@ const BuyersAgriculture = ({ filters }) => {
         )
       }
       <Row gutter={[24, 24]} justify="start">
-        {data != null && (
-          data.length != 0 ? (
+        {data !== null && (
+          data.length !== 0 ? (
             <>
-              {filteredData.length == 0 ? (
+              {filteredData.length === 0 ? (
                 <Col
                   span={24}
                   style={{ textAlign: "centre" }}

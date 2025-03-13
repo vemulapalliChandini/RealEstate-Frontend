@@ -395,56 +395,38 @@ import {
 import "./i18n";
 
 import { initializeAnalytics, logPageView } from "./analytics";
-
-import Residential from "./Pages/Agent/Residential/Residential";
 import Dashboard from "./Pages/Dashboard";
 import ProfileDetails from "./Pages/ProfileDetails";
 import BuyerRequests from "./Pages/Agent/BuyerRequests";
 import SellerRequests from "./Pages/Agent/SellerRequests";
-import LandingPage from "./Authentication/LandingPage";
 import LandingPageEx from "./Authentication/LandingPageEx";
 import Buy from "./Authentication/Buy.js";
 import Sell from "./Authentication/Sell.js";
 import Help from "./Authentication/Help.js";
-import RealEstate from "./Authentication/RealEstate";
 import NewHeader from "./Authentication/NewHeader.js";
 import FinancialAssistant from "./Pages/Buyers/Components/FinancialAssistant";
 import Wishlist from "./Pages/Buyers/Components/WishList";
 import SearchPage from "./Pages/SearchPage";
 import BuyersResidential from "./Pages/Buyers/Components/BuyersResidential";
-
 import BuyersResidentialDetails from "./Pages/Buyers/Components/BuyersResidentialDetails";
-
-
-
 import BuyersAgricultureDetails from "./Pages/Buyers/Components/BuyersAgricultureDetails";
 import GetCommercialDetail from "./Pages/Buyers/Components/BuyersCommercialDetails";
 import BuyersAgriculture from "./Pages/Buyers/Components/BuyersAgriculture";
 import GetCommercial from "./Pages/Agent/Commericial/GetCommercial";
 import MyProperties from "./Pages/Agent/MyProperties";
-// import CurrentLocation from "./Pages/Agent/CurrentLocation";
 import AgentAppointment from "./Pages/Buyers/Components/AgentAppointment";
 import BuyersLayoutDetails from "./Pages/Buyers/Components/BuyersLayoutDetails";
 import BuyersLayout from "./Pages/Buyers/Components/BuyersLayout";
 import PostIssues from "./Pages/Buyers/Components/PostIssues";
-// import PostIssuesAgent from "./Pages/Agent/PostIssuesAgent"
 import ProtectedRoute from "./Pages/ProtectedRoute";
 import Unauthorized from "./Pages/Unauthorized";
-import GetLayout from "./Pages/Agent/Layout/GetLayout";
-import Agriculture from "./Pages/Agent/Agricultural/Agriculture";
 import Chatbot from "./Pages/Chatbot";
 import Agents from "./Pages/Seller/Agents";
 import PropertyForms from "./Pages/Seller/PropertyForms";
-
-
-// Marketing Agent People from here..
 import PropertiesAll from "./Pages/MarketingAgents/PropertiesAll";
 import Myarea from "./Pages/MarketingAgents/Myarea";
 import AddEstate from "./Pages/Eclient/AddEstate";
 import CustomerForToday from "./Pages/MarketingAgents/CustomerForToday.js";
-
-
-
 import EstateList from "./Pages/Eclient/EstateList";
 import EstateReq from "./Pages/Agent/EstateReq";
 import MyEstates from "./Pages/Agent/MyEstates";

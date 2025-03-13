@@ -3,30 +3,25 @@ import { Row, Col, Card, Button } from "antd";
 import Option from "./Option";
 import { useNavigate } from "react-router-dom";
 import LoginPage from "./LoginPage";
-
 const Buy = () => {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const navigate=useNavigate();
-  
    const handleLoginClose = () => {
     setIsLoginVisible(false);
   };
   const [text, setText] = useState('');
   const fullText = "Journey to Find Your Property Begins Here......";
-
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
       setText((prev) => prev + fullText[index]);
       index += 1;
       if (index === fullText.length) {
-        clearInterval(interval); // Stop when the full text is displayed
+        clearInterval(interval); 
       }
-    }, 100); // Adjust the speed of the animation (milliseconds)
-    
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
-
   return (
     <>
       <LoginPage
@@ -34,10 +29,9 @@ const Buy = () => {
           handleLoginClose={handleLoginClose}
         />
       <Row gutter={[16, 16]}>
-        {/* Left Column: Image with Text Overlay */}
+       
         <Col xs={24} md={24}>
   <div style={{ position: "relative", width: "100%", height: "350px" }}>
-    {/* Image */}
     <img
       src="https://www.realestatemy.com/wp-content/uploads/2017/06/Five-Considerations-When-Buying-Your-First-Investment-Property-min.jpg"
       alt="Dream Home"
@@ -49,8 +43,6 @@ const Buy = () => {
         marginTop: "-2%",
       }}
     />
-
-    {/* Black Overlay */}
     <div
       style={{
         position: "absolute",
@@ -58,13 +50,11 @@ const Buy = () => {
         left: 0,
         width: "100%",
         height: "440px",
-        backgroundColor: "rgba(0, 0, 0, 0.3)", // Black color with opacity
+        backgroundColor: "rgba(0, 0, 0, 0.3)", 
         borderRadius: "10px",
         marginTop:"-2%"
       }}
     />
-
-    {/* Overlay Text */}
     <div
       style={{
         position: "absolute",
@@ -82,9 +72,9 @@ const Buy = () => {
           fontSize: "28px",
           fontWeight: "bold",
           margin: 0,
-          whiteSpace: "nowrap", // Prevents the text from wrapping
-          overflow: "hidden",   // Hides the overflow until it appears
-          display: "inline-block", // Keeps the text as a block so we can manipulate it
+          whiteSpace: "nowrap", 
+          overflow: "hidden",   
+          display: "inline-block", 
         }}
       >
         {text}
@@ -92,9 +82,7 @@ const Buy = () => {
     </div>
   </div>
 </Col>
-
       </Row>
-
     <div style={{ padding: "20px", marginTop: "20px" }}>
     <Card
       hoverable
@@ -121,7 +109,7 @@ const Buy = () => {
         marginLeft: "40%",
         marginBottom: "2%",
       }}
-      onClick={() => navigate("/findanagent")} // Use an arrow function to pass the navigate action
+      onClick={() => navigate("/findanagent")} 
     >
       Find Agents
     </button>
@@ -131,7 +119,7 @@ const Buy = () => {
           </h1>
          
       <Row gutter={[16, 16]} align="middle">
-        {/* Left Column: Image */}
+      
         <Col xs={24} md={12}>
   <img
     src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738061473/modern-minimalist-office_23-2151780708_kclnve.jpg" // Replace with your image URL
@@ -142,21 +130,17 @@ const Buy = () => {
       marginLeft: "14%",
       objectFit: "cover",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      transition: "transform 0.3s ease-in-out", // Add transition for smooth zoom effect
+      transition: "transform 0.3s ease-in-out", 
     }}
     onMouseEnter={(e) => {
-      e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+      e.target.style.transform = "scale(1.1)"; 
     }}
     onMouseLeave={(e) => {
-      e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+      e.target.style.transform = "scale(1)"; 
     }}
   />
 </Col>
-
-
-        {/* Right Column: Text and Button */}
         <Col xs={24} md={12}>
-         
           <p style={{ fontSize: "25px", color: "#4A4A4A", marginTop: "10px",marginRight:"27%"}}>
             Discover the best places to live or work with the help of our expert agents. Explore properties that match your lifestyle and needs.
           </p>
@@ -183,10 +167,9 @@ const Buy = () => {
               </h1>
       <Option />
       <Row gutter={[16, 16]} style={{ marginTop: "5%",paddingLeft:"100px",paddingRight:"100px"}}>
-  {/* First Column */}
   <Col xs={24} md={12} style={{ position: "relative" }}>
     <img
-      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064152/download_njkmni.jpg" // Replace with your image URL
+      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064152/download_njkmni.jpg"
       alt="Dream Home"
       style={{
         width: "100%",
@@ -196,10 +179,10 @@ const Buy = () => {
         transition: "transform 0.3s ease-in-out", 
       }}
       onMouseEnter={(e) => {
-        e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+        e.target.style.transform = "scale(1.1)"; 
       }}
       onMouseLeave={(e) => {
-        e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+        e.target.style.transform = "scale(1)"; 
       }}
     />
     <div
@@ -235,11 +218,9 @@ const Buy = () => {
       </button>
     </div>
   </Col>
-
-  {/* Second Column */}
   <Col xs={24} md={12} style={{ position: "relative" }}>
     <img
-      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064098/modern-house_yk2s61.png" // Replace with your image URL
+      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738064098/modern-house_yk2s61.png" 
       alt="Dream Home"
       style={{
         width: "100%",
@@ -250,10 +231,10 @@ const Buy = () => {
 
       }}
       onMouseEnter={(e) => {
-        e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+        e.target.style.transform = "scale(1.1)"; 
       }}
       onMouseLeave={(e) => {
-        e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+        e.target.style.transform = "scale(1)"; 
       }}
     />
     <div
@@ -290,10 +271,9 @@ const Buy = () => {
   </Col>
 </Row>
 <Row gutter={[16, 16]} style={{ marginTop: "3%",paddingLeft:"100px",paddingRight:"100px"}}>
-  {/* First Column */}
   <Col xs={24} md={12} style={{ position: "relative" }}>
     <img
-      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738065207/images_3_ool8ul.jpg" // Replace with your image URL
+      src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738065207/images_3_ool8ul.jpg" 
       alt="Dream Home"
       style={{
         width: "100%",
@@ -303,10 +283,10 @@ const Buy = () => {
         transition: "transform 0.3s ease-in-out", 
       }}
       onMouseEnter={(e) => {
-        e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+        e.target.style.transform = "scale(1.1)";
       }}
       onMouseLeave={(e) => {
-        e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+        e.target.style.transform = "scale(1)";
       }}
     />
     <div
@@ -342,8 +322,6 @@ const Buy = () => {
       </button>
     </div>
   </Col>
-
-  {/* Second Column */}
   <Col xs={24} md={12} style={{ position: "relative" }}>
     <img
       src="https://res.cloudinary.com/ds1qogjpk/image/upload/v1738065241/sprawling-agricultural-farm-featuring-fields-of-crops-ai-generated-photo_osvwfp.jpg" // Replace with your image URL
@@ -357,10 +335,10 @@ const Buy = () => {
 
       }}
       onMouseEnter={(e) => {
-        e.target.style.transform = "scale(1.1)"; // Zoom in on hover
+        e.target.style.transform = "scale(1.1)"; 
       }}
       onMouseLeave={(e) => {
-        e.target.style.transform = "scale(1)"; // Zoom out when hover ends
+        e.target.style.transform = "scale(1)"; 
       }}
     />
     <div
@@ -400,5 +378,4 @@ const Buy = () => {
     </>
   );
 };
-
 export default Buy;

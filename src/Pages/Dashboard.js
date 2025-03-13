@@ -5,15 +5,9 @@ import {
   UserOutlined,
   LogoutOutlined,
   UserSwitchOutlined,
-  AppstoreAddOutlined,
-  AppstoreOutlined,
-  WarningOutlined,
+    AppstoreOutlined,
   HomeOutlined,
-  ApartmentOutlined,
   CalendarOutlined,
-  PlusCircleFilled,
-  NotificationOutlined,
-  ScheduleOutlined,
   CheckSquareOutlined,
   BellOutlined,
   MoneyCollectOutlined,
@@ -23,7 +17,6 @@ import "./Dashboard.css";
 import Confetti from 'react-confetti';
 import {
   Dropdown,
-  Space,
   Button,
   Layout,
   Menu,
@@ -37,20 +30,14 @@ import {
 import { useNavigate, useLocation, Outlet, Link } from "react-router-dom";
 import { _get } from "../Service/apiClient";
 import {
-  MdAttachMoney,
   MdEventAvailable,
-  MdFavoriteBorder,
   MdOutlineEventAvailable,
 } from "react-icons/md";
 import {
   FaBoxes,
-  FaBuilding,
-  FaHandsHelping,
-  FaList,
-  FaMoneyBillWave,
-  FaPlusCircle,
+ 
 } from "react-icons/fa";
-import { AiFillHeart, AiFillWarning } from "react-icons/ai";
+import {  AiFillWarning } from "react-icons/ai";
 import { FaHandshake } from "react-icons/fa";
 import Notification from "./Buyers/Components/Notification";
 import { useTranslation } from "react-i18next";
@@ -65,10 +52,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [notificationCount, setNotificationCount] = useState(0);
   const [isSellerAgent, setIsSellerAgent] = useState(false);
-  const [notifications, setNotifications] = useState([]);
   const [winnerDetails, setWinnerDetails] = useState([]);
 
-  const [loading, setLoading] = useState(false);
 
   const [showBalloons, setShowBalloons] = useState(true);
  
@@ -112,12 +97,10 @@ const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const role = parseInt(localStorage.getItem("role"));
   const [isLoading, setIsLoading] = useState(false);
-  const [prevAgentRole, setPrevAgentRole] = useState(null);
   const agentrole = parseInt(localStorage.getItem("agentrole"));
   const handleMenuClick = (event) => {
     navigate(event.key);
   };
-  const [showModal, setShowModal] = useState(false);
   const handleMenuClickWithCollapse = (event) => {
     handleMenuClick(event);
     if (screens.xs || screens.sm) {
@@ -164,7 +147,6 @@ const Dashboard = () => {
   };
 
   const fetchRecent = async () => {
-    setLoading(true);
     try {
       const response = await _get(`/auction/getWinnerData`);
       if (response && response.data) {
@@ -191,13 +173,10 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setNotificationCount(0);
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchNotifications = async () => {
-    setLoading(true);
     try {
       const response = await _get(`/activity/getNotifications`);
       if (response && response.data) {
@@ -206,7 +185,6 @@ const Dashboard = () => {
           (notification) => notification.receiverId === userId
         );
 
-        setNotifications(filteredNotifications);
         setNotificationCount(filteredNotifications.length);
       } else {
         console.log("No data received from the API.");
@@ -216,8 +194,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setNotificationCount(0);
-    } finally {
-      setLoading(false);
     }
   };
 

@@ -31,7 +31,7 @@ const { Option } = Select;
 const { Panel } = Collapse;
 
 function AddEstate() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const screens = useBreakpoint();
   const [activeTab, setActiveTab] = useState(["ownerDetails"]);
   const [hasErrors, setHasErrors] = useState(false);
@@ -1766,7 +1766,7 @@ function AddEstate() {
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                   setAddressDetails((prev) => ({
                                     ...prev,

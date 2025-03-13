@@ -69,7 +69,7 @@ const Agents = ({ estate, setIsModalVis, isModalVis, fetchEstates }) => {
 
   const handleAssign = async (id) => {
     try {
-      const response = await _put(`estate/assignAgent/${id}/${estate._id}`);
+      await _put(`estate/assignAgent/${id}/${estate._id}`);
       setIsModalVis(!isModalVis)
       fetchEstates();
     } catch (error) {

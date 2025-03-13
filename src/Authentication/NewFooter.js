@@ -3,7 +3,6 @@
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
-
 import {
   faFacebookF,
   faTwitter,
@@ -11,11 +10,8 @@ import {
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
 import "./Styles/FooterStyle.css";
-
 import image3 from "../images/image3.png"; 
 import image2 from "../images/image2.png"; 
-
-
 const footerData = [
   {
     title: "footer.Company",
@@ -52,22 +48,18 @@ const footerData = [
     ],
   },
 ];
-
 const socialLinks = [
   { icon: faFacebookF, label: "Facebook" },
   { icon: faTwitter, label: "Twitter" },
   { icon: faInstagram, label: "Instagram" },
   { icon: faLinkedinIn, label: "LinkedIn" },
 ];
-
 const FooterPage = () => {
   const { t, i18n } = useTranslation();
-
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") || 'en'; 
     i18n.changeLanguage(savedLanguage);
   }, [i18n]);
-
   return (
     <footer className="footer">
       <div className="container">
@@ -84,7 +76,6 @@ const FooterPage = () => {
               </ul>
             </div>
           ))}
-
           <div className="footerCol">
             <h4>{t("footer.Follow Us")}</h4>
             <div className="socialLinks">

@@ -1075,18 +1075,14 @@
 //   );
 // }
 
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  Layout,
   Row,
   Col,
   Dropdown,
-  Menu,
   Input,
-  Checkbox,
   Select,
   Slider,
-  Switch,
   InputNumber,
   Grid,
   Modal,
@@ -1096,20 +1092,15 @@ import {
   Card
 } from "antd";
 import {
-  EnvironmentOutlined,
-  UserOutlined,
-  AppstoreOutlined,
   PlusCircleOutlined,
   ShopOutlined,
   BorderInnerOutlined,
   BorderlessTableOutlined,
   HomeOutlined,
   CloseOutlined,
-  FilterOutlined,
   FilterFilled,
 } from "@ant-design/icons";
 import "./SearchPage.css";
-import EstatelyImage from "../images/landingpageupdate.jpg";
 import Agriculture from "./Agent/Agricultural/Agriculture";
 import GetCommercial from "./Agent/Commericial/GetCommercial";
 import GetLayout from "./Agent/Layout/GetLayout";
@@ -1126,14 +1117,13 @@ import BuyersResidential from "./Buyers/Components/BuyersResidential";
 import { _get } from "../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import { CheckOutlined } from "@ant-design/icons";
-const { Search } = Input;
 const { Option } = Select;
 const { useBreakpoint } = Grid;
 
 export default function SearchPage() {
   const screens = useBreakpoint();
   const [filterModal, setFilterModal] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState(
     localStorage.getItem("type")
 
@@ -1147,10 +1137,7 @@ export default function SearchPage() {
       const updatedRole = localStorage.getItem("agentrole");
       setAgentRole(updatedRole ? parseInt(updatedRole) : null);
     };
-
-
     window.addEventListener("storage", handleStorageChange);
-
     return () => {
       window.removeEventListener("storage", handleStorageChange); // Cleanup listener on unmount
     };
@@ -1162,7 +1149,6 @@ export default function SearchPage() {
         setShowCard(""); // Close the card
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -1173,41 +1159,24 @@ export default function SearchPage() {
   const [showCard, setShowCard] = useState(null);;
   const [checkedValues, setCheckedValues] = useState("All");
   const [checkedTypes, setCheckedTypes] = useState("All");
-  const [checkedHouseType, setCheckedValuesHouseType] = useState("All");
+  const [checkedHouseType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [villageList, setVillageList] = useState([]);
-  const [filteredVillages, setFilteredVillages] = useState([]);
-  const [hasTyped, setHasTyped] = useState(false);
-  const [selectedRange, setSelectedRange] = useState(null);
   const [sliderVisible, setSliderVisible] = useState(true);
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
-  const [inputValue, setInputValue] = useState([0, Infinity]);
+  const [priceRange] = useState([0, Infinity]);
   const [minprice, setMinPrice] = useState(0);
   const [maxprice, setMaxPrice] = useState(1000000);
   const [sliderRange, setSliderRange] = useState([0, Infinity]);
   const [distanceMedicine, setDistanceMedicine] = useState("");
   const [distanceEducation, setDistanceEducation] = useState("");
-  const priceOptions = [
-    { label: `${t("dashboard.all")}`, range: [0, Infinity] },
-    { label: "0 - 500,000", range: [0, 500000] },
-    { label: "500,000 - 1,000,000", range: [0, 1000000] },
-    { label: "1,000,000 - 2,000,000", range: [0, 2000000] },
-    { label: "2,000,000 - 4,000,000", range: [0, 4000000] },
-    { label: "4,000,000 - 6,000,000", range: [0, 6000000] },
-    { label: "6,000,000 - 8,000,000", range: [0, 8000000] },
-    { label: "8,000,000 - 10,000,000", range: [0, 10000000] },
-  ];
-  const [selectedRange1, setSelectedRange1] = useState(null);
+  
   const [sliderVisible1, setSliderVisible1] = useState(true);
   const [sizeRange, setSizeRange] = useState([0, Infinity]);
-  const [inputValue1, setInputValue1] = useState([0, Infinity]);
   const [maxPriceFromAPI1, setMaxPriceFromAPI1] = useState();
   const [minsize, setMinSize] = useState(0);
   const [showFormType, setShowFormType] = useState(null);
   const [maxsize, setMaxSize] = useState("");
   const [nameSearchQuery2, setNameSearchQuery2] = useState("");
   const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
   const [checkedFeatureTypes, setCheckedFeatureTypes] = useState("All");
   const [purposeType, setPurposeType] = useState("All");
   const [selectedAmenities, setSelectedAmenities] = useState([]);
@@ -1215,8 +1184,6 @@ export default function SearchPage() {
   const [selectedOptions1, setSelectedOptions1] = useState([]);
   const [selectedOptions2, setSelectedOptions2] = useState([]);
   const [selectedOptions3, setSelectedOptions3] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [customLocation, setCustomLocation] = useState("");
   const [propertyName, setPropertyName] = useState("");
   const [distanceFromRoad, setDistanceFromRoad] = useState("");
   const [layoutDistanceFromRoad, setLayoutDistanceFromRoad] = useState("");
@@ -1231,17 +1198,7 @@ export default function SearchPage() {
   const [selectedAgricultureAmenities, setselectedAgricultureAmenities] = useState([]);
   const [selectedAgricultureLand, setselectedAgricultureLand] = useState([]);
   const [selectedLitigation,setSelectedLitigation]=useState(false);
-  // const agentrole = parseInt(localStorage.getItem("agentrole"));
-  const sizeOptions = [
-    { label: `${t("dashboard.all")}`, range: [0, Infinity] },
-    { label: "0 - 1,000", range: [0, 1000] },
-    { label: "0 - 2,000", range: [0, 2000] },
-    { label: "0 - 4,000", range: [0, 4000] },
-    { label: "0 - 6,000", range: [0, 6000] },
-    { label: "0 - 8,000", range: [0, 8000] },
-    { label: "0 - 10,000", range: [0, 10000] },
-  ];
-  console.log(nameSearchQuery2);
+ 
   const [filters, setFilters] = useState({
     checkedValues: checkedValues,
     searchText: searchText,
@@ -1338,33 +1295,6 @@ export default function SearchPage() {
   };
 
 
-  const handleLocationChange = (value) => {
-    setSelectedLocation(value);
-
-    if (value !== "Other") {
-      setCustomLocation(""); // Clear custom input if not "Other"
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchText: value, // Set selected location as searchText
-      }));
-    } else {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchText: "", // Clear searchText when "Other" is selected, waiting for custom input
-      }));
-    }
-  };
-
-  const handleCustomLocationChange = (e) => {
-    const customValue = e.target.value;
-    setCustomLocation(customValue);
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      searchText: customValue, // Set custom location as searchText
-    }));
-  };
-
   const handleOptionClick1 = (option) => {
     setSelectedOptions1(selectedOptions1 === option ? null : option);
   };
@@ -1392,19 +1322,57 @@ export default function SearchPage() {
     setSelectedFacing(selectedFacing === option ? null : option);
   };
   useEffect(() => {
+    const maxsizefromAPI = async () => {
+      try {
+        let first = checkedValues.includes("sold") ? "sold" : "@";
+        let second = checkedValues.includes("unSold") ? "unsold" : "@";
+        let type = showData.toLowerCase(); // Convert to lowercase for consistency
+  
+        const response = await _get(`property/maxSizeForAllProps/${type}/@/@/@/@/@/${first}/${second}`);
+        const data = response.data.maxSize;
+  
+        console.log(data);
+        setMaxSize(data);
+        setMaxSizeAPIvalue(data);
+        setSizeRange([0, data]);
+      } catch (error) {
+        console.error("Error fetching max size:", error);
+      }
+    };
+  
+    const fetchMaxPrice = async () => {
+      try {
+        let url = `/property/maxPriceForAllProps/${showData.toLowerCase()}/@/@/@/@/@`;
+        
+        if (showData === "Residential") {
+          const housetype = ["@", "@"];
+          if (checkedHouseType.includes("Flat")) housetype[0] = "flat";
+          if (checkedHouseType.includes("House")) housetype[1] = "house";
+          url = `/property/maxPriceForAllProps/residential/@/@/@/${housetype[0]}/${housetype[1]}`;
+        } else if (showData === "Commercial") {
+          const types = ["@", "@", "@"];
+          if (checkedTypes.includes("sell")) types[0] = "sell";
+          if (checkedTypes.includes("rent")) types[1] = "rent";
+          if (checkedTypes.includes("lease")) types[2] = "lease";
+          url = `/property/maxPriceForAllProps/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`;
+        }
+  
+        const response = await _get(url);
+        const maxPriceFromAPI = response.data.maxPrice;
+        
+        setMaxPrice(maxPriceFromAPI);
+        setMaxPriceFromAPI1(maxPriceFromAPI);
+      } catch (error) {
+        console.error("Error fetching max price:", error);
+      }
+    };
+  
     setSelectedType(localStorage.getItem("type"));
     setShowData(localStorage.getItem("type"));
-    fetchVillages();
     setSliderVisible(true);
     setSliderVisible1(true);
-    setAddressDetails({
-      district: "",
-      mandal: "",
-      village: "",
-    });
     maxsizefromAPI();
     fetchMaxPrice();
-
     setFilters({
       checkedValues: "All",
       searchText: "",
@@ -1420,10 +1388,10 @@ export default function SearchPage() {
       maxPrice: "",
       minSize: "",
       maxSize: "",
-      agricultureDistanceFromRoad:"",
-      litigation:"",
-      agricultureAmenities:"",
-      landType:"",
+      agricultureDistanceFromRoad: "",
+      litigation: "",
+      agricultureAmenities: "",
+      landType: "",
       layoutAmenities: "",
       CommercialDistanceFromRoad: "",
       commercialAmenities: "",
@@ -1440,32 +1408,22 @@ export default function SearchPage() {
       propertyName: "",
       purposeType: "All",
     });
+  
     setSearchText("");
+  
     function hideError(e) {
-      if (
-        e.message ===
-        "ResizeObserver loop completed with undelivered notifications."
-      ) {
-        const resizeObserverErrDiv = document.getElementById(
-          "webpack-dev-server-client-overlay-div"
-        );
-        const resizeObserverErr = document.getElementById(
-          "webpack-dev-server-client-overlay"
-        );
-        if (resizeObserverErr) {
-          resizeObserverErr.setAttribute("style", "display: none");
-        }
-        if (resizeObserverErrDiv) {
-          resizeObserverErrDiv.setAttribute("style", "display: none");
-        }
+      if (e.message === "ResizeObserver loop completed with undelivered notifications.") {
+        document.getElementById("webpack-dev-server-client-overlay")?.setAttribute("style", "display: none");
+        document.getElementById("webpack-dev-server-client-overlay-div")?.setAttribute("style", "display: none");
       }
     }
-
+  
     window.addEventListener("error", hideError);
     return () => {
-      window.addEventListener("error", hideError);
+      window.removeEventListener("error", hideError);
     };
-  }, [showData]);
+  }, [showData, checkedValues, checkedHouseType, checkedTypes]); 
+  
   const [isLoading, setIsLoading] = useState(localStorage.getItem("isLoading") === "false");
 
   useEffect(() => {
@@ -1478,179 +1436,29 @@ export default function SearchPage() {
 
     return () => clearInterval(checkLocalStorage); // Cleanup on unmount
   }, [isLoading]);
-  const maxsizefromAPI = async () => {
-    if (showData == "Agriculture") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/agricultural/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-        console.log(data);
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    } else if (showData == "Commercial") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/commercial/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-        console.log(data);
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    } else if (showData == "Layout") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/layout/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-        console.log(data);
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    }
-    if (showData == "Residential") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/residential/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-        console.log(data);
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    }
-  };
+  
   const handleMinSizeChange = (value) => {
-    const newRange1 = [value, maxsize];
     setMinSize(value);
     setSizeRange([value, maxsize]);
-    setSliderRangesize(newRange1);
-
   };
   const handleMaxSizeChange = (value) => {
-    const newRange1 = [minsize, value];
     setMaxSize(value);
     setSizeRange([minsize, value]);
-    setSliderRangesize(newRange1);
-
   };
   const handleSliderChange1 = (value) => {
     setMinSize(value[0]);
     setMaxSize(value[1]);
     setSizeRange(value);
-    setInputValue1(value);
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   sizeRange: value,
-    // }));
+   
   };
-  const fetchVillages = async () => {
-    try {
-      const response = await _get("/location/getallvillages");
-      const data = await response.data;
-      const uniqueVillages = [...new Set(data)];
-      setVillageList(uniqueVillages);
-      setFilteredVillages(uniqueVillages);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+
   const handleTypeChange = (type) => {
     setSelectedType(type);
     localStorage.setItem("type", type);
     setShowData(type);
   };
 
-  const fetchMaxPrice = async () => {
-    try {
-      if (showData == "Agriculture") {
-        const aresponse = await _get(
-          "/property/maxPriceForAllProps/agricultural/@/@/@/@/@"
-        );
-        const amaxPriceFromAPI = aresponse.data.maxPrice;
-        setMaxPriceFromAPI1(amaxPriceFromAPI);
-        setMaxPrice(amaxPriceFromAPI);
-        setSliderRange([0, amaxPriceFromAPI]);
-      } else if (showData == "Layout") {
-        const lresponse = await _get(
-          "/property/maxPriceForAllProps/layout/@/@/@/@/@"
-        );
-        const lmaxPriceFromAPI = lresponse.data.maxPrice;
-        setMaxPrice(lmaxPriceFromAPI);
-        setMaxPriceFromAPI1(lmaxPriceFromAPI);
-        setSliderRange([0, lmaxPriceFromAPI]);
-      } else if (showData == "Residential") {
-        const housetype = ["@", "@"];
 
-        if (checkedHouseType.includes("Flat")) {
-          housetype[0] = "flat";
-        }
-        if (checkedHouseType.includes("House")) {
-          housetype[1] = "house";
-        }
-        const rresponse = await _get(
-          `/property/maxPriceForAllProps/residential/@/@/@/${housetype[0]}/${housetype[1]}`
-        );
-        const rmaxPriceFromAPI = rresponse.data.maxPrice;
-        setMaxPrice(rmaxPriceFromAPI);
-        setMaxPriceFromAPI1(rmaxPriceFromAPI);
-        setSliderRange([0, rmaxPriceFromAPI]);
-      } else if (showData == "Commercial") {
-        const data = checkedTypes;
-
-        const types = ["@", "@", "@"];
-
-        if (checkedTypes.includes("sell")) {
-          types[0] = "sell";
-        }
-        if (checkedTypes.includes("rent")) {
-          types[1] = "rent";
-        }
-        if (checkedTypes.includes("lease")) {
-          types[2] = "lease";
-        }
-        const cresponse = await _get(
-          `property/maxPriceForAllProps/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
-        );
-        const cmaxPriceFromAPI = await cresponse.data.maxPrice;
-        setMaxPrice(cmaxPriceFromAPI);
-        setMaxPriceFromAPI1(cmaxPriceFromAPI);
-        setSliderRange([0, cmaxPriceFromAPI]);
-      }
-    } catch (error) {
-      console.error("Error fetching max price:", error);
-    }
-  };
   const formatPrice = (price) => {
     if (price == null) {
       return "N/A"; // Return 'N/A' or any other default value for invalid prices
@@ -1667,19 +1475,12 @@ export default function SearchPage() {
     }
   };
   const onCheckboxChange = (values) => {
-    const newCheckedValues = values;
-    setCheckedValues(values);
+        setCheckedValues(values);
     // setFilters((prevFilters) => ({
     //   ...prevFilters,
     //   checkedValues: newCheckedValues,
     // }));
   };
-
-  const options1 = [
-    { label: `${t("dashboard.sell")}`, value: "sell" },
-    { label: `${t("dashboard.rent")}`, value: "rent" },
-    { label: `${t("dashboard.lease")}`, value: "lease" },
-  ];
   const onCheckboxChange1 = (values) => {
     setCheckedTypes(values);
 
@@ -1688,271 +1489,29 @@ export default function SearchPage() {
     setCheckedFeatureTypes(values);
 
   };
-  const optionsHouseType = [
-    { label: `${t("dashboard.flat")}`, value: "Flat" },
-    { label: `${t("dashboard.house")}`, value: "House" },
-    { label: "Apartment", value: "Apartment" },
-  ];
-
-  const onCheckboxChangeHouseType = (value) => {
-    setCheckedValuesHouseType(value);
-
-  };
 
   const onPurposeChange = (value) => {
     setPurposeType(value);
 
   };
-  const handleRangeSelect = (value) => {
-    const selected = priceOptions.find((option) => option.label === value);
-    if (value === "All") {
-      setSliderVisible(false);
-    } else {
-      setSelectedRange(selected.range);
-      setPriceRange(selected.range);
-      setSliderVisible(true);
-    }
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   priceRange: selected.range,
-    // }));
-  };
-
-  const AgrisizeOptions = [
-    { label: `${t("dashboard.all")}`, range: [0, Infinity] },
-    { label: "0 - 5", range: [0, 5] },
-    { label: "0 - 10", range: [0, 10] },
-    { label: "0 - 15", range: [0, 15] },
-    { label: "0 - 20", range: [0, 20] },
-    { label: "0 - 25", range: [0, 25] },
-    { label: "0 - 30", range: [0, 30] },
-    { label: "0- 35", range: [0, 35] },
-    { label: "0- 40", range: [0, 40] },
-    { label: "0- 45", range: [0, 45] },
-    { label: "0- 50", range: [0, 50] },
-  ];
-  const handleSizeSelect = (value) => {
-    const selected =
-      showData === "Agriculture"
-        ? AgrisizeOptions.find((option) => option.label === value)
-        : sizeOptions.find((option) => option.label === value);
-    if (value === "All") {
-      setSliderVisible1(false);
-    } else {
-      setSelectedRange1(selected.range);
-      setSizeRange(selected.range);
-      setSliderVisible1(true);
-    }
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   sizeRange: selected.range,
-    // }));
-  };
-
-  const [mandals, setMandals] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState(false);
-  const [selectedMandal, setSelectedMandal] = useState(false);
-  const [villages, setVillages] = useState([]);
 
 
-  const [addressDetails, setAddressDetails] = useState({
-    country: "",
-    state: "",
-    district: "",
-    mandal: "",
-    village: "",
-  });
-  const [mandalList, setMandalList] = useState([]);
-  const [hasPincode, setHasPincode] = useState("no");
-  const handleDistrictChange = async (value) => {
-    console.log(value);
-    setSelectedDistrict(value);
-    setAddressDetails((prev) => ({ ...prev, district: value }));
-    setMandals([]);
-    setVillages([]);
-    setAddressDetails((prev) => ({
-      ...prev,
-      mandal: "",
-      village: "",
-    }));
-
-    try {
-      const response = await _get(`/location/getmandals/${value}`);
-      const mandalList = response.data.mandals;
-
-      setMandals(mandalList);
-
-      setVillages([]);
-      setAddressDetails((prev) => ({
-        ...prev,
-        village: "",
-      }));
-
-      setSearchText((prev) => {
-        return [value, "", ""];
-      });
-
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchText: [value, "", ""],
-      }));
-    } catch (error) {
-      console.error("Error fetching mandals:", error);
-    }
-  };
-
-  const handleSearchMandalChange = async (value) => {
-    console.log(value, 1162);
-    const response = await _get(
-      `/location/getmandals/${addressDetails.district}`
-    );
-
-    const mandalList = response.data.mandals;
-    setSearchText((prev) => {
-      const newText = prev || ["", "", ""];
-      return [newText[0], value, ""];
-    });
-
-    setHasTyped(value.length > 0);
-
-    const filtered = mandalList.filter((mandal) =>
-      mandal.toLowerCase().startsWith(value.toLowerCase())
-    );
-
-    const uniqueFilteredMandals = [...new Set(filtered)];
-
-    setMandals(uniqueFilteredMandals);
-    setSearchText((prev) => [prev[0], value, prev[2]]);
-    if (
-      hasTyped &&
-      searchText !== null &&
-      searchText !== "" &&
-      searchText !== undefined &&
-      uniqueFilteredMandals.length !== 0
-    ) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchText: [
-          prevFilters.searchText && prevFilters.searchText.length > 0
-            ? prevFilters.searchText[0]
-            : "",
-          value,
-          "",
-        ],
-      }));
-    }
-  };
-
-  const handleSearchChange = async (value) => {
-    console.log("hi");
-    const response1 = await _get(
-      `/location/getvillagesbymandal/${selectedMandal}`
-    );
-    const villageList = response1.data;
-    console.log(response1.data);
-
-    setSearchText((prev) => [prev[0], prev[1], value]);
-
-    setHasTyped(value.length > 0);
-    const filtered = villageList.filter((village) =>
-      village.toLowerCase().startsWith(value.toLowerCase())
-    );
-
-    const uniqueFilteredVillages = [...new Set(filtered)];
-
-    setVillages(uniqueFilteredVillages);
-    if (
-      hasTyped &&
-      searchText !== null &&
-      searchText !== "" &&
-      searchText !== undefined &&
-      uniqueFilteredVillages.length !== 0
-    ) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchText: [
-          prevFilters.searchText[0],
-          prevFilters.searchText[1],
-          value,
-        ],
-      }));
-    }
-  };
-  const handleClear = () => {
-    setVillages(villageList);
-  };
-  const handleClear1 = () => {
-    setMandals(mandalList);
-    handleDistrictChange(addressDetails.district);
-  };
-  const handleVillageChange = (value) => {
-    setAddressDetails((prev) => ({ ...prev, village: value }));
-    setSearchText((prev) => [prev[0], prev[1], value]);
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      searchText: [prevFilters.searchText[0], prevFilters.searchText[1], value],
-    }));
-  };
-  const handleMandalChange = async (value) => {
-    console.log(value);
-    setAddressDetails((prev) => ({ ...prev, mandal: value }));
-    setSearchText(value);
-    setSelectedMandal(value);
-    let response = "";
-    if (value !== undefined) {
-      response = await _get(`/location/getvillagesbymandal/${value}`);
-    }
-
-    const villageList = response.data || [];
-    setVillages(villageList);
-
-    setAddressDetails((prev) => ({
-      ...prev,
-      village: "",
-    }));
-    setSearchText((prev) => {
-      const newText = prev || ["", "", ""];
-      return [newText[0], value, ""];
-    });
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      searchText: [
-        prevFilters.searchText && prevFilters.searchText.length > 0
-          ? prevFilters.searchText[0]
-          : "",
-        value,
-        "",
-      ],
-    }));
-  };
+ 
   const handleSliderChange = (value) => {
     setMaxPrice(value);
-    setSliderRange(value);
     setMinPrice(value[0]);
     setMaxPrice(value[1]);
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   priceRange: value,
-    // }));
+   
   };
   const handleMaxPriceChange = (value) => {
     setMaxPrice(value);
-    // setSliderRange([minprice, value]);
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   priceRange: [minprice, value],
-    // }));
+   
   };
   const handleMinPriceChange = (value) => {
-    const newRange1 = [value, maxprice];
     setMinPrice(value);
     setSliderVisible(true);
     setSliderRange([value, maxprice]);
-    // setFilters((prevFilters) => ({
-    //   ...prevFilters,
-    //   priceRange: newRange1,
-    // }));
+   
   };
   const onVillageChange = (event) => {
     setSearchText(event.target.value);
@@ -1960,29 +1519,8 @@ export default function SearchPage() {
 
   const clearingFilters = () => {
     console.log("data");
-    // setCheckedValues(["sold", "unSold"]);
-
-    // setSizeRange([0, refreshSize]);
-    // setSliderRange([0, refreshPrice]);
-    // setSliderRangesize([0, refreshSize])
-    // setPriceRange([0, refreshPrice]);
-    // setSizeRange([0, refreshSize]);
-    // setMinPrice(0);
-    // setMaxPrice(refreshPrice);
-    // setMinSize(0);
-    // setMaxSize(refreshSize);
-    // setData(refreshData);
-    // setFilteredData(refreshData);
-    // setSearchText("");
-
-    // handleClear();
-    // console.log(data);
-    // console.log(filteredData);
-    // console.log(refreshData);
+ 
     window.location.reload();
-
-    setSelectedLocation("");
-    setCustomLocation("");
     setPropertyName("");
     setDistanceFromRoad("");
     setSelectedLayoutAmenities("");
@@ -1993,10 +1531,7 @@ export default function SearchPage() {
     setSelectedOptions3("");
     setCommercialDistanceFromRoad("");
     setSelectedCommercialAmenities("");
-    // setMinSize("");                
-    // setMaxSize("");                
-    // setMinPrice("");                
-    // setMaxPrice("");               
+                  
     setSelectedOptions1("");
     setSelectedOptions("");
     setSelectedBhks([]);
@@ -2006,31 +1541,7 @@ export default function SearchPage() {
     localStorage.removeItem("isLoading");
   };
   const clearingFilters1 = () => {
-    console.log("data");
-    // setCheckedValues(["sold", "unSold"]);
-
-    // setSizeRange([0, refreshSize]);
-    // setSliderRange([0, refreshPrice]);
-    // setSliderRangesize([0, refreshSize])
-    // setPriceRange([0, refreshPrice]);
-    // setSizeRange([0, refreshSize]);
-    // setMinPrice(0);
-    // setMaxPrice(refreshPrice);
-    // setMinSize(0);
-    // setMaxSize(refreshSize);
-    // setData(refreshData);
-    // setFilteredData(refreshData);
-    // setSearchText("");
-
-    // handleClear();
-    // console.log(data);
-    // console.log(filteredData);
-    // console.log(refreshData);
-    // window.location.reload();
-
-    setSelectedLocation("");
-    setCustomLocation("");
-    setPropertyName("");
+       setPropertyName("");
     setDistanceFromRoad("");
     setSelectedLayoutAmenities("");
     setSelectedRERAAmenities("");
@@ -2039,21 +1550,15 @@ export default function SearchPage() {
     setAgricultureDistanceFromRoad("");
     setSelectedLitigation("");
     setselectedAgricultureLand("");
-    setselectedAgricultureAmenities("");
-    // setMinSize("");                
-    // setMaxSize("");                
-    // setMinPrice("");                
-    // setMaxPrice("");               
+    setselectedAgricultureAmenities("");     
     setSelectedOptions1("");
     setSelectedOptions("");
     setSelectedBhks([]);
     setSelectedStatuses([]);
     setSelectedFacing("");
-
     localStorage.removeItem("isLoading");
   };
   const Search = async () => {
-
     localStorage.setItem("isLoading", true);
     setIsLoading(true);
     const filters = {

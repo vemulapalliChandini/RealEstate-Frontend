@@ -4,15 +4,12 @@ import {
     Card,
     List,
     Badge,
-    Spin,
     Input,
     Empty,
     Row,
     Col,
     Skeleton,
     Pagination,
-    Menu,
-    Dropdown,
     Button,
     Modal,
     Tooltip
@@ -27,7 +24,7 @@ import {
     HomeOutlined,
     InfoCircleOutlined,
     UserOutlined,
-    EllipsisOutlined,
+
     PlusCircleFilled,
 } from "@ant-design/icons";
 
@@ -46,13 +43,8 @@ const MarketingAgentsAssociation = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(null);
-    const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-    const [dealId, setDealId] = useState(null);
-    const [agentId, setAgentId] = useState(null);
-    const [activities, setActivites] = useState(null);
-    const [isAddActivityModalOpen, setIsAddActivityModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const itemsPerPage = 8;
 
@@ -62,11 +54,7 @@ const MarketingAgentsAssociation = () => {
         setCurrentPage(page);
     };
 
-    const handleMoreClick = (record) => {
-        console.log(record);
-        setSelectedCustomer(record.properties);
-        setIsModalVisible(true);
-    };
+   
 
     const currentProperties = filteredCustomers.slice(
         (currentPage - 1) * itemsPerPage,
@@ -76,11 +64,7 @@ const MarketingAgentsAssociation = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    const handleAddActivityModal = (dealId, agentId) => {
-        setIsAddActivityModalOpen(true);
-        setDealId(dealId);
-        setAgentId(agentId);
-    };
+  
     const handleModalClose = () => {
         setIsModalVisible(false);
     };
@@ -88,21 +72,7 @@ const MarketingAgentsAssociation = () => {
 
         setIsAddModalOpen(false);
     };
-    const handleActivities = async (deal) => {
-        setDealId(deal.deal._id);
-        setAgentId(deal.agent._id);
-        setIsActivityModalOpen(true);
-        try {
-            const response = await _get(
-                `/activity/activities?agentId=${deal.agent._id}&dealingId=${deal.deal._id}`
-            );
-            console.log(response.data.data);
-
-            setActivites(response.data.data);
-        } catch (error) {
-            console.error("Error fetching deals:", error);
-        }
-    };
+   
 
     useEffect(() => {
         const fetchDeals = async () => {
@@ -452,8 +422,6 @@ interests and deals.
                                                     backgroundColor: "#0d416b",
                                                     color: "#fff",
                                                     border: "none",
-                                                    padding: "2px",
-
                                                     cursor: "pointer",
                                                     fontWeight: "bold",
                                                     padding: "5px 10px",
@@ -709,8 +677,6 @@ associated customers.
                                                     backgroundColor: "#0d416b",
                                                     color: "#fff",
                                                     border: "none",
-                                                    padding: "2px",
-
                                                     cursor: "pointer",
                                                     fontWeight: "bold",
                                                     padding: "5px 10px",
