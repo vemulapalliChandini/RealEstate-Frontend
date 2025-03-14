@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Avatar, Button, Checkbox, Table, Row, Col, Select, Card, message, Input, Spin } from "antd";
-import { EyeOutlined, PhoneOutlined, PlusOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import {DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { _get, _put } from "../../Service/apiClient"; // Replace with your actual API call function
 import "./Admin.css"
 import { MailOutlined } from '@ant-design/icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { FaWhatsapp } from "react-icons/fa";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DeleteOutline } from "@mui/icons-material";
-import { use } from "react";
 const { Option } = Select;
 function GetCSR() {
     const [csr, setCsr] = useState([]);
@@ -398,7 +396,7 @@ function GetCSR() {
                             prefix={<SearchOutlined style={{ color: "#082d4a" }} />}
                             value={nameSearchQuery || undefined} // Ensure undefined for placeholder to show
                             onChange={(value) => {
-                                if (value != null) {
+                                if (value !== null) {
                                     setNameSearchQuery(value)
                                 } else {
                                     setNameSearchQuery(null);

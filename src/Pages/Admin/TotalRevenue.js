@@ -207,12 +207,10 @@
 
 
 import React from "react";
-import { Card, Col, Row, Statistic, Divider, Spin } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Card, Col, Row, Statistic, Divider } from "antd";
 
 
 const TotalRevenue = () => {
-  const navigate = useNavigate();
 
   const revenueData = [
     {

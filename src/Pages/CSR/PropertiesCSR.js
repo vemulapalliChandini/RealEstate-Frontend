@@ -40,7 +40,8 @@ function PropertiesCSR() {
   const [selectedType] = useState("All");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
-   const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+ 
   const [validInput, setValidInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,14 +100,14 @@ function PropertiesCSR() {
       return updatedSet;
     });
 
-    // Scroll to the top of the component
     if (topRef.current) {
       topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
   // const [isInputVisible, setInputVisible] = useState(false);
-  // const [phoneNumber, setPhoneNumber] = useState("");
+   // const [phoneNumber, setPhoneNumber] = useState("");
   // const [isPhoneValid, setPhoneValid] = useState(false);
+ 
   const [shareMethod, setShareMethod] = useState("");
   const [inputValue, setInputValue] = useState("");
   // const [isInputValid, setInputValid] = useState(false);
@@ -120,7 +121,8 @@ function PropertiesCSR() {
     // setInputVisible(true);
 
     setInputValue("");
-     setErrorMessage("");
+      setErrorMessage("");
+ 
     setIsModalOpen(true);
   };
  
@@ -231,7 +233,7 @@ function PropertiesCSR() {
 
   const handleCardClick = async (property) => {
     console.log("peroio");
-    fetchPropetiesData(property.type);
+    // fetchPropetiesData(property.type);
 
     await _get(
       `property/getpropbyid/${property.propertyType}/${property._id}`
@@ -242,7 +244,7 @@ function PropertiesCSR() {
 
     console.log(selectedProperty);
   };
-  const fetchPropetiesData = async (path) => {
+   const fetchPropetiesData = async (path) => {
     console.log("called");
     try {
       const response = await _get(`/fields/${path}`);
@@ -251,6 +253,7 @@ function PropertiesCSR() {
       console.error("Error fetching data:", error);
     }
   };
+ 
   const shareProperties = async () => {
     console.log("selepropert", selectedProperties);
     if (selectedProperties.size === 0) {

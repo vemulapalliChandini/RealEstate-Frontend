@@ -43,7 +43,7 @@ const { useBreakpoint } = Grid;
 export default function SearchPage() {
   const screens = useBreakpoint();
   const [filterModal, setFilterModal] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState(
     localStorage.getItem("mtype")
   );
@@ -52,44 +52,23 @@ export default function SearchPage() {
   const [checkedTypes, setCheckedTypes] = useState("All");
   const [checkedHouseType, setCheckedValuesHouseType] = useState(["All"]);
   const [searchText, setSearchText] = useState("");
-  const [villageList, setVillageList] = useState([]);
-  const [filteredVillages, setFilteredVillages] = useState([]);
   const [sliderVisible, setSliderVisible] = useState(true);
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
+  const [priceRange] = useState([0, Infinity]);
   const [minprice, setMinPrice] = useState(0);
   const [maxprice, setMaxPrice] = useState(1000000);
   const [nameSearchQuery2, setNameSearchQuery2] = useState("");
   const [sliderRange, setSliderRange] = useState([0, Infinity]);
-  const priceOptions = [
-    { label: `${t("dashboard.all")}`, range: [0, Infinity] },
-    { label: "0 - 500,000", range: [0, 500000] },
-    { label: "500,000 - 1,000,000", range: [0, 1000000] },
-    { label: "1,000,000 - 2,000,000", range: [0, 2000000] },
-    { label: "2,000,000 - 4,000,000", range: [0, 4000000] },
-    { label: "4,000,000 - 6,000,000", range: [0, 6000000] },
-    { label: "6,000,000 - 8,000,000", range: [0, 8000000] },
-    { label: "8,000,000 - 10,000,000", range: [0, 10000000] },
-  ];
+
   const [sliderVisible1, setSliderVisible1] = useState(true);
   const [sizeRange, setSizeRange] = useState([0, Infinity]);
-  const [inputValue1, setInputValue1] = useState([0, Infinity]);
   const [maxPriceFromAPI1, setMaxPriceFromAPI1] = useState();
   const [minsize, setMinSize] = useState(0);
   const [maxsize, setMaxSize] = useState(100000);
   const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
   const [showFormType, setShowFormType] = useState(null);
   const [checkedFeatureTypes, setCheckedFeatureTypes] = useState("All");
   const [purposeType,setPurposeType]=useState("All");
-  const sizeOptions = [
-    { label: `${t("dashboard.all")}`, range: [0, Infinity] },
-    { label: "0 - 1,000", range: [0, 1000] },
-    { label: "0 - 2,000", range: [0, 2000] },
-    { label: "0 - 4,000", range: [0, 4000] },
-    { label: "0 - 6,000", range: [0, 6000] },
-    { label: "0 - 8,000", range: [0, 8000] },
-    { label: "0 - 10,000", range: [0, 10000] },
-  ];
+  
    const [isLoading, setIsLoading] = useState(localStorage.getItem("isLoading") === "false");
     useEffect(() => {
        const checkLocalStorage = setInterval(() => {
@@ -122,7 +101,7 @@ export default function SearchPage() {
   useEffect(() => {
     setSelectedType(localStorage.getItem("mtype"));
     setShowData(localStorage.getItem("mtype"));
-    fetchVillages();
+    // fetchVillages();
     setSliderVisible(true);
     setSliderVisible1(true);
     setAddressDetails({
@@ -171,7 +150,7 @@ export default function SearchPage() {
 
 
   const maxsizefromAPI = async () => {
-    if (showData == "Agriculture") {
+    if (showData === "Agriculture") {
       try {
         const first = checkedValues.includes("sold") ? "sold" : "@";
         const second = checkedValues.includes("unSold") ? "unsold" : "@";
@@ -182,12 +161,12 @@ export default function SearchPage() {
 
         setMaxSize(data);
         setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
+        // setSliderRangesize([0, data]);
         setSizeRange([0, data]);
       } catch (error) {
         console.error("Error fetching village data:", error);
       }
-    } else if (showData == "Commercial") {
+    } else if (showData === "Commercial") {
       try {
         const first = checkedValues.includes("sold") ? "sold" : "@";
         const second = checkedValues.includes("unSold") ? "unsold" : "@";
@@ -198,12 +177,12 @@ export default function SearchPage() {
 
         setMaxSize(data);
         setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
+        // setSliderRangesize([0, data]);
         setSizeRange([0, data]);
       } catch (error) {
         console.error("Error fetching village data:", error);
       }
-    } else if (showData == "Layout") {
+    } else if (showData === "Layout") {
       try {
         const first = checkedValues.includes("sold") ? "sold" : "@";
         const second = checkedValues.includes("unSold") ? "unsold" : "@";
@@ -214,13 +193,13 @@ export default function SearchPage() {
 
         setMaxSize(data);
         setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
+        // setSliderRangesize([0, data]);
         setSizeRange([0, data]);
       } catch (error) {
         console.error("Error fetching village data:", error);
       }
     }
-    if (showData == "Residential") {
+    if (showData === "Residential") {
       try {
         const first = checkedValues.includes("sold") ? "sold" : "@";
         const second = checkedValues.includes("unSold") ? "unsold" : "@";
@@ -231,7 +210,7 @@ export default function SearchPage() {
 
         setMaxSize(data);
         setMaxSizeAPIvalue(data);
-        setSliderRangesize([0, data]);
+        // setSliderRangesize([0, data]);
         setSizeRange([0, data]);
       } catch (error) {
         console.error("Error fetching village data:", error);
@@ -239,34 +218,32 @@ export default function SearchPage() {
     }
   };
   const handleMinSizeChange = (value) => {
-    const newRange1 = [value, maxsize];
     setMinSize(value);
     setSizeRange([value, maxsize]);
-    setSliderRangesize(newRange1);
+    // setSliderRangesize(newRange1);
   };
   const handleMaxSizeChange = (value) => {
-    const newRange1 = [minsize, value];
     setMaxSize(value);
     setSizeRange([minsize, value]);
-    setSliderRangesize(newRange1);
+    // setSliderRangesize(newRange1);
   };
   const handleSliderChange1 = (value) => {
     setMinSize(value[0]);
     setMaxSize(value[1]);
     setSizeRange(value);
-    setInputValue1(value);
+    // setInputValue1(value);
   };
-  const fetchVillages = async () => {
-    try {
-      const response = await _get("/location/getallvillages");
-      const data = await response.data;
-      const uniqueVillages = [...new Set(data)];
-      setVillageList(uniqueVillages);
-      setFilteredVillages(uniqueVillages);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+  // const fetchVillages = async () => {
+  //   try {
+  //     const response = await _get("/location/getallvillages");
+  //     const data = await response.data;
+  //     // const uniqueVillages = [...new Set(data)];
+  //     // setVillageList(uniqueVillages);
+  //     // setFilteredVillages(uniqueVillages);
+  //   } catch (error) {
+  //     console.error("Error fetching village data:", error);
+  //   }
+  // };
   const handleTypeChange = (type) => {
     setSelectedType(type);
     localStorage.setItem("mtype", type);
@@ -275,7 +252,7 @@ export default function SearchPage() {
 
   const fetchMaxPrice = async () => {
     try {
-      if (showData == "Agriculture") {
+      if (showData === "Agriculture") {
         const aresponse = await _get(
           "/property/maxPriceForAllProps/agricultural/@/@/@/@/@"
         );
@@ -283,7 +260,7 @@ export default function SearchPage() {
         setMaxPriceFromAPI1(amaxPriceFromAPI);
         setMaxPrice(amaxPriceFromAPI);
         setSliderRange([0, amaxPriceFromAPI]);
-      } else if (showData == "Layout") {
+      } else if (showData === "Layout") {
         const lresponse = await _get(
           "/property/maxPriceForAllProps/layout/@/@/@/@/@"
         );
@@ -291,7 +268,7 @@ export default function SearchPage() {
         setMaxPrice(lmaxPriceFromAPI);
         setMaxPriceFromAPI1(lmaxPriceFromAPI);
         setSliderRange([0, lmaxPriceFromAPI]);
-      } else if (showData == "Residential") {
+      } else if (showData === "Residential") {
         const housetype = ["@", "@"];
 
         if (checkedHouseType.includes("Flat")) {

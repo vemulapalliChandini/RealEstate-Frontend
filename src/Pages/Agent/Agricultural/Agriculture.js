@@ -7,14 +7,12 @@ import {
 
   Empty,
   Select,
-  Grid,
   Modal,
   Form,
   Input,
   TimePicker,
   Skeleton,
   DatePicker,
-  message,
   Table,
   Menu,
   Button,
@@ -31,43 +29,35 @@ import { useTranslation } from "react-i18next";
 import { _get, _post, _put } from "../../../Service/apiClient.js";
 import "./AgriculturalStyles/Agriculture.css";
 import ShowModal from "../ShowModal";
-import SearchPage from "../../SearchPage.js";
 import moment from "moment";
 
 const { Option } = Select;
 
 const Agriculture = ({ path, filters, filters1 }) => {
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const targetCardRef = useRef(null);
   const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [selectedProperty1, setSelectedProperty1] = useState(null);
   const [sold, setSold] = useState(false);
-  const [searchText, setSearchText] = useState(["", "", ""]);
-  const [propertyName, setPropertyName] = useState("");
+  const [searchText] = useState(["", "", ""]);
+  const [propertyName] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-  const [checkedValues, setCheckedValues] = useState(["sold", "unSold"]);
+  const [checkedValues] = useState(["sold", "unSold"]);
 
 
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
+  const [priceRange] = useState([0, Infinity]);
 
-  const [maxprice, setMaxPrice] = useState(100000);
-  const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
 
-  const [maxsize, setMaxSize] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
-  const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
   const [auctionData, setAuctionData] = useState(null);
   const [isAuctionModalVisible, setIsAuctionModalVisible] = useState(false);
   const [isAuctionViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
   const [hoursDifference, setHoursDifference] = useState(0);
   const [form] = Form.useForm();
-  const [auctionDetails, setAuctionDetails] = useState(null);
   const [propertyId, setPropertyId] = useState(null);
   useEffect(() => {
     maxsizefromAPI();
@@ -79,10 +69,10 @@ const Agriculture = ({ path, filters, filters1 }) => {
   const maxPricefromAPI = async () => {
     try {
       const response = await _get("property/maxPrice/agricultural/@/@/@/@/@");
-      const data = await response.data.maxPrice;
-      setMaxPrice(data);
-      setMaxPriceAPI(data);
-      setSliderRange([0, data]);
+      // const data = await response.data.maxPrice;
+      // setMaxPrice(data);
+      // setMaxPriceAPI(data);
+      // setSliderRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
     }
@@ -228,18 +218,7 @@ const Agriculture = ({ path, filters, filters1 }) => {
       console.error("Error fetching data:", error);
     }
   };
-  const fetchAuctions = async () => {
-    try {
-      const response = await _get(`/auction/getAllAuctions`);
-      console.log("Fetched Auction data:", response.data);
-      setAuctionDetails(response.data.data);
-
-
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+ 
   
 
   const handlePaymentSuccess = async () => {
@@ -281,7 +260,7 @@ const Agriculture = ({ path, filters, filters1 }) => {
       status: status === 0 ? 1 : 0,
     };
     try {
-      const res = await _put(
+       await _put(
         "/property/markassold",
         finalObject,
         status === 0 ? "Marked as Sold" : "Marked as UnSold",
@@ -311,7 +290,6 @@ const Agriculture = ({ path, filters, filters1 }) => {
     setIsAuctionModalVisible(true);
     // const maxBidAmount = property.landDetails.totalPrice * 0.1;
     const maxBidAmount = calculateInitialBid1(property.landDetails.totalPrice);
-    const BidAmount = formatPrice(maxBidAmount)
     form.setFieldsValue({
       amount: maxBidAmount, // Set the initial bid amount
     });
@@ -345,7 +323,7 @@ const Agriculture = ({ path, filters, filters1 }) => {
     let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
     const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
 
-    if (searchText != "" && searchText != "all") {
+    if (searchText !== "" && searchText !== "all") {
       await fetchLocation();
       data = data2;
     }
@@ -395,7 +373,6 @@ const Agriculture = ({ path, filters, filters1 }) => {
 
 
   const [sizeRange, setSizeRange] = useState([0, Infinity]);
-  const [sliderRange, setSliderRange] = useState([0, Infinity]);
 
   const handlePaginationChange = (page, pageSize) => {
     setCurrentPage(page);
@@ -450,9 +427,9 @@ const Agriculture = ({ path, filters, filters1 }) => {
       );
       const data = await response.data.maxSize;
 
-      setMaxSize(data);
-      setMaxSizeAPIvalue(data);
-      setSliderRangesize([0, data]);
+      // setMaxSize(data);
+      // setMaxSizeAPIvalue(data);
+      // setSliderRangesize([0, data]);
       setSizeRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
@@ -474,11 +451,11 @@ const Agriculture = ({ path, filters, filters1 }) => {
   return (
     <div ref={targetCardRef}>
       {data != null ? (
-        data.length != 0 ? (
+        data.length !== 0 ? (
           <>
-            {checkedValues.length == 0 ? (
+            {checkedValues.length === 0 ? (
               <h2>Please select atleast one option</h2>
-            ) : filteredData.length == 0 ? (
+            ) : filteredData.length === 0 ? (
               <Col
                 span={24}
                 style={{ textAlign: "centre" }}
@@ -514,17 +491,17 @@ const Agriculture = ({ path, filters, filters1 }) => {
                           margin: 0,
                           boxShadow:
                             path !== "getfields" && "#c3e3f7 0px 5px 10px",
-                          border: item.status != 0 && "1px solid #979ba1",
+                          border: item.status !== 0 && "1px solid #979ba1",
                           backgroundColor: "rgba(159, 159, 167, 0.23)"
                         }}
 
                         bodyStyle={{ padding: 0 }}
 
                         extra={
-                          path === "getfields" && item.status == 0 ? (
+                          path === "getfields" && item.status === 0 ? (
                             <button
                               style={{
-                                color: item.status == 0 ? "green" : "red",
+                                color: item.status === 0 ? "green" : "red",
                                 flexWrap: "wrap",
                                 float: "right",
                                 width: "100%",
@@ -542,12 +519,12 @@ const Agriculture = ({ path, filters, filters1 }) => {
                               Mark as Sold
                             </button>
                           ) : (
-                            item.status == 1 &&
+                            item.status === 1 &&
                             path === "getfields" && (
                               <span>
                                 <button
                                   style={{
-                                    color: item.status == 0 ? "green" : "red",
+                                    color: item.status === 0 ? "green" : "red",
                                     flexWrap: "wrap",
                                     float: "right",
                                     width: "100%",

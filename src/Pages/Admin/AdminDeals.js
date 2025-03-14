@@ -39,7 +39,7 @@ const AdminDeals = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(null);
    
     const itemsPerPage = 6;

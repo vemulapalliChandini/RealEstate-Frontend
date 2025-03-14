@@ -1,15 +1,11 @@
 import {
   Card,
-  Checkbox,
   Col,
   InputNumber,
   Pagination,
   Row,
   Empty,
-  Select,
   Tooltip,
-  Grid,
-  Tabs,
   Skeleton,
   Form,
   Modal, Input, DatePicker, Table
@@ -26,7 +22,6 @@ import {
   AppstoreOutlined,
   EnvironmentOutlined,
   UnorderedListOutlined,
-  EyeFilled,
 } from "@ant-design/icons";
 import "./LayoutStyles/GetLayout.css";
 import ShowModal from "../ShowModal";
@@ -34,14 +29,12 @@ import { useTranslation } from "react-i18next";
 import { _get, _post, _put } from "../../../Service/apiClient.js";
 import moment from "moment";
 
-const { useBreakpoint } = Grid;
 
 const GetLayout = ({ path, filters, filters1 }) => {
-  const screens = useBreakpoint();
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const targetCardRef = useRef(null);
-  const [rating, setrating] = useState(0);
+  const [rating] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   const [selectedProperty1, setSelectedProperty1] = useState(null);
@@ -49,19 +42,18 @@ const GetLayout = ({ path, filters, filters1 }) => {
   const [sold, setSold] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const [propId, setPropId] = useState("");
-  const [searchText, setSearchText] = useState(["", "", ""]);
+  const [searchText] = useState(["", "", ""]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState();
   const [pageSize, setPageSize] = useState(6);
   const [plotCount, setPlotCount] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
-  const [minsize, setMinSize] = useState(0);
-  const [maxsize, setMaxSize] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
-  const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
-  const [propertyName, setPropertyName] = useState("");
+  // const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
+  // const [maxsize, setMaxSize] = useState(100000);
+  // const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
+  // const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
+  const [propertyName] = useState("");
   const [auctionData, setAuctionData] = useState(null);
   const [isAuctionModalVisible, setIsAuctionModalVisible] = useState(false);
   const [isAuctionViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
@@ -179,20 +171,20 @@ const GetLayout = ({ path, filters, filters1 }) => {
     maxsizefromAPI();
     fetchData();
     // fetchVillages();
-    maxPricefromAPI();
+    // maxPricefromAPI();
   }, [sold, rating, plotCount, filters, filters1]);
 
-  const maxPricefromAPI = async () => {
-    try {
-      const response = await _get("property/maxPrice/layout/@/@/@/@/@");
-      const data = await response.data.maxPrice;
-      setMaxPrice(data);
-      setMaxPriceAPI(data);
-      setSliderRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+  // const maxPricefromAPI = async () => {
+  //   try {
+  //     const response = await _get("property/maxPrice/layout/@/@/@/@/@");
+  //     const data = await response.data.maxPrice;
+  //     // setMaxPrice(data);
+  //     // setMaxPriceAPI(data);
+  //     // setSliderRange([0, data]);
+  //   } catch (error) {
+  //     console.error("Error fetching village data:", error);
+  //   }
+  // };
   // const fetchVillages = async () => {
   //   try {
   //     const response = await _get("/location/getallvillages");
@@ -266,7 +258,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
       status: status === 0 ? 1 : 0,
     };
     try {
-      const res = await _put(
+      await _put(
         "/property/markassold",
         finalObject,
         status === 0 ? "Marked as Sold" : "Marked as UnSold",
@@ -288,7 +280,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
   const handlePlotsChange = async (pid, basic_count) => {
     if (0 < plotCount && plotCount < basic_count) {
       try {
-        const res = await _put(
+        await _put(
           "/layout/update",
           {
             availablePlots: plotCount,
@@ -311,7 +303,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
     }
   };
 
-  const [checkedValues, setCheckedValues] = useState(["sold", "unSold"]);
+  const [checkedValues] = useState(["sold", "unSold"]);
 
   const applyFilters = async (
     checkedValues,
@@ -338,7 +330,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
     let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
     const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
 
-    if (searchText != "") {
+    if (searchText !== "") {
       await fetchLocation();
       data = data2;
     }
@@ -390,14 +382,8 @@ const GetLayout = ({ path, filters, filters1 }) => {
     setFilteredData(filtered);
     localStorage.setItem("isLoading", false);
   };
-
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
-  const [maxprice, setMaxPrice] = useState(100000);
-  const [sliderRange, setSliderRange] = useState(0, 100000);
+  const [priceRange] = useState([0, Infinity]);
   const [sizeRange, setSizeRange] = useState(0, Infinity);
-
-
-
   const handleInputChange = (value, totalcount) => {
     setPlotCount(value);
 
@@ -466,9 +452,9 @@ const GetLayout = ({ path, filters, filters1 }) => {
       );
       const data = await response.data.maxSize;
 
-      setMaxSize(data);
-      setMaxSizeAPIvalue(data);
-      setSliderRangesize([0, data]);
+      // setMaxSize(data);
+      // setMaxSizeAPIvalue(data);
+      // setSliderRangesize([0, data]);
       setSizeRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
@@ -477,12 +463,12 @@ const GetLayout = ({ path, filters, filters1 }) => {
 
   return (
     <div ref={targetCardRef}>
-      {data != null ? (
-        data.length != 0 ? (
+      {data !== null ? (
+        data.length !== 0 ? (
           <>
-            {checkedValues.length == 0 ? (
+            {checkedValues.length === 0 ? (
               <h2>Please select atleast one option</h2>
-            ) : filteredData.length == 0 ? (
+            ) : filteredData.length === 0 ? (
               <Col
                 span={24}
                 style={{ textAlign: "centre" }}
@@ -517,15 +503,15 @@ const GetLayout = ({ path, filters, filters1 }) => {
                           margin: 0,
                           boxShadow:
                             path !== "getlayouts" && "#c3e3f7 0px 5px 10px",
-                          border: property.status != 0 && "1px solid #979ba1",
+                          border: property.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 0 }}
                         // onClick={() => handleCardClick(property)}
                         extra={
-                          path === "getlayouts" && property.status == 0 ? (
+                          path === "getlayouts" && property.status === 0 ? (
                             <button
                               style={{
-                                color: property.status == 0 ? "green" : "red",
+                                color: property.status === 0 ? "green" : "red",
                                 flexWrap: "wrap",
                                 float: "right",
                                 width: "100%",
@@ -543,13 +529,13 @@ const GetLayout = ({ path, filters, filters1 }) => {
                               Mark as Sold
                             </button>
                           ) : (
-                            property.status == 1 &&
+                            property.status === 1 &&
                             path === "getlayouts" && (
                               <span>
                                 <button
                                   style={{
                                     color:
-                                      property.status == 0 ? "green" : "red",
+                                      property.status === 0 ? "green" : "red",
                                     flexWrap: "wrap",
                                     float: "right",
                                     width: "100%",
@@ -590,7 +576,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
                               </div>
                             )}
 
-                            {property.uploadPics.length != 0 ? (
+                            {property.uploadPics.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={property.uploadPics[0]}
@@ -788,7 +774,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
                                 )}
                               </>
                               {!isChanged &&
-                                property.status == 0 &&
+                                property.status === 0 &&
                                 path === "getlayouts" ? (
                                 <span
                                   key={property._id}
@@ -800,7 +786,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
                                   className="spanTag"
                                 >
                                   <EditFilled
-                                    visible={property.status == 0 ? true : false}
+                                    visible={property.status === 0 ? true : false}
                                     style={{ fontSize: "16px" }}
                                     onClick={() => {
                                       setPropId(property._id);
@@ -821,11 +807,11 @@ const GetLayout = ({ path, filters, filters1 }) => {
                                   className="spanTag"
                                 >
                                   {!showTooltip &&
-                                    plotCount != null &&
+                                    plotCount !== null &&
                                     property.status === 0 && (
                                       <CheckCircleFilled
                                         visible={
-                                          property.status == 0 ? true : false
+                                          property.status === 0 ? true : false
                                         }
                                         onClick={() => {
                                           setPropId(null);
@@ -841,7 +827,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
                                   {property.status === 0 && (
                                     <CloseCircleFilled
                                       visible={
-                                        property.status == 0 ? true : false
+                                        property.status === 0 ? true : false
                                       }
                                       onClick={() => {
                                         setPropId(null);

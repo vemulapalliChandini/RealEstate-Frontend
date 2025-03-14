@@ -29,16 +29,13 @@ import { _get, _post, _put } from "../../Service/apiClient";
 import { FaWhatsapp } from "react-icons/fa";
 
 import {
-    DeleteOutlined,
-    EllipsisOutlined,
+  
     MoreOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import ShowModal from "../Agent/ShowModal";
 import { FaArrowLeft } from "react-icons/fa";
-import { border } from "@chakra-ui/react";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 const { Option } = Select;
 
@@ -78,7 +75,6 @@ const AgentCustomerAssociation = () => {
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
      const [isDateSelect, setIsDateSelect] = useState(false);
             const [selectedDate, setSelectedDate] = useState(null);
-        const [selectedCardId, setSelectedCardId] = useState(null);
          const [meetingDetails, setMeetingDetails] = useState({
                     dealingId: '',
                     agentId: '',
@@ -88,9 +84,8 @@ const AgentCustomerAssociation = () => {
                     customerMail: '',
                     customerId: ''
                 });
-                const [details, setDetails] = useState([]);
+                const [details] = useState([]);
                  const [selectedStartTime, setSelectedStartTime] = useState(null);
-                          const [selectedEndTime, setSelectedEndTime] = useState(null);  
     // Handler function to update state on selection
     const onDateSelect = (date) => {
         setSelectedDate(date.format("YYYY-MM-DD"));
@@ -166,7 +161,7 @@ const [calendarForm] = Form.useForm();
                             console.log("Combined End DateTime:", combinedDateTime);
                 
                 
-                            setSelectedEndTime(combinedDateTime);
+                            // setSelectedEndTime(combinedDateTime);
                 
                             console.log(meetingDetails.customerMail);
                             const requestData = {
@@ -258,7 +253,7 @@ const [calendarForm] = Form.useForm();
     ) => {
 
         setIsCalendarModalOpen(true);
-        setSelectedCardId(dealingId);
+        // setSelectedCardId(dealingId);
         setMeetingDetails({
             dealingId,
             agentId,
@@ -723,7 +718,7 @@ const [calendarForm] = Form.useForm();
                                 <div
                                     style={{
                                         padding: "1px 10px",
-                                        backgroundColor: "#e0e0e0", color: "#000",
+                                        backgroundColor: "#e0e0e0",
                                         color: "black",
                                         border: "none",
                                         borderRadius: "5px",
@@ -774,7 +769,6 @@ const [calendarForm] = Form.useForm();
                     </div>
                 );
             },
-            align: "center",
             onHeaderCell: () => ({
                 style: {
                     backgroundColor: "#0D416B",
@@ -791,7 +785,6 @@ const [calendarForm] = Form.useForm();
             deal: { propertyName, propertyType },
             agent: { firstName, lastName, phoneNumber },
         } = deal;
-        {console.log(deal)}
         return {
             
             key: deal.deal._id,

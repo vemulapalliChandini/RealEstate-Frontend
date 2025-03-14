@@ -26,7 +26,7 @@ import {
   faRuler,
   faTag,
 } from "@fortawesome/free-solid-svg-icons";
-import { _post, _get, _put } from "../../../Service/apiClient";
+import {_get, _put } from "../../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import Meta from "antd/es/card/Meta";
 import { toast } from "react-toastify";
@@ -45,7 +45,6 @@ export default function GetCommercial({ filters }) {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
@@ -53,20 +52,7 @@ export default function GetCommercial({ filters }) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
   }, [localStorage.getItem("agentrole")]);
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+ 
   useEffect(() => {
     console.log("called");
     if (selectedProperty) {
@@ -201,7 +187,6 @@ export default function GetCommercial({ filters }) {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {

@@ -5,8 +5,9 @@ import {
   Row,
   Col,
   DatePicker,
-   Table,
+    Table,
    Pagination,
+ 
   List,
   Input,
   Modal,
@@ -26,25 +27,18 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
-import { Center } from "@chakra-ui/react";
 import { Line } from "@ant-design/charts";
 
 import moment from "moment";
-import AdminDashboard from "./AdminDashboard.js";
 import { _get } from "../../Service/apiClient";
-import { color } from "framer-motion";
 
 import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
   ArrowDownOutlined,
 } from "@ant-design/icons";
 
 import { ArrowUpOutlined } from "@ant-design/icons";
 
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -54,13 +48,9 @@ import {
   LineChart,
 } from "recharts";
 
-const { RangePicker } = DatePicker;
 
 const Dashboards = () => {
   const navigate = useNavigate();
-  const [dateRange, setDateRange] = useState(null);
-  const [selectedAgent, setSelectedAgent] = useState(null);
-  const [selectedProperty, setSelectedProperty] = useState(null);
   const [totalSales, setTotalSales] = useState(0);
   const [totalProperty, setTotalProperty] = useState(0);
 
@@ -87,7 +77,6 @@ const Dashboards = () => {
 
   //   search for the agent name and location
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [filteredAgents, setFilteredAgents] = useState(agentInfo);
 
   //  modal code from here...
@@ -134,7 +123,7 @@ const Dashboards = () => {
   //  sales related things
 
   const [filteredData, setFilteredData] = useState(salesData.slice(-7)); // Default to last 7 days
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate] = useState(null);
 
   // Sample data for the line chart (replace with actual dynamic data)
   const chartData = [
@@ -165,8 +154,6 @@ const Dashboards = () => {
   const top3Properties = topProperties.slice(0, 5);
 
   const maxVisitors = Math.max(...data.map((item) => item.visitors)); // Highest number of visitors
-  const totalVisitors = data.reduce((sum, item) => sum + item.visitors, 0); // Sum of all visitors
-  const averageVisitors = totalVisitors / data.length; // Average number of visitors
 
   const agentColumns = [
     {
@@ -318,32 +305,6 @@ const Dashboards = () => {
       setFilteredData(filtered.slice(-7));
     }
   }, [selectedDate]);
-
-  const scroll = (direction) => {
-    const container = document.getElementById("property-scroll-container");
-    if (direction === "left") {
-      container.scrollLeft -= 300;
-    } else {
-      container.scrollLeft += 300;
-    }
-  };
-
-  //  search area for agent..
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value.toLowerCase(); // Make query case-insensitive
-    setSearchQuery(query);
-
-    // Filter agents based on name and location
-    const filteredData = agentInfo.filter(
-      (agent) =>
-        agent.agentName.toLowerCase().includes(query) ||
-        agent.agentLocation.toLowerCase().includes(query)
-    );
-    setFilteredAgents(filteredData); // Update filtered data
-  };
-
-  //  modal code..
 
   const showModal = (property) => {
     setSelectedPropertys(property); // Set the selected property
@@ -865,7 +826,6 @@ rgb(13, 65, 107) 0deg ${agriculturalDegree}deg,
               //   "linear-gradient(135deg, rgba(13, 65, 107, 0.8), rgba(255, 255, 255, 0.1))",
               border: "1px solid rgba(172, 172, 172, 0.2)",
               backgroundColor: "rgba(91, 91, 95, 0.23)",
-              backdropFilter: "blur(20px)",
 
               backdropFilter: "blur(10px)",
               color: "black",
@@ -1053,7 +1013,7 @@ Highest Visitors: {maxVisitors}
 
               border: "1px solid rgba(172, 172, 172, 0.2)",
               backgroundColor: "rgba(91, 91, 95, 0.23)",
-              backdropFilter: "blur(20px)",
+           
 
               // background: "#818185",
 
@@ -1182,7 +1142,7 @@ Highest Visitors: {maxVisitors}
 
               border: "1px solid rgba(172, 172, 172, 0.2)",
               backgroundColor: "rgba(91, 91, 95, 0.23)",
-              backdropFilter: "blur(20px)",
+              
 
               backdropFilter: "blur(10px)",
               color: "black",
@@ -1209,7 +1169,7 @@ Highest Visitors: {maxVisitors}
 
               border: "1px solid rgba(172, 172, 172, 0.2)",
               backgroundColor: "rgba(91, 91, 95, 0.23)",
-              backdropFilter: "blur(20px)",
+              
 
               backdropFilter: "blur(10px)",
               color: "black",
@@ -1237,7 +1197,7 @@ Highest Visitors: {maxVisitors}
               //   "linear-gradient(135deg, rgba(13, 65, 107, 0.8), rgba(255, 255, 255, 0.1))",
               border: "1px solid rgba(172, 172, 172, 0.2)",
               backgroundColor: "rgba(91, 91, 95, 0.23)",
-              backdropFilter: "blur(20px)",
+
 
               //  linear
 

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin, Modal, Select, Input, Button, Table, Tabs, Pagination } from 'antd';
-import { _get, _put } from "../../Service/apiClient";
-
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { _get } from "../../Service/apiClient";
 import { FaWhatsapp } from "react-icons/fa";
 import {
     UserOutlined,
@@ -11,7 +9,7 @@ import {
     TeamOutlined,
     MailOutlined,
     AppstoreOutlined, MoneyCollectOutlined, ApartmentOutlined,
-    CommentOutlined, CheckCircleOutlined, CloseCircleOutlined, TableOutlined,
+    CommentOutlined, CheckCircleOutlined, TableOutlined,
     AppstoreAddOutlined
 } from "@ant-design/icons";
 import moment from "moment";
@@ -44,9 +42,6 @@ const DealStatus = () => {
         }
         return phoneNumber;
     };
-
-
-
     const columns = [
         {
             title: 'Customer Name',
@@ -224,7 +219,6 @@ const DealStatus = () => {
         try {
             const response = await _get(`/activity/activities?agentId=${agentId}&dealingId=${dealId}`);
             console.log(response.data.data);
-            const activitiesArray = Array.isArray(response.data) ? response.data : [response.data];
             setActivites(response.data.data);
             setIsActivityModalOpen(true);
 
@@ -438,11 +432,7 @@ const DealStatus = () => {
 
                 {/* Render Cards for each response inside the map */}
                 {view === 'card' && filteredAgents.map((response, index) => {
-                    const interestIn = Number(response.deal.interestIn);
-                    const status = interestIn === 1 ? 'Interested' :
-                        interestIn === 2 ? 'Not Interested' :
-                            'Pending';
-
+                    
                     return (
                         <Col span={8} key={index}>
                             <Card

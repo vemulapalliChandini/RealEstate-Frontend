@@ -2,56 +2,47 @@ import {
   UserOutlined,
   EnvironmentOutlined,
   AppstoreOutlined,
-  EyeFilled,
 } from "@ant-design/icons";
 import React, { useState, useEffect, useRef } from "react";
 import "./Residential.css";
-import { Empty, Pagination, Grid, Modal, Tabs, Skeleton, Form, Input, Table, DatePicker } from "antd";
-import { Card, Col, Row, Rate, Spin } from "antd";
+import { Empty, Pagination, Modal, Skeleton, Form, Input, Table, DatePicker } from "antd";
+import { Card, Col, Row } from "antd";
 import "../Commericial/Arrow.css";
 import ShowModal from "../ShowModal";
 import { useTranslation } from "react-i18next";
 import { _get, _post, _put } from "../../../Service/apiClient";
-import TabPane from "antd/es/tabs/TabPane";
-import ShowViews from "../ShowViews";
 import moment from "moment";
-const { useBreakpoint } = Grid;
-
 export default function Residential({ path, filters, filters1 }) {
-  const screens = useBreakpoint();
-  const [viewsModal, setViewsModal] = useState(false);
-  const [viewProp, setViewProp] = useState(null);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const targetCardRef = useRef(null);
   const [data, setData] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProduct1, setSelectedProduct1] = useState(null);
-  const [rating, setrating] = useState(0);
+  const [rating] = useState(0);
   const [sold, setSold] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [filteredData, setFilteredData] = useState([]);
-  const [searchText, setSearchText] = useState(["", "", ""]);
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
-  const [checkedValues, setCheckedValues] = useState(["sold", "unSold"]);
+  const [searchText] = useState(["", "", ""]);
+  const [priceRange] = useState([0, Infinity]);
+  const [checkedValues] = useState(["sold", "unSold"]);
   const [auctionData, setAuctionData] = useState(null);
   const [isAuctionModalVisible, setIsAuctionModalVisible] = useState(false);
   const [isAuctionViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
-  const [maxprice, setMaxPrice] = useState(100000);
-  const [sliderRange, setSliderRange] = useState([0, Infinity]);
-  const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
-  const [propertyName, setPropertyName] = useState("");
-  const [checkedHouseType, setCheckedValuesHouseType] = useState([
+  const [setMaxPrice] = useState(100000);
+  // const [sliderRange, setSliderRange] = useState([0, Infinity]);
+  // const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
+  const [propertyName] = useState("");
+  const [checkedHouseType] = useState([
     "Flat",
     "House",
     "Apartment",
   ]);
-  const [purposeType, setPurposeType] = useState("sell", "rent", "lease");
+  const [purposeType] = useState("sell", "rent", "lease");
   const [form] = Form.useForm();
-  const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
-  const [maxsize, setMaxSize] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
+  // const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
+  // const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
   const [propertyId, setPropertyId] = useState(null);
   useEffect(() => {
     maxsizefromAPI();
@@ -145,7 +136,6 @@ export default function Residential({ path, filters, filters1 }) {
     setSelectedProduct1(null);
   };
   const maxPricefromAPI = async () => {
-    const data = checkedHouseType;
     const parameters = ["@", "@"];
     if (checkedHouseType.includes("Flat")) {
       parameters[0] = "flat";
@@ -159,8 +149,8 @@ export default function Residential({ path, filters, filters1 }) {
       );
       const data = await response.data.maxPrice;
       setMaxPrice(data);
-      setMaxPriceAPI(data);
-      setSliderRange([0, data]);
+      // setMaxPriceAPI(data);
+      // setSliderRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
     }
@@ -254,7 +244,7 @@ export default function Residential({ path, filters, filters1 }) {
       status: status === 0 ? 1 : 0,
     };
     try {
-      const res = await _put(
+      await _put(
         "/property/markassold",
         finalObject,
         status === 0 ? "Marked as Sold" : "Marked as UnSold",
@@ -303,7 +293,7 @@ export default function Residential({ path, filters, filters1 }) {
     let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
     const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
 
-    if (searchText != "") {
+    if (searchText !== "") {
       await fetchLocation();
       data = data2;
     }
@@ -450,9 +440,9 @@ export default function Residential({ path, filters, filters1 }) {
         `property/maxSize/residential/@/@/@/@/@/${first}/${second}`
       );
       const data = await response.data.maxSize;
-      setMaxSize(data);
-      setMaxSizeAPIvalue(data);
-      setSliderRangesize([0, data]);
+      // setMaxSize(data);
+      // setMaxSizeAPIvalue(data);
+      // setSliderRangesize([0, data]);
       setSizeRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
@@ -462,12 +452,12 @@ export default function Residential({ path, filters, filters1 }) {
 
   return (
     <div ref={targetCardRef}>
-      {data != null ? (
-        data.length != 0 ? (
+      {data !== null ? (
+        data.length !== 0 ? (
           <>
-            {checkedValues.length == 0 ? (
+            {checkedValues.length === 0 ? (
               <h2>Please select atleast one option</h2>
-            ) : filteredData.length == 0 ? (
+            ) : filteredData.length === 0 ? (
               <Col
                 span={24}
                 style={{ textAlign: "centre" }}

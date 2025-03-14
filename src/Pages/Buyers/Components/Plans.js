@@ -4,9 +4,7 @@ import React, { useState, useEffect } from "react";
 import { _get } from "../../../Service/apiClient";
 
 import { Card, Button, Row, Col, Typography } from "antd";
-import {
-    useNavigate,
-} from "react-router-dom";
+
 
 import "./Plan.css";
 
@@ -20,7 +18,6 @@ const { Title, Text } = Typography;
 const Plans = () => {
     const [hoveredPlan, setHoveredPlan] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const navigate = useNavigate();
 
 
     const handleButtonClick = () => {

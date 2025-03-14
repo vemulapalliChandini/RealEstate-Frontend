@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Button, Card, Table, Modal, Avatar, Menu, Dropdown, Spin, Input } from "antd";
 import { _get } from "../../Service/apiClient";
 import { useNavigate } from "react-router-dom";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+ // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import AddMarketingAgents from "./AddMarketingAgents";
 import { MailOutlined, MoreOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
@@ -14,6 +14,7 @@ import { FaWhatsapp } from "react-icons/fa";
 // import AssignedProperties from "../MarketingAgents/AssignedProperties";
 
 // const { Search } = Input;
+ 
 
 const MarketingAgent = ({ responseTrue }) => {
 

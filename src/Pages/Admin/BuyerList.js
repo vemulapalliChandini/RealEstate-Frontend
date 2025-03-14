@@ -4,7 +4,6 @@ import {
   Table,
   Button,
   Spin,
-  Pagination,
   message,
   Popover,
   Card,
@@ -13,14 +12,12 @@ import {
 } from "antd";
 import { DeleteOutlined, MailOutlined } from "@ant-design/icons";
 import { _get, _delete } from "../../Service/apiClient";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
+import {  FaWhatsapp } from "react-icons/fa";
 
 export default function BuyerList() {
   const [buyer, setBuyer] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [searchLocation, setSearchLocation] = useState("");

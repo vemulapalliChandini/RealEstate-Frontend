@@ -45,8 +45,7 @@ const AgentAppointment = ({ path }) => {
   const [loading, setLoading] = useState(true);
   const [isBookAppointmentModalOpen, setIsBookAppointmentModalOpen] =
     useState(false);
-  const [isAllAppointmentsCleared, setIsAllAppointmentsCleared] =
-    useState(true);
+
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [chatModal, setChatModal] = useState(false);
@@ -171,7 +170,6 @@ const AgentAppointment = ({ path }) => {
   }, []);
 
   const handleSendMessage = () => {
-    timestamp: new Date().toLocaleTimeString();
     if (typedMessage.trim() !== "") {
       const messageData = {
         senderId: localStorage.getItem("userId"),
@@ -199,7 +197,7 @@ const socket = getSocket();
 
   useEffect(() => {
     setAppointments([]);
-    setIsAllAppointmentsCleared(true);
+
   }, [path, isBookAppointmentModalOpen]);
 
   useEffect(() => {
@@ -224,7 +222,7 @@ const socket = getSocket();
     const hasPending = appointments.some(
       (appointment) => appointment.status === 0
     );
-    setIsAllAppointmentsCleared(!hasPending);
+  
   };
 
   const filterAppointments = () => {

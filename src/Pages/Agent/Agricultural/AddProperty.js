@@ -5,7 +5,6 @@ import {
   Button,
   Select,
   Switch,
-
   Row,
   Col,
   InputNumber,
@@ -17,7 +16,6 @@ import {
   Modal,
   message,
   Popconfirm,
-  Spin,
 } from "antd";
 import "./AgriculturalStyles/AddProperty.css";
 
@@ -42,7 +40,6 @@ import "leaflet/dist/leaflet.css";
 import {
   DeleteOutlined,
   InfoCircleOutlined,
-  MicrophoneOutlined,
   UploadOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
@@ -50,7 +47,7 @@ import { _post, _get } from "../../../Service/apiClient";
 import Upload from "../Upload";
 import { useTranslation } from "react-i18next";
 import CurrentLocation from "../currentLocation";
-import { FaArrowLeft, FaMicrophone, FaVolumeUp } from "react-icons/fa";
+import { FaArrowLeft, FaMicrophone } from "react-icons/fa";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
@@ -59,7 +56,7 @@ const { Option } = Select;
 const API_KEY = "AIzaSyCRouoqOUlbhszsbloBTJa7cR4hOZvFYi4";
 function AddProperty({ setShowFormType }) {
   const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [landMark, setlandMark] = useState("");
 
@@ -68,20 +65,15 @@ function AddProperty({ setShowFormType }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
 
-  const [selectedLandType, setSelectedLandType] = useState("");
-  const [headingLabel, setHeadingLabel] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMandal, setSelectedMandal] = useState("");
   const [mandals, setMandals] = useState([]);
 
-  const [activeTab, setActiveTab] = useState(["ownerDetails"]);
   const [villages, setVillages] = useState([]);
   const [pincode, setPincode] = useState("");
-  const [selectedValues, setSelectedValues] = useState([]);
+  const [selectedValues] = useState([]);
 
   const [isLitigation, setIsLitigation] = useState(false);
-  const [isBoreFacility, setisBoreFacility] = useState(false);
-  const [hasErrors, setHasErrors] = useState(false);
   const fileInputRef = useRef(null);
   const [form] = Form.useForm();
   const { Panel } = Collapse;
@@ -89,8 +81,6 @@ function AddProperty({ setShowFormType }) {
   const [isUploading, setIsUploading] = useState(false);
 
   const [unit, setUnit] = useState("acres");
-  const [totalinacres, settotalInAcres] = useState(0);
-  const [landmeasure, setLandMeasure] = useState(0);
   const [priceunit, setPriceUnit] = useState("acres");
 
   const [latitude, setLatitude] = useState(""); // State for Latitude
@@ -126,7 +116,6 @@ function AddProperty({ setShowFormType }) {
   const audioChunks = useRef([]);
   //   const [form] = Form.useForm();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState("");
 
   // const handleSpeechInput = async () => {
   //     setIsProcessing(true);
@@ -152,43 +141,9 @@ function AddProperty({ setShowFormType }) {
   //     }
   // };
   // const cloudinaryUrl = "https://res.cloudinary.com/ds1qogjpk/video/upload/v1740149427/blob_nrppae.webm"; // e.g., "https://res.cloudinary.com/your-cloud-name/video/upload/v1620000000/yourfile.wav"
-  const cloudinaryUrl = "https://res.cloudinary.com/ds1qogjpk/video/upload/v1740149427/blob_nrppae.webm";
-  const [mediaSrc, setMediaSrc] = useState(cloudinaryUrl || null);
+  // const cloudinaryUrl = "https://res.cloudinary.com/ds1qogjpk/video/upload/v1740149427/blob_nrppae.webm";
 
 
-  const handleSpeakerClick = () => {
-    if (cloudinaryUrl) {
-      // Use video element to play the WebM file.
-      const videoElement = document.getElementById('media-player');
-      if (videoElement) {
-        if (videoElement.paused) {
-          videoElement.play();
-        } else {
-          videoElement.pause();
-        }
-      }
-    } else {
-      // Trigger file input for uploading a .wav file.
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
-      }
-    }
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setMediaSrc(url);
-      // Auto-play after a short delay.
-      setTimeout(() => {
-        const videoElement = document.getElementById('media-player');
-        if (videoElement) {
-          videoElement.play();
-        }
-      }, 100);
-    }
-  }
   const handleSpeechInput = async () => {
     setIsProcessing(true);
 
@@ -200,7 +155,7 @@ function AddProperty({ setShowFormType }) {
 
       recognition.onresult = async (event) => {
         const speechText = event.results[0][0].transcript;
-        setTranscript(speechText);
+        // setTranscript(speechText);
         await processWithGemini(speechText);
       };
 
@@ -325,8 +280,7 @@ If no road type is clearly mentioned, return "None".
       setIsLitigation(hasDisputes);
       form.setFieldsValue({ litigation: hasDisputes });
 
-      const hasBoreFacility = extractedData.amenities?.boreWell?.toLowerCase() === "yes";
-      setisBoreFacility(hasBoreFacility);
+      // setisBoreFacility(hasBoreFacility);
 
       form.setFieldsValue({
         firstName: extractedData.firstName,
@@ -467,57 +421,26 @@ If no road type is clearly mentioned, return "None".
   };
 
   const handleBoreChange = (checked) => {
-    setisBoreFacility(checked);
+    // setisBoreFacility(checked);
     form.setFieldsValue({ boreWell: checked });
   };
 
   const handleUnitChange = (value) => {
-    setType(form.getFieldValue("landsizeunit"));
+    // setType(form.getFieldValue("landsizeunit"));
 
     setUnit(value);
-    const conversionFactors = {
-      acres: 1,
-      "sq. ft": 43560,
-      "sq.yards": 4840,
-      "sq.m": 4047,
-      cents: 100,
-    };
-    if (type == "acres") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      if (price && type && landmeasure)
-        settotalInAcres(
-          (price * conversionFactors[type] * landmeasure * 1) /
-          conversionFactors[type]
-        );
-    }
+    
+    
   };
   const handlePriceUnitChange = (value) => {
     setPriceUnit(value);
   };
 
   const handleSizeChange = (data) => {
-    setLandMeasure(form.getFieldValue("size"));
+    // setLandMeasure(form.getFieldValue("size"));
 
-    const conversionFactors = {
-      acres: 1,
-      "sq. ft": 1 / 43560,
-      "sq.yards": 1 / 4840,
-      "sq.m": 1 / 4047,
-      cents: 1 / 100,
-    };
-    if (type == "acres") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      if (type == "acres") {
-        settotalInAcres(price * landmeasure);
-      } else {
-        settotalInAcres(
-          (price * conversionFactors[type] * landmeasure * 1) /
-          conversionFactors[type]
-        );
-      }
-    }
+  
+   
   };
 
   const handleDistrictChange = async (value) => {
@@ -603,14 +526,14 @@ If no road type is clearly mentioned, return "None".
     }
   };
 
-  const handleLandTypeChange = (value) => {
-    setSelectedLandType(value);
+  // const handleLandTypeChange = (value) => {
+  //   setSelectedLandType(value);
 
-    if (value === "converted") {
-      setHeadingLabel("Is this Land converted from any other Form?");
-    } else {
-    }
-  };
+  //   if (value === "converted") {
+  //     setHeadingLabel("Is this Land converted from any other Form?");
+  //   } else {
+  //   }
+  // };
   const [addressDetails, setAddressDetails] = useState({
     country: "",
     state: "",
@@ -726,24 +649,24 @@ If no road type is clearly mentioned, return "None".
   };
 
   const handlePriceChange = (data) => {
-    setPrice(form.getFieldValue("price"));
-    const conversionFactors = {
-      acres: 1, // 1 acre is 1 acre
-      "sq. ft": 43560, // 1 sq.ft. to acres
-      "sq.yards": 4840, // 1 sq.yard to acres
-      "sq.m": 4047, // 1 sq.m to acre
-      cents: 100, // 1 cent to acres
-    };
-    if (type == "acres") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      settotalInAcres(
-        (form.getFieldValue("size") *
-          form.getFieldValue("price") *
-          conversionFactors[form.getFieldValue("landsizeunit")]) /
-        form.getFieldValue("size")
-      );
-    }
+    // setPrice(form.getFieldValue("price"));
+    // const conversionFactors = {
+    //   acres: 1, // 1 acre is 1 acre
+    //   "sq. ft": 43560, // 1 sq.ft. to acres
+    //   "sq.yards": 4840, // 1 sq.yard to acres
+    //   "sq.m": 4047, // 1 sq.m to acre
+    //   cents: 100, // 1 cent to acres
+    // };
+    // if (type == "acres") {
+    //   settotalInAcres(price * landmeasure);
+    // } else {
+    //   settotalInAcres(
+    //     (form.getFieldValue("size") *
+    //       form.getFieldValue("price") *
+    //       conversionFactors[form.getFieldValue("landsizeunit")]) /
+    //     form.getFieldValue("size")
+    //   );
+    // }
   };
 
   const address = {
@@ -763,27 +686,7 @@ If no road type is clearly mentioned, return "None".
     uploadPics.push(imageUrl);
   });
 
-  const panelKeys = {
-    userId: "agentDetails",
-    ownerName: "ownerDetails",
-    phoneNumber: "ownerDetails",
-    landType: "landDetails",
-    distanceFromRoad: "Amenities",
-    checkboxGroup: "landDetails",
-    propertyDesc: "landDetails",
-    title: "landDetails",
-    surveyNumber: "landDetails",
-    size: "landDetails",
-    price: "landDetails",
-    hasPincode: "Address",
-    pincode: "Address",
-    country: "Address",
-    state: "Address",
-    district: "Address",
-    mandal: "Address",
-    village: "Address",
-    landMark: "Address",
-  };
+  
 
   const validateFieldsManually = (values) => {
     const errors = {};
@@ -822,8 +725,7 @@ If no road type is clearly mentioned, return "None".
     return errors;
   };
 
-  const [price, setPrice] = useState(0);
-  const [type, setType] = useState("acres");
+
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
   const fetchAgentEmails = async () => {
@@ -847,9 +749,7 @@ If no road type is clearly mentioned, return "None".
     const values = form.getFieldsValue();
     const validationErrors = validateFieldsManually(values);
     if (Object.keys(validationErrors).length > 0) {
-      const panelsWithErrors = new Set(
-        Object.keys(validationErrors).map((field) => panelKeys[field])
-      );
+    
 
       const errorsToSet = Object.entries(validationErrors).map(
         ([field, error]) => ({
@@ -859,8 +759,8 @@ If no road type is clearly mentioned, return "None".
       );
 
       form.setFields(errorsToSet);
-      setActiveTab([...panelsWithErrors]);
-      setHasErrors(true);
+      // setActiveTab([...panelsWithErrors]);
+      // setHasErrors(true);
     }
 
     const agentDetails = {
@@ -926,7 +826,6 @@ If no road type is clearly mentioned, return "None".
       amenities,
     };
 
-    const apiUrl = "http://172.17.15.53:3000/fields/insert";
     setLoading(true);
     try {
       console.log(
@@ -993,7 +892,7 @@ If no road type is clearly mentioned, return "None".
     setSkills(skills.filter((skill) => skill !== removedSkill));
   };
   const handlePanelChange = (key) => {
-    setActiveTab(key);
+    // setActiveTab(key);
     if (isFirstInteraction) {
       setIsFirstInteraction(false);
     }
@@ -1452,7 +1351,7 @@ If no road type is clearly mentioned, return "None".
                   <Select
                     className="select-custom"
                     placeholder="Select land type"
-                    onChange={handleLandTypeChange}
+                    // onChange={handleLandTypeChange}
                   >
                     <Option value="dryland">Dry land</Option>
                     <Option value="wetland">Wet land</Option>
@@ -1983,7 +1882,7 @@ If no road type is clearly mentioned, return "None".
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,

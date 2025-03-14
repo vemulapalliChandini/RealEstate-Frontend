@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Modal, Badge, Card, Select, Row, Col, Empty, Pagination, Collapse } from 'antd';
-import axios from 'axios';
 import { ScheduleOutlined } from '@ant-design/icons';
 import { _get } from "../../Service/apiClient";
-const { Option } = Select;
 const { Panel } = Collapse;
 
 function Meetings() {
     const [meetings, setMeetings] = useState([]);
     const [selectedMeeting, setSelectedMeeting] = useState(null);
     const [viewOption, setViewOption] = useState('today');
-    const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
+    // const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewMoreModalVisible, setViewMoreModalVisible] = useState(false);
     const [viewAllMeetings, setViewAllMeetings] = useState([]);
-    const [meetingDetailsModalVisible, setMeetingDetailsModalVisible] = useState(false);
+    // const [meetingDetailsModalVisible, setMeetingDetailsModalVisible] = useState(false);
     const [remainingMeetings, setRemainingMeetings] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [meetingsPerPage] = useState(2);
@@ -65,7 +63,7 @@ function Meetings() {
             return meetingDate.toDateString() === selectedDate.toDateString();
         });
 
-        setSelectedDateMeetings(dateMeetings);
+        // setSelectedDateMeetings(dateMeetings);
         setSelectedDate(selectedDate.toDateString());
         setSelectedMeeting(dateMeetings.length > 0 ? dateMeetings[0] : null);
     };
@@ -88,7 +86,7 @@ function Meetings() {
                             if (listData.length === 1) {
 
                                 setViewAllMeetings(listData);
-                                setMeetingDetailsModalVisible(true);
+                                // setMeetingDetailsModalVisible(true);
                             } else {
 
                                 setViewAllMeetings(listData);
@@ -116,9 +114,7 @@ function Meetings() {
         setRemainingMeetings(remainingMeetings);
     };
 
-    const handleMeetingDetailsModalClose = () => {
-        setMeetingDetailsModalVisible(false);
-    };
+ 
 
     const handleViewMeetingDetails = (meeting) => {
         setSelectedMeeting(meeting);

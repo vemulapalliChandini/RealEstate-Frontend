@@ -11,7 +11,6 @@ import {
   Divider,
   InputNumber,
   Menu,
-  Grid,
 } from "antd";
 import { calculateEMI } from "./emiCalculator";
 import {
@@ -40,12 +39,10 @@ const banks = [
   "Union Bank of India",
   "Canara Bank",
 ];
-const { useBreakpoint } = Grid;
 
 const FinancialAssistant = () => {
-  const screens = useBreakpoint();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [emiResult, setEmiResult] = useState(null);
   const [eligibility, setEligibility] = useState(null);

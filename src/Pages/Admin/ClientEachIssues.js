@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { _get } from "../../Service/apiClient";
-import { Row, Col, Card, Typography, Avatar, Button, Modal } from "antd";
+import {  Card, Typography, Avatar, Button, Modal } from "antd";
 export default function ClientEachIssues() {
   const { userId } = useParams();
   const [issue, setIssue] = useState([]);

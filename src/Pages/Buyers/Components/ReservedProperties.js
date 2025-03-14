@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Card, Row, Col, Spin, Button, Pagination, Grid, Popconfirm, Input, Skeleton } from "antd";
+import { Card, Row, Col, Pagination, Input, Skeleton } from "antd";
 
 import { useNavigate } from "react-router-dom";
 
@@ -11,18 +11,13 @@ import { _delete, _get } from "../../../Service/apiClient";
 import {
   MoneyCollectOutlined,
   EnvironmentOutlined,
-  ArrowLeftOutlined,
-  ClusterOutlined,
-  EllipsisOutlined,
   AppstoreOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 const { Meta } = Card;
-const { useBreakpoint } = Grid;
 
 const ReservedProperties = () => {
-  const { t, i18n } = useTranslation();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [nameSearchQuery2, setNameSearchQuery2] = useState("");
@@ -38,7 +33,6 @@ const ReservedProperties = () => {
       .then((response) => {
         const data = response.data;
         console.log(data);
-        const formattedProperties = [];
         setProperties(data);
         setLoading(false);
       })
@@ -48,22 +42,7 @@ const ReservedProperties = () => {
       });
   };
 
-  const handleRemove = async (propertyId) => {
-    console.log("dshdhd");
-    try {
-      await _delete(
-        `/wishlist/delete/${propertyId}`,
-        "Property removed from wishlist",
-        "Failed to remove property from wishlist"
-      ).then(() => {
-        setProperties((prevProperties) =>
-          prevProperties.filter((property) => property.propertyId !== propertyId)
-        );
-      });
-    } catch (error) {
-      console.error("Error deleting data:", error);
-    }
-  };
+ 
 
   const formatPrice = (price) => {
     if (price == null) {
@@ -135,9 +114,7 @@ const ReservedProperties = () => {
     console.error("Filtered properties is not an array.");
   }
 
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
+ 
 
   return (
     <div className="wishlist" ref={targetCardRef}>
