@@ -1,12 +1,11 @@
 import React, { useState, useRef } from "react";
-import { Row, Col, Button, Card, Table, Modal, Avatar, Form, Space, Input, Select, Tooltip, Progress } from "antd";
+import { Row, Col, Button,   Form, Space, Input,   Tooltip, Progress } from "antd";
 import { useTranslation } from "react-i18next";
-import { _get, _post } from "../../Service/apiClient";
+import { _post } from "../../Service/apiClient";
 import {
     DeleteOutlined,
     InfoCircleOutlined,
-    EyeOutlined,
-
+ 
 } from "@ant-design/icons";
 import Upload from "../Agent/Upload";
 import Cropper from "react-cropper";
@@ -18,7 +17,7 @@ function AddMarketingAgents({ onAddSuccess }) {
     const [imageUrl1, setImageUrl1] = useState(null);
     const [uploadProgress1, setUploadProgress1] = useState(0);
     const [isUploading1, setIsUploading1] = useState(false);
-    const [responseTrue, setResponseTrue] = useState(false);
+    // const [responseTrue, setResponseTrue] = useState(false);
     const fileInputRef = useRef(null);
     const cropperRef = useRef(null);
     const [loading, setLoading] = useState(false);
@@ -104,7 +103,7 @@ function AddMarketingAgents({ onAddSuccess }) {
         }
     };
     const onFinish = async (values) => {
-        const role = localStorage.getItem("role");
+        // const role = localStorage.getItem("role");
         const payload = {
             ...values,
             role: 6,
@@ -126,7 +125,7 @@ function AddMarketingAgents({ onAddSuccess }) {
                 onAddSuccess();
                 setCroppedImage(null);
                 console.log("hello");
-                setResponseTrue(true);
+                // setResponseTrue(true);
             }
         } catch (error) {
         }
@@ -153,7 +152,7 @@ function AddMarketingAgents({ onAddSuccess }) {
             setIsUploading1(false);
         }
     };
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     return (
         <div style={{ marginTop: "3%" }}>

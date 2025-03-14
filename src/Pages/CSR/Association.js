@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Card, List, Badge, Spin, Input, Empty, Row, Col, Skeleton, Pagination, Menu, Dropdown, Button, Modal, Tooltip } from "antd";
+import { Tabs, Card, List, Badge,  Input, Empty, Row, Col, Skeleton, Pagination,   Button, Modal, Tooltip } from "antd";
 import { _get } from "../../Service/apiClient";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,8 +10,7 @@ import {
     HomeOutlined,
     InfoCircleOutlined,
     UserOutlined,
-    EllipsisOutlined,
-    PlusCircleFilled
+     PlusCircleFilled
 
 } from "@ant-design/icons";
 
@@ -37,24 +36,20 @@ const Association = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    // const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(null);
-    const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-    const [dealId, setDealId] = useState(null);
-    const [agentId, setAgentId] = useState(null);
-    const [activities, setActivites] = useState(null);
-    const [isAddActivityModalOpen, setIsAddActivityModalOpen] = useState(false);
+ 
     const [isAddModalOPen, setIsAddModalOpen] = useState(false);
     const itemsPerPage = 6;
     const navigate = useNavigate();
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
-    const handleMoreClick = (record) => {
-        console.log(record);
-        setSelectedCustomer(record.properties);
-        setIsModalVisible(true);
-    };
+    // const handleMoreClick = (record) => {
+    //     console.log(record);
+    //     setSelectedCustomer(record.properties);
+    //     setIsModalVisible(true);
+    // };
     const currentProperties = filteredCustomers.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
@@ -66,33 +61,33 @@ const Association = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    const handleAddActivityModal = (dealId, agentId) => {
+    // const handleAddActivityModal = (dealId, agentId) => {
 
-        setIsAddActivityModalOpen(true);
-        setDealId(dealId);
-        setAgentId(agentId);
-    }
+    //     setIsAddActivityModalOpen(true);
+    //     setDealId(dealId);
+    //     setAgentId(agentId);
+    // }
     const handleModalClose = () => {
 
         setIsModalVisible(false);
 
     };
-    const handleActivities = async (deal) => {
+    // const handleActivities = async (deal) => {
 
-        setDealId(deal.deal._id);
-        setAgentId(deal.agent._id);
-        setIsActivityModalOpen(true);
-        try {
-            const response = await _get(`/activity/activities?agentId=${deal.agent._id}&dealingId=${deal.deal._id}`);
-            console.log(response.data.data);
+    //     setDealId(deal.deal._id);
+    //     setAgentId(deal.agent._id);
+    //     setIsActivityModalOpen(true);
+    //     try {
+    //         const response = await _get(`/activity/activities?agentId=${deal.agent._id}&dealingId=${deal.deal._id}`);
+    //         console.log(response.data.data);
 
-            setActivites(response.data.data);
+    //         setActivites(response.data.data);
 
-        } catch (error) {
-            console.error('Error fetching deals:', error);
+    //     } catch (error) {
+    //         console.error('Error fetching deals:', error);
 
-        }
-    };
+    //     }
+    // };
     const handleCloseModal = () => {
 
         setIsAddModalOpen(false);
@@ -447,8 +442,7 @@ interests and deals.
                                                     backgroundColor: "#0d416b",
                                                     color: "#fff",
                                                     border: "none",
-                                                    padding: "2px",
-
+ 
                                                     cursor: "pointer",
                                                     fontWeight: "bold",
                                                     padding: "5px 10px",
@@ -720,8 +714,7 @@ associated customers.
                                                     backgroundColor: "#0d416b",
                                                     color: "#fff",
                                                     border: "none",
-                                                    padding: "2px",
-
+ 
                                                     cursor: "pointer",
                                                     fontWeight: "bold",
                                                     padding: "5px 10px",
@@ -751,8 +744,7 @@ associated customers.
             </Tabs>
             {isModalVisible && (
                 <ShowModal
-                    selectedProperty={selectedCustomer}
-                    isModalVisible={isModalVisible}
+                     isModalVisible={isModalVisible}
                     handleCancel={handleModalClose}
                 />
             )}

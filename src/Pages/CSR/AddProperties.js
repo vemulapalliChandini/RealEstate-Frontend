@@ -1,36 +1,33 @@
 import React, { useState } from "react";
-import { Card, Row, Col, Typography, Space, Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Card, Row, Col, Typography, Space } from "antd";
+// import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
     PlusCircleOutlined,
-    ShopOutlined,
-    BorderInnerOutlined,
-    BorderlessTableOutlined,
-    HomeOutlined,
+ 
     CloseOutlined,
 } from "@ant-design/icons";
 import CommercialForm from "../Agent/Commericial/CommercialForm";
 import AddProperty from "../Agent/Agricultural/AddProperty";
 import LayoutForm from "../Agent/Layout/LayoutForm";
 import ResidentialForm from "../Agent/Residential/ResidentialForm";
-import { FaArrowLeft } from "react-icons/fa";
+// import { FaArrowLeft } from "react-icons/fa";
 
 // Images for the cards
 
 const Users = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const [role, setRole] = useState(localStorage.getItem('role'));
+    // const navigate = useNavigate();
+    const role = useState(localStorage.getItem('role'));
     const [showFormType, setShowFormType] = useState(null);
 
     const handleCardClick = (type) => {
         setShowFormType(type);
     };
 
-    const handleBackClick = () => {
-        setShowFormType(null); // Hide form and show cards
-    };
+    // const handleBackClick = () => {
+    //     setShowFormType(null); // Hide form and show cards
+    // };
 
     return (
         <div>

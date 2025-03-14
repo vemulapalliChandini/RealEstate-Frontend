@@ -2,7 +2,7 @@
 
 
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Row,
   Col,
@@ -26,7 +26,7 @@ import Meta from "antd/es/card/Meta";
 import moment from 'moment';
 import ShowModal from "../Agent/ShowModal";
 import { useLocation, useNavigate } from "react-router-dom";
-import { MailOutlined, SearchOutlined, VerifiedUserOutlined } from "@mui/icons-material";
+import { MailOutlined, SearchOutlined } from "@mui/icons-material";
 import {
   // MailOutlined,
   UserOutlined,
@@ -40,8 +40,7 @@ function PropertiesCSR() {
   const [selectedType] = useState("All");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [data, setData] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+   const [errorMessage, setErrorMessage] = useState("");
   const [validInput, setValidInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,57 +104,55 @@ function PropertiesCSR() {
       topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  const [isInputVisible, setInputVisible] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isPhoneValid, setPhoneValid] = useState(false);
+  // const [isInputVisible, setInputVisible] = useState(false);
+  // const [phoneNumber, setPhoneNumber] = useState("");
+  // const [isPhoneValid, setPhoneValid] = useState(false);
   const [shareMethod, setShareMethod] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const [isInputValid, setInputValid] = useState(false);
+  // const [isInputValid, setInputValid] = useState(false);
   const [typeSearchQuery, setTypeSearchQuery] = useState("All")
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
-  const [nameSearchQuery, setNameSearchQuery] = useState("");
+  // const [nameSearchQuery, setNameSearchQuery] = useState("");
   const [nameSearchQuery2, setNameSearchQuery2] = useState("");
   const handleShareClick = (method) => {
     console.log("share clicked");
     setShareMethod(method);
-    setInputVisible(true);
+    // setInputVisible(true);
 
     setInputValue("");
-    setInputValid(false);
-    setErrorMessage("");
+     setErrorMessage("");
     setIsModalOpen(true);
   };
-  const filterProperties = (landDetails) => {
-    return landDetails.filter((item) => {
-      console.log(locationSearchQuery);
-      const typeSearch = typeSearchQuery !== "All" ? typeSearchQuery.toLowerCase() : "";
-      const locationSearch = locationSearchQuery.toLowerCase();
-      const agentSearch = nameSearchQuery.toLowerCase();
+ 
 
-      const nameSearch2 = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : "";
-      const isPropertyIdSearch = /\d/.test(nameSearch2);
-      const typeMatch = typeSearchQuery === "All" || item.propertyType.toLowerCase().includes(typeSearch);
-      console.log(item.district);
-      console.log(item.mandal);
-      console.log(item.village);
+  const filterProperties = useCallback((landDetails) => {
+    // Precompute the search query values to avoid recomputing inside the loop
+    const typeSearch = typeSearchQuery !== "All" ? typeSearchQuery.toLowerCase() : "";
+    const locationSearch = locationSearchQuery ? locationSearchQuery.toLowerCase() : "";
+    const agentSearch = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : "";
+  
+    return landDetails.filter((item) => {
+      // Safeguard against undefined or null fields
+      const typeMatch = typeSearch === "" || item.propertyType?.toLowerCase().includes(typeSearch);
       const locationMatch =
         (item.district && item.district.toLowerCase().includes(locationSearch)) ||
         (item.mandal && item.mandal.toLowerCase().includes(locationSearch)) ||
         (item.village && item.village.toLowerCase().includes(locationSearch));
-      console.log(locationMatch)
-
-
-      const agentMatch = nameSearchQuery === "" || item.agentName.toLowerCase().includes(agentSearch);
-
-      // Matches property ID or property name based on the input type.
+      const agentMatch = agentSearch === "" || item.agentName?.toLowerCase().includes(agentSearch);
+  
+      // Matching property ID or name
+      const nameSearch2 = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2);
       const nameMatch2 = isPropertyIdSearch
         ? item.propertyId && item.propertyId.toString().toLowerCase().includes(nameSearch2)
         : item.propertyName && item.propertyName.toLowerCase().includes(nameSearch2);
-
-      // Return true only if all filters match.
+  
       return typeMatch && locationMatch && agentMatch && (nameSearchQuery2 === "" || nameMatch2);
     });
-  };
+  }, [locationSearchQuery,nameSearchQuery2 ,typeSearchQuery]);  
+  
+
+
   const formatPrice = (price) => {
     if (price == null) {
       return "N/A"; // Return 'N/A' or any other default value for invalid prices
@@ -171,16 +168,24 @@ function PropertiesCSR() {
       return price.toString(); // Display as is for smaller values
     }
   };
-  const handleSearchFilters = () => {
+ 
+  // Example of calling the filter logic on input change or form submission:
+ 
+
+
+  const handleSearchFilters = useCallback(() => {
     setCurrentPage(1); // Reset to first page after filter
     const filteredProperties = filterProperties(landDetails);
     // Now update your state with filtered properties
     setFilteredProperties(filteredProperties);
-  };
-  // Example of calling the filter logic on input change or form submission:
+  }, [landDetails,filterProperties]); // Include landDetails as a dependency
+  
   useEffect(() => {
-    handleSearchFilters();
-  }, [typeSearchQuery, locationSearchQuery, nameSearchQuery, selectedType, nameSearchQuery2]);
+    handleSearchFilters(); 
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleSearchFilters, typeSearchQuery, locationSearchQuery, selectedType, nameSearchQuery2,filterProperties, landDetails]);
+  
 
   const currentProperties = filteredProperties.slice(
     (currentPage - 1) * itemsPerPage,
@@ -241,8 +246,8 @@ function PropertiesCSR() {
     console.log("called");
     try {
       const response = await _get(`/fields/${path}`);
-      setData(response.data.data);
-    } catch (error) {
+      console.log("res",response)
+     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
@@ -287,6 +292,8 @@ function PropertiesCSR() {
         `Properties shared successfully via ${shareMethod === "email" ? "Email" : "WhatsApp"
         }!`
       );
+
+      console.log("res",response)
       setLoading(false);
       setIsModalOpen(false);
       setInputValue("");
@@ -306,7 +313,7 @@ function PropertiesCSR() {
   };
   useEffect(() => {
     fetchData(Id);
-  }, []);
+  }, [Id]);
   const handleBackToCustomers = () => {
     navigate('/dashboard/csr/MarketingAgents');
   };
@@ -354,6 +361,8 @@ function PropertiesCSR() {
       setAssignedDate(null);
       setIsAssignModalOpen(false);
       setSelectedProperties(new Set());
+
+      console.log("res",res)
     } catch (error) {
     }
   };

@@ -1,28 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
-import { _get, _post } from "../../Service/apiClient";
+import { _get} from "../../Service/apiClient";
 import { Table, Avatar, Modal, Row, Col, Input, Select, Card, Button, DatePicker, Spin, Form } from "antd";
 import { PhoneOutlined, MailOutlined, EnvironmentOutlined, UserOutlined, IdcardOutlined, MoneyCollectOutlined, PlusCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from 'moment';
 import "./Customers.css"
 import AddCustomer from "./AddCustomer";
 const { Option } = Select;
-const { Search } = Input
+// const { Search } = Input
 export default function Customers() {
     const [agents, setAgents] = useState([]);
     const [selectedAgent, setSelectedAgent] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [nameSearchQuery, setNameSearchQuery] = useState("");
-    const [locationSearchQuery, setLocationSearchQuery] = useState("");
+    // const [locationSearchQuery, setLocationSearchQuery] = useState("");
     const [agentNames, setAgentNames] = useState([]);
     const location = useLocation();
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const enableSelection = location.state?.enableSelection || false;
-    const MarketingAgentId = location.state?.MarketingAgentId || null;
+    // const MarketingAgentId = location.state?.MarketingAgentId || null;
     const [loading, setLoading] = useState(false);
     const [assignedDate, setAssignedDate] = useState(null);
     const [selectDate, setSelectDate] = useState(false);
@@ -38,7 +38,7 @@ export default function Customers() {
     const navigate = useNavigate();
     useEffect(() => {
         const fetchAgents = async () => {
-            const id = localStorage.getItem("userId");
+            // const id = localStorage.getItem("userId");
             setLoading(true);
             try {
                 const response = await _get(`/customer/getCustomer`);
@@ -77,7 +77,7 @@ export default function Customers() {
     };
 
     const handleAssign = async (dateType) => {
-        const csrId = localStorage.getItem("userId");
+        // const csrId = localStorage.getItem("userId");
 
         let dateToAssign;
 
@@ -95,25 +95,25 @@ export default function Customers() {
             dateToAssign = date;
         }
         console.log(dateToAssign);
-        const payload = {
-            assignedBy: csrId,
-            assignedTo: MarketingAgentId,
-            assignedDate: dateToAssign,
-            customers: selectedRowKeys.map((customerId) => ({
-                customerId: customerId,
-                status: "",
-                description: "",
-            })),
-        };
+        // const payload = {
+        //     assignedBy: csrId,
+        //     assignedTo: MarketingAgentId,
+        //     assignedDate: dateToAssign,
+        //     customers: selectedRowKeys.map((customerId) => ({
+        //         customerId: customerId,
+        //         status: "",
+        //         description: "",
+        //     })),
+        // };
 
         setLoading(true);
         try {
-            const res = await _post(
-                "/csr/assignCustomer",
-                payload,
-                "Assigned Successfully",
-                "Customer already assigned for this"
-            );
+            // const res = await _post(
+            //     "/csr/assignCustomer",
+            //     payload,
+            //     "Assigned Successfully",
+            //     "Customer already assigned for this"
+            // );
             setAssignedDate(null);
             setIsAssignModalOpen(false);
             setSelectedRowKeys([]);
@@ -175,7 +175,7 @@ export default function Customers() {
             render: (text, record) => (
                 <span>
 
-                    <a
+                    <p
                         onClick={() => handleAvatarClick(record)}
                         style={{
                             color: "#0D416B",
@@ -185,7 +185,7 @@ export default function Customers() {
                     >
 
                         {`${record.firstName} ${record.lastName}`}
-                    </a>
+                    </p>
                 </span>
             ),
             onHeaderCell: () => ({
@@ -276,13 +276,13 @@ export default function Customers() {
                 .includes(nameSearchQuery.toLowerCase())
             : true;
 
-        const locationMatch = locationSearchQuery
-            ? (agent.district && agent.district.toLowerCase().includes(locationSearchQuery.toLowerCase())) ||
-            (agent.mandal && agent.mandal.toLowerCase().includes(locationSearchQuery.toLowerCase())) ||
-            (agent.village && agent.village.toLowerCase().includes(locationSearchQuery.toLowerCase()))
-            : true;
+        // const locationMatch = locationSearchQuery
+        //     ? (agent.district && agent.district.toLowerCase().includes(locationSearchQuery.toLowerCase())) ||
+        //     (agent.mandal && agent.mandal.toLowerCase().includes(locationSearchQuery.toLowerCase())) ||
+        //     (agent.village && agent.village.toLowerCase().includes(locationSearchQuery.toLowerCase()))
+        //     : true;
 
-        return nameMatch && locationMatch;
+        return nameMatch ;
     });
 
     if (loading) {
