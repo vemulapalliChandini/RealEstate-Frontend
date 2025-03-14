@@ -4,12 +4,12 @@ import {
   Form,
   Input,
   InputNumber,
-  Card,
+
   Row,
   Col,
   Switch,
   Select,
-  Carousel,
+  
   Tooltip,
   Collapse,
   Progress,
@@ -26,7 +26,6 @@ import {
   TileLayer,
   Marker,
   useMapEvents,
-  Popup,
 } from "react-leaflet";
 
 import L from "leaflet";
@@ -37,7 +36,6 @@ import {
   InfoCircleOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import FormItem from "antd/es/form/FormItem";
 
 import { _get } from "../../../Service/apiClient.js";
 import Upload from "../Upload";
@@ -61,25 +59,21 @@ const { Panel } = Collapse;
 
 const LayoutForm = ({ setShowFormType }) => {
   const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [componentVariant, setComponentVariant] = useState("filled");
-  const [amount, setAmount] = useState(0);
-  const [time, setTime] = useState("");
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [amount] = useState(0);
   const [hasPincode, setHasPincode] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMandal, setSelectedMandal] = useState("");
   const [mandals, setMandals] = useState([]);
   const [villages, setVillages] = useState([]);
   const [pincode, setPincode] = useState("");
-  const [activeTab, setActiveTab] = useState(["ownerDetails"]);
-  const [hasErrors, setHasErrors] = useState(false);
+  // const [activeTab, setActiveTab] = useState(["ownerDetails"]);
+  // const [hasErrors, setHasErrors] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [price, setPrice] = useState(0);
   const [type, setType] = useState("acres");
-  const [pricePerAcre, setPricePerAcre] = useState(0);
-  const [size, setSize] = useState(0);
   const [unit, setUnit] = useState("sq. ft");
   const [totalinacres, settotalInAcres] = useState(0);
   const [isFirstInteraction, setIsFirstInteraction] = useState(true);
@@ -95,10 +89,6 @@ const LayoutForm = ({ setShowFormType }) => {
   ]);
 
   const [isModalVisibles, setIsModalVisibles] = useState(false);
-  const [batchRange, setBatchRange] = useState([1, 1]);
-  const [batchSize, setBatchSize] = useState(0);
-  const [landUnit, setLandUnit] = useState("sq. ft");
-  const [prices, setPrices] = useState(0);
 
   const [batchRanges, setBatchRanges] = useState([
     { start: 1, end: 1, size: 0, price: 0, unit: "sq. ft" }, // Initial range
@@ -198,83 +188,83 @@ const LayoutForm = ({ setShowFormType }) => {
       { plotNumber: "", size: "", unit: "sq. ft", price: "" }, // Add new empty plot
     ]);
   };
-  const columns = [
-    {
-      title: "Plot Number",
-      dataIndex: "plotNumber",
-      key: "plotNumber",
-      align: "center",
-      render: (_, record, index) => (
-        <InputNumber
-          value={record.plotNumber}
-          onChange={(value) => handlePlotChange(index, "plotNumber", value)}
-        />
-      ),
-      onHeaderCell: () => ({
-        style: {
-          backgroundColor: "#0D416B",
-          color: "white",
-          fontWeight: "bold",
-          width: "20%",
-        },
-      }),
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-      align: "center",
-      render: (_, record, index) => (
-        <>
-          <InputNumber
-            value={record.size}
-            onChange={(value) => handlePlotChange(index, "size", value)}
-            style={{ width: "40%" }}
-          />
-          <Select
-            value={record.unit}
-            onChange={(value) => handlePlotChange(index, "unit", value)}
-            style={{ width: "55%", marginLeft: "5px" }}
-          >
-            {landMeasurementOptions.map((option) => (
-              <Select.Option key={option} value={option}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
-        </>
-      ),
-      onHeaderCell: () => ({
-        style: {
-          backgroundColor: "#0D416B",
-          color: "white",
-          fontWeight: "bold",
-          width: "30%",
-        },
-      }),
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      align: "center",
-      render: (_, record, index) => (
-        <InputNumber
-          value={record.price}
-          onChange={(value) => handlePlotChange(index, "price", value)}
-          style={{ width: "50%" }}
-        />
-      ),
-      onHeaderCell: () => ({
-        style: {
-          backgroundColor: "#0D416B",
-          color: "white",
-          fontWeight: "bold",
-          width: "30%",
-        },
-      }),
-    },
-  ];
+  // const columns = [
+  //   {
+  //     title: "Plot Number",
+  //     dataIndex: "plotNumber",
+  //     key: "plotNumber",
+  //     align: "center",
+  //     render: (_, record, index) => (
+  //       <InputNumber
+  //         value={record.plotNumber}
+  //         onChange={(value) => handlePlotChange(index, "plotNumber", value)}
+  //       />
+  //     ),
+  //     onHeaderCell: () => ({
+  //       style: {
+  //         backgroundColor: "#0D416B",
+  //         color: "white",
+  //         fontWeight: "bold",
+  //         width: "20%",
+  //       },
+  //     }),
+  //   },
+  //   {
+  //     title: "Size",
+  //     dataIndex: "size",
+  //     key: "size",
+  //     align: "center",
+  //     render: (_, record, index) => (
+  //       <>
+  //         <InputNumber
+  //           value={record.size}
+  //           onChange={(value) => handlePlotChange(index, "size", value)}
+  //           style={{ width: "40%" }}
+  //         />
+  //         <Select
+  //           value={record.unit}
+  //           onChange={(value) => handlePlotChange(index, "unit", value)}
+  //           style={{ width: "55%", marginLeft: "5px" }}
+  //         >
+  //           {landMeasurementOptions.map((option) => (
+  //             <Select.Option key={option} value={option}>
+  //               {option}
+  //             </Select.Option>
+  //           ))}
+  //         </Select>
+  //       </>
+  //     ),
+  //     onHeaderCell: () => ({
+  //       style: {
+  //         backgroundColor: "#0D416B",
+  //         color: "white",
+  //         fontWeight: "bold",
+  //         width: "30%",
+  //       },
+  //     }),
+  //   },
+  //   {
+  //     title: "Price",
+  //     dataIndex: "price",
+  //     key: "price",
+  //     align: "center",
+  //     render: (_, record, index) => (
+  //       <InputNumber
+  //         value={record.price}
+  //         onChange={(value) => handlePlotChange(index, "price", value)}
+  //         style={{ width: "50%" }}
+  //       />
+  //     ),
+  //     onHeaderCell: () => ({
+  //       style: {
+  //         backgroundColor: "#0D416B",
+  //         color: "white",
+  //         fontWeight: "bold",
+  //         width: "30%",
+  //       },
+  //     }),
+  //   },
+  // ];
 
   //  End.........
 
@@ -410,9 +400,6 @@ const LayoutForm = ({ setShowFormType }) => {
 
   const [imageUrls, setImageUrls] = useState([]);
 
-  const showMapModal = () => {
-    setIsModalVisible(true);
-  };
 
   const handleOk = () => {
     setIsModalVisible(false);
@@ -422,23 +409,12 @@ const LayoutForm = ({ setShowFormType }) => {
     setIsModalVisible(false);
   };
 
-  const handleLatitudeChange = (e) => {
-    setLatitude(e.target.value);
-    if (e.target.value && longitude) {
-      setSelectedLocation([e.target.value, longitude]);
-    }
-  };
 
   const handleLandMark = (e) => {
     setlandMark(e.target.value); // Update state on input change
   };
 
-  const handleLongitudeChange = (e) => {
-    setLongitude(e.target.value);
-    if (latitude && e.target.value) {
-      setSelectedLocation([latitude, e.target.value]);
-    }
-  };
+
 
   const customIcon = new L.Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/128/1483/1483336.png",
@@ -461,10 +437,6 @@ const LayoutForm = ({ setShowFormType }) => {
       <Marker position={selectedLocation} icon={customIcon} />
     ) : null;
   };
-
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
   const onFormVariantChange = ({ variant }) => {
     setComponentVariant(variant);
   };
@@ -483,7 +455,7 @@ const LayoutForm = ({ setShowFormType }) => {
       cents: 435.6, // 1 cent = 435.6 square feet
     };
 
-    if (type == "sq.ft") {
+    if (type === "sq.ft") {
       settotalInAcres(price * landmeasure);
     } else {
       settotalInAcres(
@@ -507,7 +479,7 @@ const LayoutForm = ({ setShowFormType }) => {
     // setPricePerAcre(data);
     setPrice(form.getFieldValue("plotPrice"));
 
-    if (type == "acres") {
+    if (type === "acres") {
       settotalInAcres(price * landmeasure);
     } else {
       settotalInAcres(
@@ -519,9 +491,6 @@ const LayoutForm = ({ setShowFormType }) => {
     }
   };
 
-  const calculateTotalAmount = (amount, time) => {
-    return Math.round(amount * time);
-  };
 
   const handleUnitChange = (value) => {
     console.log("hiiii");
@@ -538,7 +507,7 @@ const LayoutForm = ({ setShowFormType }) => {
       cents: 435.6, // 1 cent = 435.6 square feet
     };
     console.log(conversionFactors[value]);
-    if (type == "sq. ft") {
+    if (type === "sq. ft") {
       settotalInAcres(price * landmeasure);
     } else {
       if (price && type && landmeasure)
@@ -551,21 +520,6 @@ const LayoutForm = ({ setShowFormType }) => {
     }
 
     console.log(totalinacres);
-  };
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    const url = await Upload(file, (progress) => {
-      setUploadProgress(progress);
-    });
-
-    setImageUrls((prevUrls) => [...prevUrls, url]);
-    setIsUploading(false);
   };
   const handleDistrictChange = async (value) => {
     form.setFields([{ name: "district", errors: [] }]);
@@ -782,8 +736,8 @@ const LayoutForm = ({ setShowFormType }) => {
         })
       );
       form.setFields(errorsToSet); // Set form fields with errors
-      setActiveTab([...panelsWithErrors]);
-      setHasErrors(true);
+      // setActiveTab([...panelsWithErrors]);
+      // setHasErrors(true);
     }
 
     // Only continue if there are no validation errors
@@ -963,25 +917,6 @@ const LayoutForm = ({ setShowFormType }) => {
   const deletingImage = (index) => {
     setImageUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
-
-  const [isOwnerNameFocused, setIsOwnerNameFocused] = useState(false);
-  const [isContactFocused, setIsContactFocused] = useState(false);
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-
-  const handleOwnerNameFocus = () => setIsOwnerNameFocused(true);
-  const handleOwnerNameBlur = (e) => {
-    if (e.target.value === "") setIsOwnerNameFocused(false);
-  };
-
-  const handleContactFocus = () => setIsContactFocused(true);
-  const handleContactBlur = (e) => {
-    if (e.target.value === "") setIsContactFocused(false);
-  };
-
-  const handleEmailFocus = () => setIsEmailFocused(true);
-  const handleEmailBlur = (e) => {
-    if (e.target.value === "") setIsEmailFocused(false);
-  };
   const [form] = Form.useForm();
   const [skills, setSkills] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -1003,7 +938,6 @@ const LayoutForm = ({ setShowFormType }) => {
     setSkills(skills.filter((skill) => skill !== removedSkill));
   };
   const handlePanelChange = (key) => {
-    setActiveTab(key);
     if (isFirstInteraction) {
       setIsFirstInteraction(false);
     }

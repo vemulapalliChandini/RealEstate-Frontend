@@ -3,20 +3,16 @@ import {
     Input,
     Table,
     Card,
-    Typography,
     Button,
-    Pagination,
     message,
     Popover,
     Row,Col
 } from "antd";
 import { DeleteOutlined, EnvironmentOutlined, MailOutlined } from "@ant-design/icons";
 import { _get, _delete } from "../../Service/apiClient";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {  FaWhatsapp } from "react-icons/fa";
 
 
-const { Text } = Typography;
 
 const CSRList = () => {
     const [csrAgents, setCsrAgents] = useState([]);
@@ -24,7 +20,6 @@ const CSRList = () => {
     const [searchName, setSearchName] = useState("");
     const [searchLocation, setSearchLocation] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCsrAgents();

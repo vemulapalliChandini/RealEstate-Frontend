@@ -3,7 +3,6 @@ import {
   Input,
   Avatar,
   Table,
-  Typography,
   Button,
   Empty,
   Popover,
@@ -12,12 +11,10 @@ import {
   Card,
   Row,Col
 } from "antd";
-import { DeleteOutlined, EnvironmentOutlined, MailOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, MailOutlined, SearchOutlined } from "@ant-design/icons";
 import { _get, _delete } from "../../Service/apiClient";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {  FaWhatsapp } from "react-icons/fa";
 
-const { Text } = Typography;
 
 export default function Clients() {
   const [client, setClient] = useState([]);
@@ -27,8 +24,6 @@ export default function Clients() {
   const [searchLocation, setSearchLocation] = useState("");
   const [filteredClients, setFilteredClients] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
   useEffect(() => {
     fetchClients();
   }, []);

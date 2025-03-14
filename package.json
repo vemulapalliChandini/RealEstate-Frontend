@@ -15,6 +15,7 @@
     "@google/generative-ai": "^0.22.0",
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
+    "@react-google-maps/api": "^2.20.6",
     "aframe": "^1.6.0",
     "antd": "^5.22.3",
     "axios": "^1.7.5",
@@ -23,7 +24,6 @@
     "cropperjs": "^1.6.2",
     "firebase": "^10.13.2",
     "framer-motion": "^11.13.1",
-    "google-maps-react": "^2.0.6",
     "https": "^1.0.0",
     "https-browserify": "^1.0.0",
     "i18next": "^24.2.2",
@@ -51,12 +51,12 @@
     "recharts": "^2.13.3",
     "socket.io-client": "^4.8.1"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+ "scripts": {
+  "start": "GENERATE_SOURCEMAP=false react-scripts start",
+  "build": "GENERATE_SOURCEMAP=false react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
   "eslintConfig": {
     "extends": [
       "react-app",

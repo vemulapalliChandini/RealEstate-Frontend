@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Avatar, Button, Checkbox, Table, Input, Row, Col, Select, Spin } from "antd";
+import { Modal, Avatar, Button, Checkbox, Table, Input, Col, Select, Spin } from "antd";
 import { _get, _put } from "../../Service/apiClient"; // Replace with your actual API call function
 import "./Admin.css";
 import { FaWhatsapp } from "react-icons/fa";
@@ -35,10 +35,6 @@ function AdminAgents() {
         };
         fetchCsr();
     }, []);
-
-   
-   
-
     const handleViewModalCancel = () => {
         setIsViewModalOpen(false);
         setAssignedAgents([]);
@@ -224,7 +220,7 @@ function AdminAgents() {
                     style={{ width: 200, border: "1px solid #666", marginRight: "3%" }}
                     value={nameSearchQuery || undefined} // Ensure undefined for placeholder to show
                     onChange={(value) => {
-                        if (value != null) {
+                        if (value !== null) {
                             setNameSearchQuery(value);
                         } else {
                             setNameSearchQuery(null);

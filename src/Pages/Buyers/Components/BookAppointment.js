@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 
 const Bookappointment = ({ id, pid, ptype, onClose, setIsModalVis }) => {
   const [form] = Form.useForm();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const disablePastDates = (current) => {
     return current && current < moment().startOf("day");
   };

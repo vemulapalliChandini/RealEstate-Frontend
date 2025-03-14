@@ -20,8 +20,6 @@ const BuyerDeals = ({ data }) => {
     const [dealId,] = useState(null);
     const [agentId] = useState(null);
     const [isSold, setIsSold] = useState(false);
-    const [isDateSelect, setIsDateSelect] = useState(false);
-    const [isClosed, setIsClosed] = useState(false);
       const [activities] = useState([]);
     const [isPropertyView, setIsPropertyView] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState([]);
@@ -179,7 +177,6 @@ const BuyerDeals = ({ data }) => {
     const onDateSelect = (date) => {
         setSelectedDate(date.format("YYYY-MM-DD"));
         setIsCalendarModalOpen(false);
-        setIsDateSelect(true);
 
     };
     const handleViewMore = (dealId) => {
@@ -224,10 +221,7 @@ const BuyerDeals = ({ data }) => {
 
             if (res.status === 200 || res.status === 201) {
                 setIsDealModalOpen(false);
-                setIsClosed((prevState) => ({
-                    ...prevState,
-                    [dealId]: true, // Mark the specific deal as closed
-                }));
+             
                 form.resetFields();
             }
         } catch (error) {
@@ -274,7 +268,6 @@ const BuyerDeals = ({ data }) => {
     const handleCancel = () => {
         setIsActivityModalOpen(false);
         setIsCalendarModalOpen(false);
-        setIsDateSelect(false);
         setIsDealModalOpen(false);
         setSelectedDate(null);
         setIsPropertyView(false);

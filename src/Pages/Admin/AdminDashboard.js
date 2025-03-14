@@ -22,7 +22,7 @@ const AdminDashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const [selectedData, setSelectedData] = useState(null);
+  const [selectedData] = useState(null);
 
 
   const [agricultureData, setAgricultureData] = useState([]);

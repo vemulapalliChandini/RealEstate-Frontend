@@ -19,10 +19,8 @@ import {
   MailOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
 import { _get, _delete } from "../../Service/apiClient";
-import { useNavigate } from "react-router-dom";
-
 const { Text } = Typography;
 
 const MarketingAgentsList = ({ role, title }) => {
@@ -31,8 +29,7 @@ const MarketingAgentsList = ({ role, title }) => {
   const [searchName, setSearchName] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
-  const navigate = useNavigate();
+  const [pageSize] = useState(8);
 
   useEffect(() => {
     fetchAgents();

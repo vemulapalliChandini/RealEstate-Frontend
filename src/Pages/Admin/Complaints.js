@@ -1,14 +1,10 @@
 import React from "react";
-import { Card, Row, Col, Typography } from "antd";
+import { Card, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 
 
 const Complaints = () => {
   const navigate = useNavigate();
-  const role = localStorage.getItem("role"); // or wherever you get the role
-
-  // const navigate = useNavigate();
-
   return (
     <div style={{ padding: "20px" }}>
     

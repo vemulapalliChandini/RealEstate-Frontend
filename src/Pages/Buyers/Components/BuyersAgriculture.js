@@ -34,8 +34,6 @@ const BuyersAgriculture = ({ filters }) => {
   const [data, setData] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [isAuctoonViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
   const targetCardRef = useRef(null);
   const [agentrole, setAgentRole] = useState(null);
@@ -50,10 +48,8 @@ const BuyersAgriculture = ({ filters }) => {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
@@ -69,9 +65,7 @@ const BuyersAgriculture = ({ filters }) => {
       const initialBid = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
         : selectedProperty?.auctionData?.[0]?.amount;
-   
-      setReservationAmount(initialBid);
-      setBackendMoney(amount);
+         setBackendMoney(amount);
       setRequiredBid(initialBid);
       if (now.isBefore(startDate)) {
         setRemainingTime("Auction Not Yet Started");
@@ -104,7 +98,6 @@ const BuyersAgriculture = ({ filters }) => {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -213,16 +206,13 @@ const BuyersAgriculture = ({ filters }) => {
       const initialWishlist = productsData
         .filter((item) => item.wishStatus === 1)
         .map((item) => item._id);
-      setWishlist(initialWishlist);
 
       setData(response.data.data);
       setFilteredData(response.data.data);
 
       // applyFilters(filters, response.data.data);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setLoading(false);
     }
   };
   const formatPrice = (price) => {

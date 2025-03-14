@@ -28,7 +28,6 @@ function Properties() {
   const [landDetails, setLandDetails] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedType, setSelectedType] = useState("All");
   const [searchLocation, setSearchLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 8;
@@ -54,7 +53,6 @@ function Properties() {
 
   const filterByType = (type) => {
     console.log(type);
-    setSelectedType(type);
     if (type === "All") {
       setFilteredProperties(landDetails);
     } else {

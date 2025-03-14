@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Form,
-  Card,
   Row,
   Col,
-  InputNumber,
   Switch,
-  Carousel,
-  Button,
   Tooltip,
   Grid,
   Input,
@@ -16,16 +12,11 @@ import {
 } from "antd";
 import "./Residential.css";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import Configuration from "./Configuration";
 const { useBreakpoint } = Grid;
 const { Option } = Select;
-export default function Amenities({ setExtraAmmenitiesData }) {
+export default function Amenities() {
   const screens = useBreakpoint();
-  const [isModalVis, setIsModalVis] = useState(false);
 
-  const handleModalClose = () => {
-    setIsModalVis(!isModalVis);
-  };
 
   return (
     <>

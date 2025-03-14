@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Table, Spin, Input, Empty, Card, Row, Col,Menu,Popover,Dropdown,Button, Form,Radio,Modal,DatePicker,TimePicker,Select,Pagination, Calendar} from "antd";
 import { _get,_put,_post} from "../../Service/apiClient";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { FaWhatsapp } from "react-icons/fa";
 
 import { SearchOutlined,MoreOutlined } from "@ant-design/icons";
 import { FaArrowLeft } from "react-icons/fa";
-import { border } from "@chakra-ui/react";
 import moment from "moment";
 import { toast } from "react-toastify";
 const {Option}=Select;
 const AgentPropertyAssociation = () => {
     const { propertyId } = useParams();
-    const location = useLocation();
     const [form] = Form.useForm();
-    const propertyName = location.state?.propertyName;
     const navigate = useNavigate();
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,9 +24,7 @@ const AgentPropertyAssociation = () => {
     const[isAddActivityModalOpen,setIsAddActivityModalOpen]=useState(false);
     const[agentId,setAgentId]=useState(null);
     const[isActivityModalOpen,setIsActivityModalOpen]=useState(false);
-    const[isModalVisible,setIsModalVisible]=useState(false);
     const[activities,setActivites]=useState(null);
-    const[selectedCustomer,setSelectedCustomer]=useState(null);
     const[isSold,setIsSold]=useState(false);
     const[activityType,setActivityType]=useState(null);
     const[currentPage,setCurrentPage]=useState(1);
@@ -38,9 +33,7 @@ const AgentPropertyAssociation = () => {
     const[expandedComment,setExpandedComment]=useState(null);
      const [isDateSelect, setIsDateSelect] = useState(false);
         const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedCardId, setSelectedCardId] = useState(null);
         const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
-        const [isAddModalOpen, setIsAddModalOpen] = useState(false);
         const [meetingDetails, setMeetingDetails] = useState({
             dealingId: '',
             agentId: '',
@@ -50,9 +43,8 @@ const AgentPropertyAssociation = () => {
             customerMail: '',
             customerId: ''
         });
-        const [details, setDetails] = useState([]);
+        const [details] = useState([]);
        const [selectedStartTime, setSelectedStartTime] = useState(null);
-          const [selectedEndTime, setSelectedEndTime] = useState(null);  
     const [pageSize]=useState(4);
     const handleBackToCustomers = () => {
         navigate("/dashboard/agent/agentdeals");
@@ -81,7 +73,7 @@ const AgentPropertyAssociation = () => {
                 console.log("Combined End DateTime:", combinedDateTime);
     
     
-                setSelectedEndTime(combinedDateTime);
+                // setSelectedEndTime(combinedDateTime);
     
                 console.log(meetingDetails.customerMail);
                 const requestData = {
@@ -197,7 +189,7 @@ const AgentPropertyAssociation = () => {
     ) => {
       
         setIsCalendarModalOpen(true);
-        setSelectedCardId(dealingId);
+        // setSelectedCardId(dealingId);
         setMeetingDetails({
             dealingId,
             agentId,
@@ -416,7 +408,7 @@ const AgentPropertyAssociation = () => {
         setCurrentPage(page);
     };
     const handleCancel = () => {
-        setIsModalVisible(false);
+        // setIsModalVisible(false);
         setIsDealModalOpen(false);
         setIsAddActivityModalOpen(false);
         setIsCalendarModalOpen(false);
@@ -446,10 +438,7 @@ const AgentPropertyAssociation = () => {
             console.error("Error fetching deals:", error);
         }
     };
-    const handleMoreClick = (record) => {
-        setSelectedCustomer(record.properties);
-        setIsModalVisible(true);
-    };
+   
     const formatPhoneNumber = (number) => {
         if (!number) return "";
         const cleaned = number.toString().replace(/\D/g, "");
@@ -637,7 +626,6 @@ const AgentPropertyAssociation = () => {
                             style={{
                               padding: "1px 10px",
                               backgroundColor: "#e0e0e0",
-                              color: "#000",
                               color: "black",
                               border: "none",
                               borderRadius: "5px",
@@ -689,7 +677,6 @@ const AgentPropertyAssociation = () => {
                     </div>
                 );
             },
-            align: "center",
             onHeaderCell: () => ({
                 style: {
                     backgroundColor: "#0D416B",

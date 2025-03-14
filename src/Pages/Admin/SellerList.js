@@ -6,7 +6,7 @@ import {
   message,
   Popover,
   Spin,
-  Typography,
+  
   Card,
   Row,
   Col,
@@ -18,10 +18,8 @@ import {
   SearchOutlined
 } from "@ant-design/icons";
 import { _get, _delete } from "../../Service/apiClient";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {  FaWhatsapp } from "react-icons/fa";
 
-const { Text } = Typography;
 
 export default function SellerList() {
   const [seller, setSeller] = useState([]);
@@ -31,7 +29,6 @@ export default function SellerList() {
   const [searchLocation, setSearchLocation] = useState("");
   const [filteredSellers, setFilteredSellers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSellers();

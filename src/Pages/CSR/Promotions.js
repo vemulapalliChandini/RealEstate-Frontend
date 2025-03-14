@@ -3,7 +3,6 @@ import {
     Row,
     Col,
     Card,
-    Typography,
     Spin,
     Empty,
     Tag,
@@ -11,17 +10,15 @@ import {
     List,
     Pagination
 } from "antd";
-import { _get, _delete } from "../../Service/apiClient";
+import { _get } from "../../Service/apiClient";
 
 import {
-    ArrowLeftOutlined,
-    ArrowRightOutlined,
+   
     ArrowDownOutlined,
     ArrowUpOutlined,
 } from "@ant-design/icons";
 
 const { Meta } = Card;
-const { Title, Text } = Typography;
 
 const Promotions = () => {
     const [landDetails, setLandDetails] = useState([]);
@@ -29,14 +26,12 @@ const Promotions = () => {
 
     const [topProperties, setTopProperties] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [stateData, setStateData] = useState([]);
+    const [stateData] = useState([]);
     const pageSize = 5;
 
     useEffect(() => {
         getData();
         fetchTopProperties();
-
-
     }, []);
 
     const getData = async () => {
@@ -69,25 +64,12 @@ const Promotions = () => {
 
     // pagination
 
-    const paginatedData = stateData.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize
-    );
+   
 
     // Handle page change
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
-
-
-
-
-
-
-
-
-
-
 
 
 

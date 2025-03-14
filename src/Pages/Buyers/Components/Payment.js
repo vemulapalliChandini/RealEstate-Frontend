@@ -14,9 +14,6 @@ import {
 import { toast } from "react-toastify";
 import { _put } from "../../../Service/apiClient";
 
-import { useNavigate } from "react-router-dom";
-
-
 
 import { jwtDecode } from "jwt-decode";
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

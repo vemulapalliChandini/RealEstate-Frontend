@@ -7,7 +7,6 @@ import {
   Spin,
   Empty,
   Modal,
-  Grid,
   Pagination,
 } from "antd";
 import {
@@ -15,13 +14,11 @@ import {
   UserOutlined,
   AppstoreOutlined,
   AreaChartOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 import { _get } from "../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import EstateDetails from "../Eclient/EstateDetails";
 
-const { useBreakpoint } = Grid;
 
 const MyEstates = () => {
   const { t } = useTranslation();
@@ -32,7 +29,6 @@ const MyEstates = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedData, setPaginatedData] = useState([]);
   const targetCardRef = useRef(null);
-  const screens = useBreakpoint();
 
   useEffect(() => {
     fetchEstates();
