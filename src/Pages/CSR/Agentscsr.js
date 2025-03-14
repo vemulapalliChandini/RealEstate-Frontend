@@ -17,23 +17,21 @@ import {
   Button,
 } from "antd";
 import {
-  PhoneOutlined,
-  MailOutlined,
-  EnvironmentOutlined,
-  SearchOutlined,
+   MailOutlined,
+   SearchOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
 import { FaWhatsapp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom"; // Add this import for navigation
 
 const { Option } = Select;
-const { Search } = Input;
+// const { Search } = Input;
 export default function Agentscsr() {
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [nameSearchQuery, setNameSearchQuery] = useState("");
-  const [locationSearchQuery, setLocationSearchQuery] = useState("");
+  // const [locationSearchQuery, setLocationSearchQuery] = useState("");
   const [agentNames, setAgentNames] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -257,22 +255,22 @@ export default function Agentscsr() {
         .includes(nameSearchQuery.toLowerCase())
       : true;
 
-    const locationMatch = locationSearchQuery
-      ? (agent.district &&
-        agent.district
-          .toLowerCase()
-          .includes(locationSearchQuery.toLowerCase())) ||
-      (agent.mandal &&
-        agent.mandal
-          .toLowerCase()
-          .includes(locationSearchQuery.toLowerCase())) ||
-      (agent.village &&
-        agent.village
-          .toLowerCase()
-          .includes(locationSearchQuery.toLowerCase()))
-      : true;
+    // const locationMatch = locationSearchQuery
+    //   ? (agent.district &&
+    //     agent.district
+    //       .toLowerCase()
+    //       .includes(locationSearchQuery.toLowerCase())) ||
+    //   (agent.mandal &&
+    //     agent.mandal
+    //       .toLowerCase()
+    //       .includes(locationSearchQuery.toLowerCase())) ||
+    //   (agent.village &&
+    //     agent.village
+    //       .toLowerCase()
+    //       .includes(locationSearchQuery.toLowerCase()))
+    //   : true;
 
-    return nameMatch && locationMatch;
+    return nameMatch;
   });
 
   return (

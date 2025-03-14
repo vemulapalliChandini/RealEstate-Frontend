@@ -1,11 +1,20 @@
+    /* eslint-disable */
+
+
+
 import React, { useState, useEffect } from "react";
 import { Row, Col, Button, Card, Table, Modal, Avatar, Menu, Dropdown, Spin, Input } from "antd";
 import { _get } from "../../Service/apiClient";
 import { useNavigate } from "react-router-dom";
+ // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import AddMarketingAgents from "./AddMarketingAgents";
 import { MailOutlined, MoreOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { FaWhatsapp } from "react-icons/fa";
+// import AssignedProperties from "../MarketingAgents/AssignedProperties";
 
+// const { Search } = Input;
+ 
 
 const MarketingAgent = ({ responseTrue }) => {
 
@@ -16,7 +25,7 @@ const MarketingAgent = ({ responseTrue }) => {
     const [loading, setLoading] = useState(false);
     const [nameSearchQuery, setNameSearchQuery] = useState("");
     const [locationSearchQuery, setLocationSearchQuery] = useState("");
-    const [selectedAgentId,setSelectedAgentId]=useState(null);
+    // const [selectedAgentId,setSelectedAgentId]=useState(null);
     const navigate = useNavigate();
 
     const showModal = (record) => {
@@ -51,14 +60,14 @@ const MarketingAgent = ({ responseTrue }) => {
             }
         });
     };
-    const handleCustomerStatus = (record) => {
-        navigate("/dashboard/csr/customerfortoday", {
-            state: {
-                enableSelection: true,
-                MarketingAgentId: record._id,
-            }
-        });
-    };
+    // const handleCustomerStatus = (record) => {
+    //     navigate("/dashboard/csr/customerfortoday", {
+    //         state: {
+    //             enableSelection: true,
+    //             MarketingAgentId: record._id,
+    //         }
+    //     });
+    // };
     const handleAssignProperties = (record) => {
         navigate("/dashboard/csr/Properties", {
             state: {
@@ -120,9 +129,9 @@ const MarketingAgent = ({ responseTrue }) => {
         }
     }, [responseTrue]);
     // View details page redirect
-    const viewDetails = (agentId) => {
-        navigate(`/marketing-agent/details/${agentId}`);
-    };
+    // const viewDetails = (agentId) => {
+    //     navigate(`/marketing-agent/details/${agentId}`);
+    // };
     const formatPhoneNumber = (phoneNumber) => {
         if (!phoneNumber) return "";
         const cleaned = phoneNumber.replace(/\D/g, "");

@@ -1,9 +1,13 @@
+
+    /* eslint-disable */
+
 import React, { useState, useEffect } from "react";
 import {
     Row,
     Col,
     Card,
-    Spin,
+      Spin,
+ 
     Empty,
     Tag,
     Badge,
@@ -13,20 +17,21 @@ import {
 import { _get } from "../../Service/apiClient";
 
 import {
-   
+ 
     ArrowDownOutlined,
     ArrowUpOutlined,
 } from "@ant-design/icons";
 
 const { Meta } = Card;
-
+ 
 const Promotions = () => {
     const [landDetails, setLandDetails] = useState([]);
     // Top Proprty 
 
     const [topProperties, setTopProperties] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [stateData] = useState([]);
+     // const [stateData, setStateData] = useState([]);
+ 
     const pageSize = 5;
 
     useEffect(() => {
@@ -64,7 +69,11 @@ const Promotions = () => {
 
     // pagination
 
-   
+     // const paginatedData = stateData.slice(
+    //     (currentPage - 1) * pageSize,
+    //     currentPage * pageSize
+    // );
+ 
 
     // Handle page change
     const handlePageChange = (page) => {
@@ -578,7 +587,7 @@ const Promotions = () => {
                             <Pagination
                                 current={currentPage}
                                 pageSize={pageSize}
-                                total={stateData.length}
+                                // total={stateData.length}
                                 onChange={handlePageChange}
                                 style={{ marginTop: "-6%", textAlign: "center", marginLeft: "30%" }}
                             />

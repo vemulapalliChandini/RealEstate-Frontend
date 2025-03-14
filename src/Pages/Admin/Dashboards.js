@@ -5,8 +5,9 @@ import {
   Row,
   Col,
   DatePicker,
-  Table,
-    Pagination,
+    Table,
+   Pagination,
+ 
   List,
   Input,
   Modal,

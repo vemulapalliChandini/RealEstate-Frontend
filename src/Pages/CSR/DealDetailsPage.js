@@ -1,32 +1,32 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Table, Button, Menu, Dropdown, Card, Modal, Row, Col, Pagination, Form, TimePicker, DatePicker, Input, Select, Spin } from 'antd';
-import { DeleteOutlined, EllipsisOutlined, EnvironmentOutlined, MoreOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Table, Button, Menu, Dropdown, Card, Modal, Row, Col, Pagination, Form, TimePicker, DatePicker, Input, Select } from 'antd';
+import { DeleteOutlined, EnvironmentOutlined, MoreOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { FaWhatsapp } from 'react-icons/fa';
 import ShowModal from '../Agent/ShowModal';
-import { _delete, _get, _post, _put } from "../../Service/apiClient";
+import { _get, _post, _put } from "../../Service/apiClient";
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import moment from "moment";
-import { alignProperty } from '@mui/material/styles/cssUtils';
+// import { alignProperty } from '@mui/material/styles/cssUtils';
 const { Option } = Select;
 const DealDetailsPage = () => {
     const location = useLocation();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
-    const deals = location.state?.deals || [];
+    const rawDeals = useMemo(() => location.state?.deals || [], [location.state?.deals]);
     const [activities, setActivites] = useState([]);
     const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
     const [isAddActivityModalOpen, setIsAddActivityModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(4);
     const [AgentNames, setAgentNames] = useState([]);
-    const [PropertyNames, setPropertyNames] = useState([]);
-    const [PropertyId, setPropertyId] = useState([]);
+    // const [PropertyNames, setPropertyNames] = useState([]);
+    // const [PropertyId, setPropertyId] = useState([]);
     const [isCommentModal, setIsCommentModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState("All");
-    const [selectedStatus1, setSelectedStatus1] = useState("All");
-    const [comments, setComments] = useState(null);
+    const selectedStatus1  = useState("All");
+    // const [comments, setComments] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [expandedComment, setExpandedComment] = useState(null); // To track which comment is expanded
     const [dealId, setDealId] = useState(null);
@@ -41,22 +41,18 @@ const DealDetailsPage = () => {
     const [nameSearchQuery2, setNameSearchQuery2] = useState("");
 
     const [locationSearchQuery, setLocationSearchQuery] = useState("");
-    const [ActivitydealId, setActivityDealId] = useState(null);
-    const [ActivityagentId, setActivityAgentId] = useState(null);
+    // const [ActivitydealId, setActivityDealId] = useState(null);
+    // const [ActivityagentId, setActivityAgentId] = useState(null);
     const [agentId, setAgentId] = useState(null);
     const [role, setRole] = useState(null);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
-    useEffect(() => {
-        if (selectedProperty) {
-            console.log('Selected Property:', selectedProperty);
-        }
-    }, [selectedProperty]);
+ 
     useEffect(() => {
         const role = localStorage.getItem("role");
         setRole(Number(role));
 
-    }, [localStorage.getItem("role")]);
+    }, []);
     const handleDelete = (dealId) => {
         setDealId(dealId);
         setIsDeleteModalOpen(true);
@@ -75,30 +71,36 @@ const DealDetailsPage = () => {
             navigate('/dashboard/marketingagent/deals');
         }
     };
+
+
+    let deals = useMemo(() => {
+        return rawDeals.map((deal) => ({
+          ...deal,
+          // Add any additional processing or transformation for 'deal' here
+        }));
+      }, [rawDeals])
     useEffect(() => {
         // Set agent names
         setAgentNames(
             [...new Set(deals.map((agent) => `${agent.agent.firstName} ${agent.agent.lastName}`))]
         );
-        deals.forEach(deal => {
-            console.log(deal.deal.propertyName, deal.property.propertyId);
-        });
-
+   
+    
         const names = [];
         const ids = [];
-
-        deals.forEach(deal => {
-            names.push(deal.deal.propertyName);
-            ids.push(deal.property?.propertyId);
-        });
-
+    
+        // deals.forEach(deal => {
+        //     names.push(deal.deal.propertyName);
+        //     ids.push(deal.property?.propertyId);
+        // });
+    
         // Set both states
-        setPropertyNames(names);
-        setPropertyId(ids);
-        console.log(PropertyNames);
-        console.log(PropertyId);
-
-    }, [deals]);
+        // setPropertyNames(names);
+        // setPropertyId(ids);
+        console.log(names); // Logs updated names
+        console.log(ids); // Logs updated ids
+    }, [deals]); // Only depend on 'deals' because PropertyNames and PropertyId are updated in the effect itself
+    
 
     const deleteAssignedAgent = async () => {
         const body = {
@@ -115,8 +117,8 @@ const DealDetailsPage = () => {
         }
     };
 
-    const [soldStatus, setsoldStatus] = useState("Not Sold");
-    const [soldCost, setSoldCost] = useState(null);
+    // const [soldStatus, setsoldStatus] = useState("Not Sold");
+    // const [soldCost, setSoldCost] = useState(null);
     const filteredAgents = deals.filter((agent) => {
         const nameSearch1 = nameSearchQuery1 ? nameSearchQuery1.toLowerCase() : '';
         const nameSearch2 = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : '';
@@ -221,7 +223,7 @@ const DealDetailsPage = () => {
             render: (text, record) => (
                 <span>
                     <UserOutlined style={{ marginRight: "8px" }} />
-                    <a
+                    <p
                         onClick={() => handleMore(record)}
                         style={{
                             color: "#0D416B",
@@ -230,7 +232,7 @@ const DealDetailsPage = () => {
                         }}
                     >
                         {record.deal.propertyName}
-                    </a>
+                    </p>
                 </span>
             ),
             onHeaderCell: () => ({
@@ -485,10 +487,10 @@ const DealDetailsPage = () => {
         setDealId(dealId);
         setAgentId(agentId);
     }
-    const handleComments = (comments) => {
-        setComments(comments);
-        setIsCommentModal(true);
-    }
+    // const handleComments = (comments) => {
+    //     setComments(comments);
+    //     setIsCommentModal(true);
+    // }
     const handleCancel = () => {
         setIsModalVisible(false);
         setIsDeleteModalOpen(false);
@@ -554,7 +556,7 @@ const DealDetailsPage = () => {
         const endIndex = startIndex + pageSize;
 
         return filteredActivities.slice(startIndex, endIndex);
-    }, [filteredActivities, currentPage, pageSize]);
+    }, [filteredActivities, currentPage, pageSize,activities]);
 
     const onPageChange = (page) => {
         setCurrentPage(page);
@@ -612,15 +614,15 @@ const DealDetailsPage = () => {
             console.error("Error in scheduling meeting:", error);
         }
     };
-    if (loading) {
-        return <Spin
-            size="large" style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)", // This centers the loader
-            }} />;
-    }
+    // if (loading) {
+    //     return <Spin
+    //         size="large" style={{
+    //             position: "absolute",
+    //             top: "50%",
+    //             left: "50%",
+    //             transform: "translate(-50%, -50%)", // This centers the loader
+    //         }} />;
+    // }
 
     const Activitycolumns = [
         {
@@ -750,8 +752,7 @@ const DealDetailsPage = () => {
                                 backgroundColor: '#0D416B',
                                 color: 'white',
                                 // marginLeft: "-50%",
-                                color: 'white',
-                                border: 'none',
+                                 border: 'none',
                                 borderRadius: '5px',
                                 cursor: 'pointer',
                             }}
@@ -963,12 +964,12 @@ const DealDetailsPage = () => {
                 footer={null}
                 width={800}
             >
-                <Card
+                {/* <Card
                     title={<div style={{ backgroundColor: "#0d416b", color: "white", padding: "10px" }}>Comments</div>}
                     headStyle={{ backgroundColor: "#0d416b", color: "white" }}
                 >
                     {comments}
-                </Card>
+                </Card> */}
             </Modal>
             <Modal
                 open={isAddActivityModalOpen}

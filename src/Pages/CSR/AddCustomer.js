@@ -1,56 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Radio, Button, Upload, message, Space, Card, Row, Col, Select, Tooltip, Spin, Modal, Table, InputNumber } from 'antd';
-import { PlusOutlined, PlusCircleFilled, InfoCircleOutlined, CheckCircleOutlined, DeleteOutlined, MailOutlined } from '@ant-design/icons';
-import { Option } from "antd/es/mentions";
+import React, { useState } from 'react';
+import { Form, Input,   Button, message, Space, Card, Row, Col, Select } from 'antd';
+// import { PlusOutlined, PlusCircleFilled, InfoCircleOutlined, CheckCircleOutlined, DeleteOutlined, MailOutlined } from '@ant-design/icons';
+// import { Option } from "antd/es/mentions";
 import "../../Authentication/Styles/FloatingLabel.css";
 import { useTranslation } from "react-i18next";
 import { _get, _post } from "../../Service/apiClient";
-import { DeleteOutlineOutlined } from '@mui/icons-material';
-import { color } from 'framer-motion';
-import { FaWhatsapp } from 'react-icons/fa';
+// import { DeleteOutlineOutlined } from '@mui/icons-material';
+// import { color } from 'framer-motion';
+// import { FaWhatsapp } from 'react-icons/fa';
 
 function AddCustomer({ formReset }) {
-    const [fileList, setFileList] = useState(null);
-    const { t, i18n } = useTranslation();
+    // const [fileList, setFileList] = useState(null);
+    const { t } = useTranslation();
     const [form] = Form.useForm();
-    const [addressDetails, setAddressDetails] = useState({
-        district: "",
-        mandal: "",
-        village: "",
-    });
+    // const [addressDetails, setAddressDetails] = useState({
+    //     district: "",
+    //     mandal: "",
+    //     village: "",
+    // });
 
-    const [mandals, setMandals] = useState([]);
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [villages, setVillages] = useState([]);
-    const [pincode, setPincode] = useState(null);
-    const [selectedMandal, setSelectedMandal] = useState("");
-    const [customerData, setCustomerData] = useState([]);
-    const [uploadedFileName, setUploadedFileName] = useState(null);
+    // const [mandals, setMandals] = useState([]);
+    // const [selectedDistrict, setSelectedDistrict] = useState("");
+    // const [villages, setVillages] = useState([]);
+    // const [pincode, setPincode] = useState(null);
+    // const [selectedMandal, setSelectedMandal] = useState("");
+    // const [customerData, setCustomerData] = useState([]);
+    // const [uploadedFileName, setUploadedFileName] = useState(null);
 
-    const [showAssignAgentButton, setShowAssignAgentButton] = useState("");
-    const [district, setDistrict] = useState('');
+    // const [showAssignAgentButton, setShowAssignAgentButton] = useState("");
+    // const [district, setDistrict] = useState('');
     const [nameSearchQuery, setNameSearchQuery] = useState([]);
-    const [isAddModalOPen, setIsAddModalOpen] = useState(false);
-    const [ExistingCustomerDetails, setExistingCustomerDetails] = useState([]);
-    const [IsModalVisible, setIsModalVisible] = useState(false);
-    const handlevillageChange = async (value) => {
-        setAddressDetails((prev) => ({ ...prev, village: value }));
-    };
-    const handleDistrictChange = (e) => {
-        setDistrict(e.target.value);
-    };
-    const [properties, setProperties] = useState([]);
-    const [filteredProperties, setFilteredProperties] = useState([]);
-    const [loading, setLoading] = useState(false);
+    // const [isAddModalOPen, setIsAddModalOpen] = useState(false);
+    // const [ExistingCustomerDetails, setExistingCustomerDetails] = useState([]);
+    // const [IsModalVisible, setIsModalVisible] = useState(false);
+    // const handlevillageChange = async (value) => {
+    //     setAddressDetails((prev) => ({ ...prev, village: value }));
+    // };
+    // const handleDistrictChange = (e) => {
+    //     setDistrict(e.target.value);
+    // };
+    // const [properties, setProperties] = useState([]);
+    // const [filteredProperties, setFilteredProperties] = useState([]);
+    // const [loading, setLoading] = useState(false);
 
     const [customerExists, setCustomerExists] = useState(false);
     const [customerDetails, setCustomerDetails] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [customerDetails1, setCustomerDetails1] = useState([]);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [customerDetails1, setCustomerDetails1] = useState([]);
 
-    const handleCloseModal = async () => {
-        setIsAddModalOpen(false);
-    }
+    // const handleCloseModal = async () => {
+    //     setIsAddModalOpen(false);
+    // }
     form.resetFields();
     // setCustomerExists(false);
     const handlePhoneNumber = async (value) => {
@@ -67,7 +67,7 @@ function AddCustomer({ formReset }) {
             console.log(error.response.data.message);
             if (error.response.data.message === "Customer not found") {
                 setCustomerExists(false);
-                setIsModalOpen(false);
+                // setIsModalOpen(false);
                 console.log(customerExists);
             } else {
                 const errorMessage = error?.response?.data?.message || "An error occurred while fetching agents.";
@@ -75,72 +75,72 @@ function AddCustomer({ formReset }) {
             }
         }
     };
-    useEffect(() => {
+    // useEffect(() => {
 
 
-        const fetchCustomers = async () => {
-            try {
-                const response = await _get(`/customer/getCustomer`);
-                console.log(response.data);
-                setCustomerDetails1(response.data);
-            } catch (error) {
-                console.error("Error fetching agents: ", error);
-            }
-        };
-        fetchCustomers();
-    }, []);
+    //     const fetchCustomers = async () => {
+    //         try {
+    //             const response = await _get(`/customer/getCustomer`);
+    //             console.log(response.data);
+    //             setCustomerDetails1(response.data);
+    //         } catch (error) {
+    //             console.error("Error fetching agents: ", error);
+    //         }
+    //     };
+    //     fetchCustomers();
+    // }, []);
 
-    useEffect(() => {
-        const fetchProperties = async () => {
-            setLoading(true);
-            try {
-                const response = await _get('/deal/getAllProperties');
-                console.log(response);
-                const data = response.data.data || [];
-                console.log(data);
-                setProperties(
-                    data.map((agent) => ({
-                        propertyId: agent.id,
-                        propertyName: agent.propertyName,
-                        type: agent.type,
-                        agentId: agent.agentId
-                    }))
-                );
+    // useEffect(() => {
+    //     const fetchProperties = async () => {
+    //         // setLoading(true);
+    //         try {
+    //             const response = await _get('/deal/getAllProperties');
+    //             console.log(response);
+    //             const data = response.data.data || [];
+    //             console.log(data);
+    //             // setProperties(
+    //             //     data.map((agent) => ({
+    //             //         propertyId: agent.id,
+    //             //         propertyName: agent.propertyName,
+    //             //         type: agent.type,
+    //             //         agentId: agent.agentId
+    //             //     }))
+    //             // );
 
-                setFilteredProperties(
-                    data.map((agent) => ({
-                        propertyId: agent.id,
-                        propertyName: agent.propertyName,
-                        type: agent.type,
-                        agentId: agent.agentId,
-                        displayName: `${agent.propertyName} - ${agent.type}`, // This is for display in the Select
-                    }))
-                );
-            } catch (error) {
-                console.error('Error fetching properties:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProperties();
-    }, []);
+    //             // setFilteredProperties(
+    //             //     data.map((agent) => ({
+    //             //         propertyId: agent.id,
+    //             //         propertyName: agent.propertyName,
+    //             //         type: agent.type,
+    //             //         agentId: agent.agentId,
+    //             //         displayName: `${agent.propertyName} - ${agent.type}`, // This is for display in the Select
+    //             //     }))
+    //             // );
+    //         } catch (error) {
+    //             console.error('Error fetching properties:', error);
+    //         } finally {
+    //             // setLoading(false);
+    //         }
+    //     };
+    //     fetchProperties();
+    // }, []);
 
 
-    const handleAddCustomer = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                setCustomerData((prevData) => [...prevData, values]);
-                console.log('Customer Data:', customerData);
-                form.resetFields();
+    // const handleAddCustomer = () => {
+    //     form
+    //         .validateFields()
+    //         .then((values) => {
+    //             setCustomerData((prevData) => [...prevData, values]);
+    //             console.log('Customer Data:', customerData);
+    //             form.resetFields();
 
-            })
-            .catch((errorInfo) => {
-                console.log('Validate Failed:', errorInfo);
-            });
-    };
+    //         })
+    //         .catch((errorInfo) => {
+    //             console.log('Validate Failed:', errorInfo);
+    //         });
+    // };
 
-    const csrId = localStorage.getItem("userId");
+    // const csrId = localStorage.getItem("userId");
     const onFinish = async (values) => {
         console.log(values);
         console.log(nameSearchQuery);
@@ -193,42 +193,42 @@ function AddCustomer({ formReset }) {
         } catch (error) {
         }
     };
-    const onDelete = () => {
-        setUploadedFileName(null);
-        setFileList(null);
-    }
-    const handleSearch = (searchValue) => {
-        console.log(searchValue);
-        setNameSearchQuery(searchValue);
-        if (!searchValue) {
-            setFilteredProperties(properties);
-        } else {
-            const filtered = properties.filter((property) =>
-                property.label.toLowerCase().includes(searchValue.toLowerCase())
-            );
-            setFilteredProperties(filtered);
-        }
-    };
-    const onUpload = async () => {
-        if (fileList.length === 0) {
-            return message.error('Please upload a file first');
-        }
+    // const onDelete = () => {
+    //     setUploadedFileName(null);
+    //     setFileList(null);
+    // }
+    // const handleSearch = (searchValue) => {
+    //     console.log(searchValue);
+    //     setNameSearchQuery(searchValue);
+    //     if (!searchValue) {
+    //         setFilteredProperties(properties);
+    //     } else {
+    //         const filtered = properties.filter((property) =>
+    //             property.label.toLowerCase().includes(searchValue.toLowerCase())
+    //         );
+    //         setFilteredProperties(filtered);
+    //     }
+    // };
+    // const onUpload = async () => {
+    //     if (fileList.length === 0) {
+    //         return message.error('Please upload a file first');
+    //     }
 
-        const formData = new FormData();
-        formData.append('file', fileList[0]);
+    //     const formData = new FormData();
+    //     formData.append('file', fileList[0]);
 
-        try {
+    //     try {
 
-            const response = await _post('/csr/upload-excel', formData);
+    //         const response = await _post('/csr/upload-excel', formData);
 
-            if (response.status === 200) {
-                message.success('File uploaded successfully');
-            }
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            message.error('Error uploading file');
-        }
-    };
+    //         if (response.status === 200) {
+    //             message.success('File uploaded successfully');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error uploading file:', error);
+    //         message.error('Error uploading file');
+    //     }
+    // };
 
     return (
         <>

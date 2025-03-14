@@ -1,57 +1,57 @@
 import React, { useState } from 'react';
-import { Form, Input, Radio, Button, Upload, message, Space, Card, Row, Col, Select, Tooltip, Checkbox } from 'antd';
-import { PlusOutlined, PlusCircleFilled, InfoCircleOutlined, CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Option } from "antd/es/mentions";
+import { Form, Input, Radio, Button, Space, Card, Row, Col  } from 'antd';
+// import { PlusOutlined, PlusCircleFilled, InfoCircleOutlined, CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+// import { Option } from "antd/es/mentions";
 import "../../Authentication/Styles/FloatingLabel.css";
 import { useTranslation } from "react-i18next";
 import { _get, _post } from "../../Service/apiClient";
-import { DeleteOutlineOutlined } from '@mui/icons-material';
+// import { DeleteOutlineOutlined } from '@mui/icons-material';
 
 function AssignAgent() {
-    const [fileList, setFileList] = useState(null);
-    const { t, i18n } = useTranslation();
+    // const [fileList, setFileList] = useState(null);
+    const { t  } = useTranslation();
     const [form] = Form.useForm();
-    const [addressDetails, setAddressDetails] = useState({
-        district: "",
-        mandal: "",
-        village: "",
-    });
+    // const [addressDetails, setAddressDetails] = useState({
+    //     district: "",
+    //     mandal: "",
+    //     village: "",
+    // });
     const [showAssignAgentButton, setShowAssignAgentButton] = useState("");
-    const [mandals, setMandals] = useState([]);
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [villages, setVillages] = useState([]);
-    const [pincode, setPincode] = useState(null);
-    const [selectedMandal, setSelectedMandal] = useState("");
-    const [customerData, setCustomerData] = useState([]);
-    const [uploadedFileName, setUploadedFileName] = useState(null);
+    // const [mandals, setMandals] = useState([]);
+    // const [selectedDistrict, setSelectedDistrict] = useState("");
+    // const [villages, setVillages] = useState([]);
+    // const [pincode, setPincode] = useState(null);
+    // const [selectedMandal, setSelectedMandal] = useState("");
+    // const [customerData, setCustomerData] = useState([]);
+    // const [uploadedFileName, setUploadedFileName] = useState(null);
     const [district, setDistrict] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const[agents,setAgents]=useState([]);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const[agents,setAgents]=useState([]);
     const handleDistrictChange = (e) => {
         setDistrict(e.target.value);
     };
-    const handlevillageChange = async (value) => {
-        setAddressDetails((prev) => ({ ...prev, village: value }));
-    };
+    // const handlevillageChange = async (value) => {
+    //     setAddressDetails((prev) => ({ ...prev, village: value }));
+    // };
 
-    const handleAddCustomer = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                setCustomerData((prevData) => [...prevData, values]);
-                console.log('Customer Data:', customerData);
-                form.resetFields();
+    // const handleAddCustomer = () => {
+    //     form
+    //         .validateFields()
+    //         .then((values) => {
+    //             setCustomerData((prevData) => [...prevData, values]);
+    //             console.log('Customer Data:', customerData);
+    //             form.resetFields();
 
-            })
-            .catch((errorInfo) => {
-                console.log('Validate Failed:', errorInfo);
-            });
-    };
+    //         })
+    //         .catch((errorInfo) => {
+    //             console.log('Validate Failed:', errorInfo);
+    //         });
+    // };
 
 
     const onFinish = async (values) => {
         console.log(values);
-        const Payload = [...customerData, values];
+        const Payload = [values];
         try {
             const res = await _post(
                 "/customer/addCustomers",
@@ -67,35 +67,35 @@ function AssignAgent() {
         } catch (error) {
         }
     };
-    const onDelete = () => {
-        setUploadedFileName(null);
-        setFileList(null);
-    }
+    // const onDelete = () => {
+    //     setUploadedFileName(null);
+    //     setFileList(null);
+    // }
     const fetchAgents = async () => {
         const response = await _get(`/agent/getAgentByDistrict/${district}`);
         console.log(response.data);
-        setIsModalOpen(true);
+        // setIsModalOpen(true);
     }
-    const onUpload = async () => {
-        if (fileList.length === 0) {
-            return message.error('Please upload a file first');
-        }
+    // const onUpload = async () => {
+    //     if (fileList.length === 0) {
+    //         return message.error('Please upload a file first');
+    //     }
 
-        const formData = new FormData();
-        formData.append('file', fileList[0]);
+    //     const formData = new FormData();
+    //     formData.append('file', fileList[0]);
 
-        try {
+    //     try {
 
-            const response = await _post('/csr/upload-excel', formData);
+    //         const response = await _post('/csr/upload-excel', formData);
 
-            if (response.status === 200) {
-                message.success('File uploaded successfully');
-            }
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            message.error('Error uploading file');
-        }
-    };
+    //         if (response.status === 200) {
+    //             message.success('File uploaded successfully');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error uploading file:', error);
+    //         message.error('Error uploading file');
+    //     }
+    // };
     return (
         <Card style={{
             maxWidth: '800px', margin: 'auto', padding: '20px', boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",

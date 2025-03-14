@@ -9,11 +9,11 @@ import { _get, _post } from "../../Service/apiClient";
 
 import { FaWhatsapp } from "react-icons/fa";
 
-import { DeleteOutlined, EllipsisOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
+import {   MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import moment from "moment";
 import ShowModal from "../Agent/ShowModal";
 import { FaArrowLeft } from "react-icons/fa";
-import { border } from "@chakra-ui/react";
+// import { border } from "@chakra-ui/react";
 const { Option } = Select;
 
 const CustomerAssociation = () => {
@@ -492,8 +492,7 @@ const [activityType, setActivityType] = useState("");
                     </div>
                 );
             },
-            align: "center",
-            onHeaderCell: () => ({
+             onHeaderCell: () => ({
                 style: {
                     backgroundColor: "#0D416B",
                     color: "white",

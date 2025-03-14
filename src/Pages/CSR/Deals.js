@@ -1,21 +1,23 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Card, Col, Row, Spin, Modal, Select, Input, Button, Table, Tabs, Pagination, Menu, Form, Dropdown, Radio, Space, message, TimePicker, DatePicker } from 'antd';
-import { _get, _put, _post } from "../../Service/apiClient";
 
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+    /* eslint-disable */
+
+
+import React, { useEffect, useState, useMemo } from 'react';
+import { Card, Col, Row, Spin, Modal, Select, Input, Button, Table, Pagination, Menu, Form, Dropdown,   DatePicker } from 'antd';
+import { _get } from "../../Service/apiClient";
+
+
+
+
+// import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { FaWhatsapp } from "react-icons/fa";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 import {
     UserOutlined,
-    HomeOutlined,
-    EnvironmentOutlined,
-    TeamOutlined,
-    MailOutlined,
-    AppstoreOutlined, MoneyCollectOutlined, ApartmentOutlined,
-    CommentOutlined, CheckCircleOutlined, CloseCircleOutlined, TableOutlined,
-    AppstoreAddOutlined,
-    EllipsisOutlined,
+     EnvironmentOutlined,
+     MailOutlined,
+     MoneyCollectOutlined,  
     PhoneOutlined,
     IdcardOutlined,
     PlusCircleFilled,
@@ -23,47 +25,45 @@ import {
     MoreOutlined
 } from "@ant-design/icons";
 import moment from "moment";
-import AddCustomer from './AddCustomer';
-import AddDeal from './AddDeal';
+ import AddDeal from './AddDeal';
 const { Option } = Select;
-const { TabPane } = Tabs;
-const { Search } = Input;
+ 
 const Deals = () => {
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedDeal, setSelectedDeal] = useState(null);
+    // const [selectedDeal, setSelectedDeal] = useState(null);
     const [nameSearchQuery, setNameSearchQuery] = useState("");
-    const [nameSearchQuery1, setNameSearchQuery1] = useState("");
-    const [nameSearchQuery2, setNameSearchQuery2] = useState("");
-    const [nameSearchQuery4, setNameSearchQuery4] = useState("");
-    const [locationSearchQuery, setLocationSearchQuery] = useState("");
+    // const [nameSearchQuery1, setNameSearchQuery1] = useState("");
+    // const [nameSearchQuery2, setNameSearchQuery2] = useState("");
+    // const [nameSearchQuery4, setNameSearchQuery4] = useState("");
+    // const [locationSearchQuery, setLocationSearchQuery] = useState("");
     const [CustomerNames, setCustomerNames] = useState([]);
-    const [AgentNames, setAgentNames] = useState([]);
-    const [PropertyNames, setPropertyNames] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState("All");
-    const [view, setView] = useState('card');
+    // const [AgentNames, setAgentNames] = useState([]);
+    // const [PropertyNames, setPropertyNames] = useState([]);
+    // const [selectedStatus, setSelectedStatus] = useState("All");
+    // const [view, setView] = useState('card');
     const [activities, setActivites] = useState([]);
     const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
     // const [currentPage, setCurrentPage] = useState(1);
-    const [isDealModalOpen, setIsDealModalOpen] = useState(false);
+    // const [isDealModalOpen, setIsDealModalOpen] = useState(false);
     const [isAddModalOPen, setIsAddModalOpen] = useState(false);
-    const [deals1, setDeals1] = useState([]);
+    // const [deals1, setDeals1] = useState([]);
     const [pageSize] = useState(4);
     const [selectedProperty, setSelectedProperty] = useState([]);
-    const [customerExists, setCustomerExists] = useState(false);
-    const [customerDetails, setCustomerDetails] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [district, setDistrict] = useState('');
-    const [properties, setProperties] = useState([]);
+    // const [customerExists, setCustomerExists] = useState(false);
+    // const [customerDetails, setCustomerDetails] = useState([]);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [district, setDistrict] = useState('');
+    // const [properties, setProperties] = useState([]);
     const [role, setRole] = useState(null);
-    const [filteredProperties, setFilteredProperties] = useState([]);
+    // const [filteredProperties, setFilteredProperties] = useState([]);
     const navigate = useNavigate();
-    const { t, i18n } = useTranslation();
+    // const { t, i18n } = useTranslation();
     const [form] = Form.useForm();
-    const handleDistrictChange = (e) => {
-        setDistrict(e.target.value);
-    };
+    // const handleDistrictChange = (e) => {
+    //     setDistrict(e.target.value);
+    // };
     const [expandedComment, setExpandedComment] = useState(null); // To track which comment is expanded
 
     const handleToggle = (id) => {
@@ -78,40 +78,40 @@ const Deals = () => {
         }
         return phoneNumber;
     };
-    useEffect(() => {
-        const fetchProperties = async () => {
-            setLoading(true);
-            try {
-                const response = await _get('/deal/getAllProperties');
-                console.log(response);
-                const data = response.data.data || [];
-                console.log(data);
-                setProperties(
-                    data.map((agent) => ({
-                        propertyId: agent.id,
-                        propertyName: agent.propertyName,
-                        type: agent.type,
-                        agentId: agent.agentId
-                    }))
-                );
+    // useEffect(() => {
+    //     const fetchProperties = async () => {
+    //         setLoading(true);
+    //         try {
+    //             const response = await _get('/deal/getAllProperties');
+    //             console.log(response);
+    //             const data = response.data.data || [];
+    //             console.log(data);
+    //             // setProperties(
+    //             //     data.map((agent) => ({
+    //             //         propertyId: agent.id,
+    //             //         propertyName: agent.propertyName,
+    //             //         type: agent.type,
+    //             //         agentId: agent.agentId
+    //             //     }))
+    //             // );
 
-                setFilteredProperties(
-                    data.map((agent) => ({
-                        propertyId: agent.id,
-                        propertyName: agent.propertyName,
-                        type: agent.type,
-                        agentId: agent.agentId,
-                        displayName: `${agent.propertyName} - ${agent.type}`, // This is for display in the Select
-                    }))
-                );
-            } catch (error) {
-                console.error('Error fetching properties:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProperties();
-    }, []);
+    //             // setFilteredProperties(
+    //             //     data.map((agent) => ({
+    //             //         propertyId: agent.id,
+    //             //         propertyName: agent.propertyName,
+    //             //         type: agent.type,
+    //             //         agentId: agent.agentId,
+    //             //         displayName: `${agent.propertyName} - ${agent.type}`, // This is for display in the Select
+    //             //     }))
+    //             // );
+    //         } catch (error) {
+    //             console.error('Error fetching properties:', error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    //     fetchProperties();
+    // }, []);
     const columns = [
         {
             title: "Customer Name",
@@ -122,7 +122,7 @@ const Deals = () => {
                 <span>
                     <UserOutlined style={{ marginRight: "8px" }} />
                     <a
-                        onClick={() => handleMore(record)}
+                         onClick={() => handleMore(record)}
                         style={{
                             color: "#0D416B",
                             cursor: "pointer",
@@ -244,81 +244,56 @@ const Deals = () => {
 
     ];
 
-    const handleCancel = () => {
-        setIsActivityModalOpen(false);
+ 
+ 
+     // const onFinish = async (values) => {
+    //     console.log(values);
+    //     console.log(customerDetails);
+    //     const properties = nameSearchQuery4.map((property) => ({
+    //         propertyId: property.propertyId,
+    //         propertyName: property.propertyName,
+    //         propertyType: property.type,
+    //         agentId: property.agentId,
+    //     }));
+    //     let updatedValues = {
+    //         ...values,
+    //         properties: properties,
+    //         csrId: csrId,
+    //     };
+    //     if (customerExists && customerDetails && Object.keys(customerDetails).length > 0) {
+    //         updatedValues = {
+    //             ...updatedValues,
+    //             firstName: customerDetails.firstName,
+    //             lastName: customerDetails.lastName,
+    //             email: customerDetails.email,
+    //             phoneNumber: customerDetails.phoneNumber,
+    //             pincode: customerDetails.pincode,
+    //             state: customerDetails.state,
+    //             country: customerDetails.country,
+    //             district: customerDetails.district,
+    //             mandal: customerDetails.mandal,
+    //             village: customerDetails.village,
 
-        form.resetFields();
-    };
-    const handlePhoneNumber = async (value) => {
-        try {
+    //         };
+    //     }
+    //     console.log(updatedValues);
 
-            const response = await _get(`/deal/checkUser/${value}`);
-            console.log(response.data);
-            setCustomerExists(true);
-            setCustomerDetails(response.data.data);
-            console.log(customerExists);
-        } catch (error) {
-            console.log(error);
-            console.log(error.response.data.message);
-            if (error.response.data.message === "Customer not found") {
-                setCustomerExists(false);
-                setIsModalOpen(false);
-                console.log(customerExists);
-            } else {
-                const errorMessage = error?.response?.data?.message || "An error occurred while fetching agents.";
-                message.error(errorMessage);
-            }
-        }
-    };
-    const csrId = localStorage.getItem("userId");
-    const onFinish = async (values) => {
-        console.log(values);
-        console.log(customerDetails);
-        const properties = nameSearchQuery4.map((property) => ({
-            propertyId: property.propertyId,
-            propertyName: property.propertyName,
-            propertyType: property.type,
-            agentId: property.agentId,
-        }));
-        let updatedValues = {
-            ...values,
-            properties: properties,
-            csrId: csrId,
-        };
-        if (customerExists && customerDetails && Object.keys(customerDetails).length > 0) {
-            updatedValues = {
-                ...updatedValues,
-                firstName: customerDetails.firstName,
-                lastName: customerDetails.lastName,
-                email: customerDetails.email,
-                phoneNumber: customerDetails.phoneNumber,
-                pincode: customerDetails.pincode,
-                state: customerDetails.state,
-                country: customerDetails.country,
-                district: customerDetails.district,
-                mandal: customerDetails.mandal,
-                village: customerDetails.village,
+    //     try {
+    //         const res = await _post(
+    //             "/deal/createDeal",
+    //             updatedValues,
+    //             "Customers Added Successfully",
+    //             "Error Adding Customers"
+    //         );
+    //         if (res.status === 200 || res.status === 201) {
+    //             form.resetFields();
 
-            };
-        }
-        console.log(updatedValues);
-
-        try {
-            const res = await _post(
-                "/deal/createDeal",
-                updatedValues,
-                "Customers Added Successfully",
-                "Error Adding Customers"
-            );
-            if (res.status === 200 || res.status === 201) {
-                form.resetFields();
-
-            }
+    //         }
 
 
-        } catch (error) {
-        }
-    };
+    //     } catch (error) {
+    //     }
+    // };
     const handleMore = (deal) => {
         console.log(deal.customer);
         setSelectedProperty(deal.customer);
@@ -360,8 +335,8 @@ const Deals = () => {
 
 
 
-            setDeals1(response.data);
-            setIsDealModalOpen(true);
+            // setDeals1(response.data
+            // setIsDealModalOpen(true);
 
         } catch (error) {
             console.error('Error fetching deals:', error);
@@ -456,22 +431,9 @@ const Deals = () => {
     const [filterProperty, setFilterProperty] = useState(null);
 
     // Memoize the paginated activities
-    const currentActivities = useMemo(() => {
-        return activities.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-        );
-    }, [activities, currentPage, pageSize]);
+ 
 
-    // Unique values for filters
-    const dateOptions = useMemo(() => {
-        const uniqueDates = [...new Set(
-            activities.map(activity =>
-                moment(activity.meetingDate).format("DD MMMM YYYY")
-            )
-        )];
-        return uniqueDates.map(date => ({ value: date, label: date }));
-    }, [activities]);
+ 
 
     const propertyOptions = useMemo(() => {
         const uniqueProperties = [...new Set(activities.map(activity => activity.propertyName))];
@@ -526,9 +488,9 @@ const Deals = () => {
         _id: activity._id,  // Assuming each activity has a unique ID
     }));
 
-    const toggleView = (viewType) => {
-        setView(viewType);
-    };
+    // const toggleView = (viewType) => {
+    //     setView(viewType);
+    // };
     useEffect(() => {
         const role = localStorage.getItem("role");
         setRole(Number(role));
@@ -556,15 +518,14 @@ const Deals = () => {
 
     const handleCloseModal = () => {
         setIsModalVisible(false);
-        setSelectedDeal(null);
+        // setSelectedDeal(null);
         setIsActivityModalOpen(false);
         setIsAddModalOpen(false);
     };
     const filteredAgents = deals.filter((agent) => {
         console.log(agent);
         const nameSearch = nameSearchQuery ? nameSearchQuery.toLowerCase() : '';
-        const nameSearch1 = nameSearchQuery1 ? nameSearchQuery1.toLowerCase() : '';
-        const nameSearch2 = nameSearchQuery2 ? nameSearchQuery2.toLowerCase() : '';
+   
         const fullName = `${agent.customer.firstName} ${agent.customer.lastName}`.toLowerCase();
 
 
@@ -574,33 +535,24 @@ const Deals = () => {
             agent.customer.lastName.toLowerCase().includes(nameSearch);
 
 
+ 
 
-        const nameMatch2 =
+        // const statusMatch =
+        //     Number(agent.deal.interestIn) === Number(selectedStatus);
 
-            agent.deal.propertyName.toLowerCase().includes(nameSearch2);
-
-
-        const statusMatch =
-            Number(agent.deal.interestIn) === Number(selectedStatus);
-
-        const locationSearch = locationSearchQuery.toLowerCase();
-
-        const locationMatch =
-
-            (agent.customer.district?.toLowerCase().includes(locationSearch)) ||
-            (agent.customer.mandal?.toLowerCase().includes(locationSearch)) ||
-            (agent.customer.village?.toLowerCase().includes(locationSearch))
+  
 
 
+        // if (selectedStatus === "All") {
+        //     return nameMatch ;
+        // }
 
 
-        if (selectedStatus === "All") {
-            return nameMatch && locationMatch;
-        }
-
-
-        return nameMatch && locationMatch && statusMatch && nameMatch2;
+        return nameMatch;
     });
+   
+   
+   
     const handleAddClick = async () => {
         setIsAddModalOpen(true);
     }
