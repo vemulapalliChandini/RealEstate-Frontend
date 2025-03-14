@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useCallback} from "react";
 import {
   Card,
   Row,
@@ -29,15 +29,11 @@ const EstateList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedData, setPaginatedData] = useState([]);
   const targetCardRef = useRef(null);
-
-  useEffect(() => {
-    fetchEstates();
-  }, [currentPage, pageSize]);
-
-  const fetchEstates = async () => {
+  const fetchEstates = useCallback(async () => {
     try {
       const response = await _get("estate/getAllEstates");
       setEstates(response.data);
+      
       const newPaginatedData = response.data.slice(
         (currentPage - 1) * pageSize,
         currentPage * pageSize
@@ -46,7 +42,11 @@ const EstateList = () => {
     } catch (error) {
       console.error("Error fetching estates:", error);
     }
-  };
+  }, [currentPage, pageSize]); // Only re-create when currentPage or pageSize changes
+  
+  useEffect(() => {
+    fetchEstates();
+  }, [fetchEstates]); 
 
   const handlePaginationChange = (page, pageSize) => {
     setCurrentPage(page);

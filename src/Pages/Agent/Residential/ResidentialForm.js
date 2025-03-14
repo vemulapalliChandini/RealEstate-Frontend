@@ -361,7 +361,7 @@ const ResidentialForm = ({ setShowFormType }) => {
     };
 
     setLandMeasure(data);
-    if (type == "acres") {
+    if (type === "acres") {
       settotalInAcres(price * landmeasure);
     } else {
       settotalInAcres(

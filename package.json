@@ -52,8 +52,8 @@
     "socket.io-client": "^4.8.1"
   },
  "scripts": {
-  "start": "GENERATE_SOURCEMAP=false react-scripts start",
-  "build": "GENERATE_SOURCEMAP=false react-scripts build",
+  "start": "GENERATE_SOURCEMAP=false react-scripts start --quiet",
+  "build": "GENERATE_SOURCEMAP=false react-scripts build ",
   "test": "react-scripts test",
   "eject": "react-scripts eject"
 },

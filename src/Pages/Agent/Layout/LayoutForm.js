@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback } from "react";
 import {
   Button,
   Form,
@@ -62,7 +62,6 @@ const LayoutForm = ({ setShowFormType }) => {
   const { t } = useTranslation();
   const [componentVariant, setComponentVariant] = useState("filled");
   const [amount] = useState(0);
-  const [hasPincode, setHasPincode] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMandal, setSelectedMandal] = useState("");
   const [mandals, setMandals] = useState([]);
@@ -362,7 +361,7 @@ const LayoutForm = ({ setShowFormType }) => {
 
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
+  const fetchAgentEmails = useCallback(async () => {
     try {
       const response = await _get(`/csr/getAssignedAgents/${csrId}`);
       console.log("Agent Emails:", response.data);
@@ -370,15 +369,17 @@ const LayoutForm = ({ setShowFormType }) => {
     } catch (error) {
       console.error("Error fetching agent emails:", error);
     }
-  };
+  }, [csrId]);
+  
+  useEffect(() => {
+    fetchAgentEmails();
+  }, [fetchAgentEmails]); // ✅ Ensures it runs when `fetchAgentEmails` changes
+  
   const updateCoordinates = (lat, long) => {
     setLatitude(lat);
     setLongitude(long);
   };
 
-  useEffect(() => {
-    fetchAgentEmails();
-  }, []);
 
   //  for map...
 
@@ -595,18 +596,7 @@ const LayoutForm = ({ setShowFormType }) => {
     }
   };
 
-  const handlePincodeChange1 = () => {
-    setHasPincode(!hasPincode);
-    setPincode(null);
-    setAddressDetails({
-      district: "",
-      mandal: "",
-      village: "",
-    });
-    setMandals([]);
-    setVillages([]);
-  };
-
+  
   const handlePincodeChange = async (e) => {
     const pincodeValue = e.target.value;
     if (pincodeValue === "") {
@@ -834,7 +824,6 @@ const LayoutForm = ({ setShowFormType }) => {
           longitude: longitude ? longitude.toString() : "",
           landMark: landMark?.toString() || "",
         },
-        description: values.description,
 
 
 
@@ -961,7 +950,7 @@ const LayoutForm = ({ setShowFormType }) => {
         landsizeunit: "sq. ft",
         state: "Andhra Pradesh",
         country: "India",
-        landsizeunit: "sq. ft",
+        
         pricesizeunit: "sq. ft",
       }}
     >
@@ -2852,7 +2841,7 @@ const LayoutForm = ({ setShowFormType }) => {
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,

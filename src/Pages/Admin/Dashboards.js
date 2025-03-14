@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   Row,
@@ -104,7 +104,7 @@ const Dashboards = () => {
     (propertyData.residential / totalPercentage) * 180 + agriculturalDegree;
   const commercialDegree = 180;
 
-  const salesData = [
+  const salesData = useMemo(() =>[
     { date: "2024-11-01", price: 30000 },
     { date: "2024-11-02", price: 35000 },
     { date: "2024-11-03", price: 40000 },
@@ -117,7 +117,7 @@ const Dashboards = () => {
     { date: "2024-11-10", price: 75000 },
     { date: "2024-11-11", price: 80000 },
     { date: "2024-11-12", price: 85000 },
-  ];
+  ],[]);
 
 
   //  sales related things
@@ -304,7 +304,7 @@ const Dashboards = () => {
       );
       setFilteredData(filtered.slice(-7));
     }
-  }, [selectedDate]);
+  }, [selectedDate,salesData]);
 
   const showModal = (property) => {
     setSelectedPropertys(property); // Set the selected property

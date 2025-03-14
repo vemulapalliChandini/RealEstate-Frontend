@@ -277,7 +277,7 @@ export default function GetCommercial({ filters }) {
       // Frontend filtering
       if (filters.searchText) {
         const searchText = filters.searchText.toLowerCase();
-        if (searchText != "" && searchText != "all") {
+        if (searchText !== "" && searchText !== "all") {
           await fetchLocation();
           filtered = data2;
         }

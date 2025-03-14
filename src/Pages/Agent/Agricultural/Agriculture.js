@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useCallback } from "react";
 import {
   Card,
   Row,
@@ -59,24 +59,9 @@ const Agriculture = ({ path, filters, filters1 }) => {
   const [hoursDifference, setHoursDifference] = useState(0);
   const [form] = Form.useForm();
   const [propertyId, setPropertyId] = useState(null);
-  useEffect(() => {
-    maxsizefromAPI();
-    fetchData();
-    // fetchVillages();
-    maxPricefromAPI();
-  }, [filters, filters1]);
+ 
 
-  const maxPricefromAPI = async () => {
-    try {
-      const response = await _get("property/maxPrice/agricultural/@/@/@/@/@");
-      // const data = await response.data.maxPrice;
-      // setMaxPrice(data);
-      // setMaxPriceAPI(data);
-      // setSliderRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+ 
   const handleViewAuction = (property) => {
     // console.log("proep", property);
     setAuctionData(property.auctionData);
@@ -196,28 +181,6 @@ const Agriculture = ({ path, filters, filters1 }) => {
   };
 
 
-  const fetchData = async () => {
-    try {
-      const response = await _get(`/fields/${path}`);
-      console.log("Fetched data:", response.data);
-      setData(response.data.data);
-      setFilteredData(response.data.data);
-
-      // Apply filters if any
-
-      applyFilters(
-        checkedValues,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
-        response.data.data
-      );
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
  
   
 
@@ -294,81 +257,7 @@ const Agriculture = ({ path, filters, filters1 }) => {
       amount: maxBidAmount, // Set the initial bid amount
     });
   };
-  const applyFilters = async (
-    checkedValues,
-    searchText,
-    priceRange,
-    sizeRange,
-    propertyName,
-    data
-  ) => {
-    console.log("apply filters called");
-    console.log("data", data);
-    if (filters != null) {
-      checkedValues = filters.checkedValues;
-      searchText = filters.searchText;
-      priceRange = filters.priceRange;
-      sizeRange = filters.sizeRange;
-      propertyName = filters.propertyName;
-    }
-    if (filters1 != null) {
-      checkedValues = filters1.checkedValues;
-      searchText = filters1.searchText;
-      priceRange = filters1.priceRange;
-      sizeRange = filters1.sizeRange;
-      propertyName = filters1.propertyName;
-    }
-    console.log("data", data);
-    // Handle search text filter (e.g., property name / ID)
-    let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
-    const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
 
-    if (searchText !== "" && searchText !== "all") {
-      await fetchLocation();
-      data = data2;
-    }
-    console.log("data12", data);
-    let filtered = data;
-    if (checkedValues === "All") {
-      filtered = data;
-    } else if (checkedValues === "Sold") {
-      filtered = data.filter((property) => property.status === 1);
-    } else if (checkedValues === "Unsold") {
-      filtered = data.filter((property) => property.status === 0);
-    }
-
-    // Filter based on price range
-    if (priceRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.landDetails.totalPrice) >= priceRange[0] &&
-          Number(property.landDetails.totalPrice) <= priceRange[1]
-      );
-    }
-
-    // Filter based on size range
-    if (sizeRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.landDetails.size) >= sizeRange[0] &&
-          Number(property.landDetails.size) <= sizeRange[1]
-      );
-    }
-
-    // Filter based on property name or ID
-    if (nameSearch2 !== "") {
-      filtered = filtered.filter((property) => {
-        const nameMatch2 = isPropertyIdSearch
-          ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-          : property.landDetails.title && property.landDetails.title.toLowerCase().includes(nameSearch2);
-
-        return nameMatch2;
-      });
-    }
-    console.log("data1", data);
-    setFilteredData(filtered);
-    localStorage.setItem("isLoading", false);
-  };
 
 
 
@@ -384,57 +273,127 @@ const Agriculture = ({ path, filters, filters1 }) => {
       });
     }
   };
-  let data2;
-  const fetchLocation = async () => {
-    try {
-      let type = "";
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      } else {
-        searchText = filters1.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all";
-      }
-      if (path === "getfields") {
-        type = localStorage.getItem("mtype");
-        const response = await _get(
-          `/property/mypropslocation/${type}/${searchText}`
-        );
-        data2 = response.data;
-      } else {
-        type = localStorage.getItem("type");
-        const response = await _get(`/property/location/${type}/${searchText}`);
-        data2 = response.data;
-      }
-    } catch (error) {
-      setFilteredData("");
-    }
-  };
+ const [data2,setData2]=useState();
+   const fetchLocation = useCallback(async () => {
+     try {
+       let type = "";
+       let searchText = "";
+   
+       if (filters !== undefined) {
+         searchText = filters.searchText;
+       } else {
+         searchText = filters1.searchText;
+       }
+   
+       if (!searchText) {
+         searchText = "all";
+       }
+   
+       if (path === "getlayouts") {
+         type = localStorage.getItem("mtype");
+         const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
+         setData2(response.data); // Use state instead of modifying `data2` directly
+       } else {
+         type = localStorage.getItem("type");
+         const response = await _get(`/property/location/${type}/${searchText}`);
+         setData2(response.data); // Use state instead of modifying `data2` directly
+       }
+     } catch (error) {
+       setFilteredData([]);
+     }
+   }, [filters, filters1, path]);
+   
+   
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
-  const maxsizefromAPI = async () => {
-    try {
-      const first = checkedValues.includes("sold") ? "sold" : "@";
-      const second = checkedValues.includes("unSold") ? "unsold" : "@";
-      const response = await _get(
-        `property/maxSize/agricultural/@/@/@/@/@/${first}/${second}`
-      );
-      const data = await response.data.maxSize;
-
-      // setMaxSize(data);
-      // setMaxSizeAPIvalue(data);
-      // setSliderRangesize([0, data]);
-      setSizeRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+  const applyFilters = useCallback(
+    async (
+      checkedValues,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName,
+      data
+    ) => {
+      console.log("apply filters called");
+      console.log("data", data);
+  
+      if (filters != null) {
+        checkedValues = filters.checkedValues;
+        searchText = filters.searchText;
+        priceRange = filters.priceRange;
+        sizeRange = filters.sizeRange;
+        propertyName = filters.propertyName;
+      }
+      if (filters1 != null) {
+        checkedValues = filters1.checkedValues;
+        searchText = filters1.searchText;
+        priceRange = filters1.priceRange;
+        sizeRange = filters1.sizeRange;
+        propertyName = filters1.propertyName;
+      }
+      console.log("data", data);
+  
+      let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2);
+  
+      if (searchText !== "" && searchText !== "all") {
+        await fetchLocation();
+        data = data2;
+      }
+      console.log("data12", data);
+  
+      let filtered = data;
+  
+      if (checkedValues === "All") {
+        filtered = data;
+      } else if (checkedValues === "Sold") {
+        filtered = data.filter((property) => property.status === 1);
+      } else if (checkedValues === "Unsold") {
+        filtered = data.filter((property) => property.status === 0);
+      }
+  
+      // Filter based on price range
+      if (priceRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.landDetails.totalPrice) >= priceRange[0] &&
+            Number(property.landDetails.totalPrice) <= priceRange[1]
+        );
+      }
+  
+      // Filter based on size range
+      if (sizeRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.landDetails.size) >= sizeRange[0] &&
+            Number(property.landDetails.size) <= sizeRange[1]
+        );
+      }
+  
+      // Filter based on property name or ID
+      if (nameSearch2 !== "") {
+        filtered = filtered.filter((property) => {
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId &&
+              property.propertyId.toString().toLowerCase().includes(nameSearch2)
+            : property.landDetails.title &&
+              property.landDetails.title.toLowerCase().includes(nameSearch2);
+  
+          return nameMatch2;
+        });
+      }
+      console.log("data1", data);
+      setFilteredData(filtered);
+      localStorage.setItem("isLoading", false);
+    },
+    [filters, filters1, fetchLocation, setFilteredData,data2]
+  );
+  
+ 
   const formatPrice = (price) => {
     if (price >= 1_00_00_000) {
       return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
@@ -446,7 +405,46 @@ const Agriculture = ({ path, filters, filters1 }) => {
       return price.toString(); // Display as is for smaller values
     }
   };
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await _get(`/fields/${path}`);
+      console.log("Fetched data:", response.data);
+      setData(response.data.data);
+      setFilteredData(response.data.data);
+  
+      // Apply filters if any
+      applyFilters(
+        checkedValues,
+        searchText,
+        priceRange,
+        sizeRange,
+        propertyName,
+        response.data.data
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [path, setData, setFilteredData, applyFilters, checkedValues, searchText, priceRange, sizeRange, propertyName]);
+  const maxsizefromAPI = useCallback(async () => {
+    try {
+      const first = checkedValues.includes("sold") ? "sold" : "@";
+      const second = checkedValues.includes("unSold") ? "unsold" : "@";
+      const response = await _get(
+        `property/maxSize/agricultural/@/@/@/@/@/${first}/${second}`
+      );
+      const data = await response.data.maxSize;
+  
+      setSizeRange([0, data]);
+    } catch (error) {
+      console.error("Error fetching village data:", error);
+    }
+  }, [checkedValues, setSizeRange]);
+  
+  useEffect(() => {
+    maxsizefromAPI();
+    fetchData();
 
+  }, [filters, filters1,fetchData,maxsizefromAPI]);
 
   return (
     <div ref={targetCardRef}>

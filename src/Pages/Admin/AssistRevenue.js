@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, Row, Col, Statistic, Divider } from "antd";
 import {
   BarChart,
@@ -22,39 +22,38 @@ const AssistRevenue = () => {
   const [assistData, setAssistData] = useState([]);
 
   // Mock data to simulate API response
-  const mockBankData = [
+  const mockBankData = useMemo(() => [
     { bankName: "Bank A", promotionCount: 50 },
     { bankName: "Bank B", promotionCount: 40 },
     { bankName: "Bank C", promotionCount: 30 },
     { bankName: "Bank D", promotionCount: 20 },
     { bankName: "Bank E", promotionCount: 30 },
     { bankName: "Bank F", promotionCount: 20 },
-  ];
+  ], []);
 
-  const mockLoanData = [
+  const mockLoanData = useMemo(() => [
     { bankName: "Bank A", users: 100 },
     { bankName: "Bank B", users: 80 },
     { bankName: "Bank C", users: 60 },
     { bankName: "Bank D", users: 40 },
     { bankName: "Bank E", users: 30 },
     { bankName: "Bank F", users: 20 },
-  ];
+  ], []);
 
-  const mockAssistData = [
+  const mockAssistData = useMemo(() => [
     { bankName: "Bank A", assistanceProvided: 120 },
     { bankName: "Bank B", assistanceProvided: 100 },
     { bankName: "Bank C", assistanceProvided: 80 },
     { bankName: "Bank D", assistanceProvided: 50 },
     { bankName: "Bank E", assistanceProvided: 30 },
     { bankName: "Bank F", assistanceProvided: 20 },
-  ];
-
+  ], []);
   useEffect(() => {
-    // Simulating API calls for data fetching
     setBankData(mockBankData);
     setLoanData(mockLoanData);
     setAssistData(mockAssistData);
-  }, []);
+  }, [mockBankData, mockLoanData, mockAssistData]); 
+  
 
   const navigate = useNavigate();
 

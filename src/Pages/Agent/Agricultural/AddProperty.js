@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect,useCallback} from "react";
 import {
   Form,
   Input,
@@ -53,7 +53,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const { useBreakpoint } = Grid;
 const { Option } = Select;
-const API_KEY = "AIzaSyCRouoqOUlbhszsbloBTJa7cR4hOZvFYi4";
+const API_KEY = process.env.API_KEY;
 function AddProperty({ setShowFormType }) {
   const screens = useBreakpoint();
   const { t } = useTranslation();
@@ -358,7 +358,7 @@ If no road type is clearly mentioned, return "None".
     if (role) {
       setUserRole(parseInt(role, 10));
     }
-    console.log(videoUrl);
+  
   }, []);
 
 
@@ -728,22 +728,20 @@ If no road type is clearly mentioned, return "None".
 
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
+  const fetchAgentEmails = useCallback(async () => {
     try {
-      const response = await _get(
-        `/csr/getAssignedAgents/${csrId}`
-      );
+      const response = await _get(`/csr/getAssignedAgents/${csrId}`);
       console.log("Agent Emails:", response.data);
       setAgentEmails(response.data || []);
     } catch (error) {
       console.error("Error fetching agent emails:", error);
     }
-  };
-
+  }, [csrId]); 
+  
 
   useEffect(() => {
     fetchAgentEmails();
-  }, []);
+  }, [fetchAgentEmails]);
 
   const onFinish = async () => {
     const values = form.getFieldsValue();

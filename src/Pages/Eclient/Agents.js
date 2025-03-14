@@ -8,7 +8,7 @@ import {
   Tooltip,
   Button,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { _get, _put } from "../../Service/apiClient";
 import {
   CalendarOutlined,
@@ -36,18 +36,18 @@ const Agents = ({ estate, setIsModalVis, isModalVis, fetchEstates }) => {
     }
   }, [location.pathname]);
 
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  const fetchAgents = async () => {
+  const fetchAgents = useCallback(async () => {
     try {
       const response = await _get(`emClient/getAllAgents/${estate._id}`);
       setAgents(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [estate._id]); // Only re-create when estate._id changes
+  
+  useEffect(() => {
+    fetchAgents();
+  }, [fetchAgents]);
 
   const currentAgents = agents
     ? agents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
