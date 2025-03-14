@@ -16,8 +16,6 @@ import { faEnvelope, faMapMarkerAlt, faPhoneAlt } from "@fortawesome/free-solid-
 import { _get } from "../../Service/apiClient";
 import { SearchOutlined } from "@mui/icons-material";
 
-const { Meta } = Card;
-
 const FindAnAgent = () => {
     const [agents, setAgents] = useState([]);
     const [loading, setLoading] = useState(false);

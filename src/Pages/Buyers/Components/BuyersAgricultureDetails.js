@@ -55,12 +55,10 @@ const BuyersAgricultureDetails = () => {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setisLoading] = useState(false);
-  const pageSize = 4;
   const [showNextDay, setShowNextDay] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
@@ -175,7 +173,6 @@ const BuyersAgricultureDetails = () => {
   // Handle money input change
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {

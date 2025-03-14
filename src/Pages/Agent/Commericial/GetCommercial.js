@@ -2,13 +2,9 @@ import {
   Card,
   Col,
   Pagination,
-
   Row,
-
   Empty,
   Select,
-
-  Grid,
   Input,
   DatePicker,
   Modal,
@@ -33,44 +29,28 @@ import { _get, _post, _put } from "../../../Service/apiClient.js";
 import ShowModal from "../ShowModal";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
-
-const { useBreakpoint } = Grid;
 const { Option } = Select;
 
 const GetCommercial = ({ path, filters, filters1 }) => {
 
-  const { t, i18n } = useTranslation();
+  const { t, } = useTranslation();
   const targetCardRef = useRef(null);
-  const [rating, setrating] = useState(0);
+  const [rating] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sold, setSold] = useState(false);
-  const [searchText, setSearchText] = useState(["", "", ""]);
+  const [searchText] = useState(["", "", ""]);
   const [data, setData] = useState();
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-  const [minprice, setMinPrice] = useState(0);
-  const [maxprice, setMaxPrice] = useState(100000);
-  const [sliderRange, setSliderRange] = useState([0, Infinity]);
-  const [maxfromAPI, setMaxPriceAPI] = useState(1000000);
-  const [propertyName, setPropertyName] = useState("");
-  const [checkedTypes, setCheckedTypes] = useState(["sell", "rent", "lease"]);
-  const [checkedFeatureTypes, setCheckedFeatureTypes] = useState(["Retail", "Industrial", "Hospitality", "SocialActivities"])
+  const [propertyName] = useState("");
+  const [checkedTypes] = useState(["sell", "rent", "lease"]);
+  const [checkedFeatureTypes] = useState(["Retail", "Industrial", "Hospitality", "SocialActivities"])
   const [auctionData, setAuctionData] = useState(null);
   const [isAuctionModalVisible, setIsAuctionModalVisible] = useState(false);
   const [isAuctionViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const options1 = [
-
-    { label: `${t("dashboard.sell")}`, value: "sell" },
-    { label: `${t("dashboard.rent")}`, value: "rent" },
-    { label: `${t("dashboard.lease")}`, value: "lease" },
-  ];
-  const [minsize, setMinSize] = useState(0);
-  const [maxsize, setMaxSize] = useState(100000);
-  const [sliderRangesize, setSliderRangesize] = useState([0, Infinity]);
-  const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
   const [propertyId, setPropertyId] = useState(null);
     const [hoursDifference, setHoursDifference] = useState(0);
   useEffect(() => {
@@ -207,17 +187,17 @@ const GetCommercial = ({ path, filters, filters1 }) => {
     if (checkedTypes.includes("lease")) {
       types[2] = "lease";
     }
-    try {
-      const response = await _get(
-        `property/maxPrice/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
-      );
-      const data = await response.data.maxPrice;
-      setMaxPrice(data);
-      setMaxPriceAPI(data);
-      setSliderRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
+    // try {
+    //   const response = await _get(
+    //     `property/maxPrice/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
+    //   );
+    //   const data = await response.data.maxPrice;
+    //   setMaxPrice(data);
+    //   setMaxPriceAPI(data);
+    //   // setSliderRange([0, data]);
+    // } catch (error) {
+    //   console.error("Error fetching village data:", error);
+    // }
   };
   const handlePaymentSuccess = async () => {
     await fetchData(); // Fetch data first
@@ -345,7 +325,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
     propertyName,
     data
   ) => {
-    if (filters != null) {
+    if (filters !== null) {
       checkedValues = filters.checkedValues;
       checkedFeatureTypes = filters.checkedFeatureTypes;
       searchText = filters.searchText;
@@ -356,7 +336,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
         checkedTypes = filters.checkedTypes;
       }
     }
-    if (filters1 != null) {
+    if (filters1 !== null) {
       checkedValues = filters1.checkedValues;
       checkedFeatureTypes = filters1.checkedFeatureTypes;
       searchText = filters1.searchText;
@@ -369,7 +349,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
     let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
     const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
 
-    if (searchText != "" && searchText != "all") {
+    if (searchText !== "" && searchText !== "all") {
       await fetchLocation();
       data = data2;
     }
@@ -390,7 +370,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
 
     if (checkedTypes === "Sell" || checkedTypes === "Rent" || checkedTypes === "Lease") {
       filtered = filtered.filter((property) =>
-        property.propertyDetails.landDetails[checkedTypes.toLowerCase()]?.plotSize != null
+        property.propertyDetails.landDetails[checkedTypes.toLowerCase()]?.plotSize !== null
       );
     }
     if (checkedFeatureTypes && checkedFeatureTypes.length > 0) {
@@ -526,9 +506,9 @@ const GetCommercial = ({ path, filters, filters1 }) => {
         `property/maxSize/commercial/@/@/@/@/@/${first}/${second}`
       );
       const data = await response.data.maxSize;
-      setMaxSize(data);
-      setMaxSizeAPIvalue(data);
-      setSliderRangesize([0, data]);
+      // setMaxSize(data);
+      // setMaxSizeAPIvalue(data);
+      // setSliderRangesize([0, data]);
       setSizeRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
@@ -537,12 +517,12 @@ const GetCommercial = ({ path, filters, filters1 }) => {
 
   return (
     <div ref={targetCardRef}>
-      {data != null ? (
-        data.length != 0 ? (
+      {data !== null ? (
+        data.length !== 0 ? (
           <>
-            {checkedValues.length == 0 ? (
+            {checkedValues.length === 0 ? (
               <h2>Please select atleast one option</h2>
-            ) : filteredData.length == 0 ? (
+            ) : filteredData.length === 0 ? (
               <Col
                 span={24}
                 style={{ textAlign: "centre" }}
@@ -576,7 +556,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
                           margin: 0,
                           boxShadow:
                             path !== "getlayouts" && "#c3e3f7 0px 5px 10px",
-                          border: property.status != 0 && "1px solid #979ba1",
+                          border: property.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 0 }}
                         // onClick={() => handleCardClick(property)}
@@ -602,13 +582,13 @@ const GetCommercial = ({ path, filters, filters1 }) => {
                               Mark as Sold
                             </button>
                           ) : (
-                            property.status == 1 &&
+                            property.status === 1 &&
                             path === "getcommercial" && (
                               <span>
                                 <button
                                   style={{
                                     color:
-                                      property.status == 0 ? "green" : "red",
+                                      property.status === 0 ? "green" : "red",
                                     flexWrap: "wrap",
                                     float: "right",
                                     width: "100%",
@@ -649,7 +629,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
                               </div>
                             )}
 
-                            {property.propertyDetails.uploadPics.length != 0 ? (
+                            {property.propertyDetails.uploadPics.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={property.propertyDetails.uploadPics[0]}

@@ -26,10 +26,8 @@ import {
 
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet"; // Import Leaflet
 
 import Confetti from 'react-confetti';
-import GoogleApiWrapper from "./Map";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   faEnvelope,
@@ -44,7 +42,6 @@ import Bookappointment from "./BookAppointment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { _get, _put, _post, _delete } from "../../../Service/apiClient";
 import moment from "moment";
-import { useTranslation } from "react-i18next";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { GiCheckedShield } from "react-icons/gi";
 import { BsShieldFillCheck } from "react-icons/bs";
@@ -58,18 +55,14 @@ const { useBreakpoint } = Grid;
 export default function BuyersLayoutDetails() {
   const agentsRef = useRef(null);
   const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
-  const [layout, setLayout] = useState(null);
-  const [findAgents, setFindAgents] = useState(false);
+    const [layout, setLayout] = useState(null);
+  const [findAgents] = useState(false);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-  const itemsPerPage = 4;
   const navigate = useNavigate();
-  const [agents, setAgents] = useState([]);
   const [isModalVis, setIsModalVis] = useState(false);
   const [agentId, setAgentId] = useState(null);
-  const [agentName, setAgentName] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState(1);
   const [wishlist, setWishlist] = useState("");
   const [properties, setProperties] = useState(null);
   const [showInterestButton, setShowInterestButton] = useState(false);
@@ -79,12 +72,10 @@ export default function BuyersLayoutDetails() {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const [agentrole, setIsAgentRole] = useState(null);
+  const [agentrole] = useState(null);
   const [isPropertyOnHold, setIsPropertyOnHold] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isLoading, setisLoading] = useState(false);
@@ -92,10 +83,6 @@ export default function BuyersLayoutDetails() {
   const [currentPages, setCurrentPages] = useState(1);
   const itemsPerPages = 8;
   const [showNextDay, setShowNextDay] = useState(false);
-  const startIndexs = (currentPage - 1) * itemsPerPages;
-  const endIndexs = startIndexs + itemsPerPages;
-  // const currentData = layoutDetails.plots.slice(startIndexs, endIndexs);
-
   const handlePageChange = (page) => {
     setCurrentPages(page);
   };
@@ -123,10 +110,7 @@ export default function BuyersLayoutDetails() {
 
     return () => clearTimeout(timer);
   }, []);
-  //  plots
-
-  const [plots, setPlots] = useState([]);
-  const role = localStorage.getItem("role");
+    const role = localStorage.getItem("role");
   const pageSize = 4;
   const fetchData = async (id) => {
     setLoading(true);
@@ -283,12 +267,7 @@ export default function BuyersLayoutDetails() {
         };
 
         // Send the request
-        const response = await _post(
-          "/deal/createDeal",
-          payload,
-          `${layout.layoutDetails.layoutTitle} added to wishlist`, // Success message
-          "Property already added to wishlist" // Error message
-        );
+
         setWishlist([...wishlist, layout._id]);
       }
       // fetchLayout();
@@ -298,28 +277,10 @@ export default function BuyersLayoutDetails() {
       console.error("Error updating wishlist:", error);
     }
   };
-  // const handleShowInterest = async () => {
-  //   setShowInterestButton(false); // Temporarily disable the button
-  //   setTimeout(() => setShowInterestButton(true), 3000); // Re-enable after 2 seconds
-  // };
   const handleViewAuction = (property) => {
     console.log(property);
     setSelectedProperty(property);
     setIsAuctionViewModalVisible(true);
-  };
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
   };
   useEffect(() => {
     console.log("called");
@@ -335,8 +296,6 @@ export default function BuyersLayoutDetails() {
       const initialBid = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
         : selectedProperty?.auctionData?.[0]?.amount;
-
-      setReservationAmount(initialBid);
       setBackendMoney(amount);
       setRequiredBid(initialBid);
       // Determine the initial state message
@@ -373,7 +332,6 @@ export default function BuyersLayoutDetails() {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -929,7 +887,6 @@ export default function BuyersLayoutDetails() {
                       onClick={() => {
                         handleContactClick();
                         setAgentId(layout.userId);
-                        setAgentName(layout.agentName);
                         setIsModalVis(true);
                       }}
                     >

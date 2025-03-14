@@ -26,7 +26,7 @@ import Meta from "antd/es/card/Meta";
 import moment from 'moment';
 import ShowModal from "../Agent/ShowModal";
 import { useLocation, useNavigate } from "react-router-dom";
-import { MailOutlined, SearchOutlined, VerifiedUserOutlined } from "@mui/icons-material";
+import { MailOutlined, SearchOutlined } from "@mui/icons-material";
 import {
   // MailOutlined,
   UserOutlined,
@@ -40,7 +40,6 @@ function PropertiesCSR() {
   const [selectedType] = useState("All");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [data, setData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [validInput, setValidInput] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,17 +99,14 @@ function PropertiesCSR() {
       return updatedSet;
     });
 
-    // Scroll to the top of the component
     if (topRef.current) {
       topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  const [isInputVisible, setInputVisible] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isPhoneValid, setPhoneValid] = useState(false);
+  // const [isInputVisible, setInputVisible] = useState(false);
   const [shareMethod, setShareMethod] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const [isInputValid, setInputValid] = useState(false);
+  // const [isInputValid, setInputValid] = useState(false);
   const [typeSearchQuery, setTypeSearchQuery] = useState("All")
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
   const [nameSearchQuery, setNameSearchQuery] = useState("");
@@ -118,10 +114,10 @@ function PropertiesCSR() {
   const handleShareClick = (method) => {
     console.log("share clicked");
     setShareMethod(method);
-    setInputVisible(true);
+    // setInputVisible(true);
 
     setInputValue("");
-    setInputValid(false);
+    // setInputValid(false);
     setErrorMessage("");
     setIsModalOpen(true);
   };
@@ -226,7 +222,7 @@ function PropertiesCSR() {
 
   const handleCardClick = async (property) => {
     console.log("peroio");
-    fetchPropetiesData(property.type);
+    // fetchPropetiesData(property.type);
 
     await _get(
       `property/getpropbyid/${property.propertyType}/${property._id}`
@@ -237,15 +233,15 @@ function PropertiesCSR() {
 
     console.log(selectedProperty);
   };
-  const fetchPropetiesData = async (path) => {
-    console.log("called");
-    try {
-      const response = await _get(`/fields/${path}`);
-      setData(response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  // const fetchPropetiesData = async (path) => {
+  //   console.log("called");
+  //   try {
+  //     const response = await _get(`/fields/${path}`);
+  //     setData(response.data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
   const shareProperties = async () => {
     console.log("selepropert", selectedProperties);
     if (selectedProperties.size === 0) {

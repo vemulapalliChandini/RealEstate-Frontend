@@ -24,7 +24,6 @@ import {
   Empty,
   Pagination,
   Tooltip,
-  Spin,
   Input,
   Skeleton,
 } from "antd";
@@ -47,7 +46,6 @@ import { useTranslation } from "react-i18next";
 import { _get, _put } from "../../Service/apiClient";
 import { Select } from "antd";
 import { Grid } from "antd";
-import { useNavigate } from "react-router-dom";
 import Chatbot from "../Chatbot";
 const { useBreakpoint } = Grid;
 const { Option } = Select;
@@ -55,7 +53,7 @@ const { Option } = Select;
 // const socket = io("http://172.17.13.106:3000");
 
 const BuyerRequests = ({ path }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [loading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -63,7 +61,6 @@ const BuyerRequests = ({ path }) => {
   const [curUser, setCurUser] = useState(null);
   const [typedMessage, setTypedMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [newMessagesCount, setNewMessagesCount] = useState(0);
   const [curReceiver, setCurReceiver] = useState("");
 
   // const [userId] = useState("currentUserId");
@@ -242,7 +239,7 @@ const BuyerRequests = ({ path }) => {
           ? "Rejected successfully"
           : "Updated successfully";
     try {
-      const res = await _put(
+       await _put(
         `booking/updatebookingstatus/${_id}/${status}`,
         {},
         successMessage
@@ -615,7 +612,7 @@ const BuyerRequests = ({ path }) => {
                               "#0D416B",
                             border: "none",
                             padding: "4px 10px",
-                            borderRadius: "7px",
+                           
                             fontWeight: "bold",
                             position: "absolute",
                             transform: "translateX(-50%)",
@@ -638,7 +635,6 @@ const BuyerRequests = ({ path }) => {
                               "lightgray",
                             border: "none",
                             padding: "4px 10px",
-                            borderRadius: "7px",
                             fontWeight: "bold",
                             position: "absolute",
                             transform: "translateX(-50%)",
@@ -692,7 +688,6 @@ const BuyerRequests = ({ path }) => {
                             "#0D416B",
                           border: "none",
                           padding: "4px 10px",
-                          borderRadius: "7px",
                           fontWeight: "bold",
                           position: "absolute",
                           transform: "translateX(-50%)",
@@ -746,7 +741,6 @@ const BuyerRequests = ({ path }) => {
                             "linear-gradient(135deg, #ff5252, #ff1744)",
                           border: "none",
                           padding: "4px 10px",
-                          borderRadius: "7px",
                           fontWeight: "bold",
                           position: "absolute",
                           transform: "translateX(-50%)",

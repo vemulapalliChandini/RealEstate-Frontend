@@ -69,7 +69,6 @@ const AuctionCards = ({ showModalOnLoad }) => {
         : selectedProperty?.auctionData?.amount;
       const initialBid = calculateInitialBid(amount);
       console.log(initialBid);
-      const razorpayAmount = calculateInitialBid1(amount);
       // setReservationAmount(razorpayAmount);
       setBackendMoney(amount);
       setRequiredBid(initialBid);

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
 import { Option } from "antd/es/mentions";
-
 import {
   Button,
   Col,
@@ -8,17 +7,14 @@ import {
   Input,
   Row,
   Select,
- 
   Space,
   Tooltip,
   Card,
-  Grid,
   Progress
 } from "antd";
 import {
   DeleteOutlined,
   InfoCircleOutlined,
- 
   UploadOutlined,
 } from "@ant-design/icons";
 import { _get, _post } from "../../Service/apiClient";
@@ -27,18 +23,14 @@ import "../../Authentication/Styles/FloatingLabel.css"
 import Upload from "../Agent/Upload";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
-
-const { useBreakpoint } = Grid;
 function AddCSR() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [addressDetails, setAddressDetails] = useState({
     district: "",
     mandal: "",
     village: "",
   });
- 
-
   const [isUploading1, setIsUploading1] = useState(false);
   const [uploadProgress1, setUploadProgress1] = useState(0);
   const fileInputRef = useRef(null);
@@ -52,24 +44,19 @@ function AddCSR() {
   const [croppedImage, setCroppedImage] = useState(null);
   const [uploadStep, setUploadStep] = useState(1);
   const cropperRef = useRef(null);
-
   const handlevillageChange = async (value) => {
     setAddressDetails((prev) => ({ ...prev, village: value }));
   };
   const [selectedRole, setSelectedRole] = useState("");
-
   const handleRoleChange = (value) => {
     setSelectedRole(value);
     console.log(selectedRole);
   };
-
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     setIsUploading1(true);
     setUploadProgress1(0);
-
     try {
       const url = await Upload(file, (progress) => {
         setUploadProgress(progress);
@@ -91,22 +78,15 @@ function AddCSR() {
         console.error("Cropping failed. Canvas not available.");
         return;
       }
-
       setIsUploading1(true);
       setUploadProgress1(0);
-
       try {
-
         const croppedBlob = await new Promise((resolve) =>
           croppedCanvas.toBlob(resolve, "image/jpeg")
         );
-
-
         const url = await Upload(croppedBlob, (progress) => {
           setUploadProgress(progress);
         }, "image");
-
-
         setCroppedImage(url);
         setImageUrl1(null);
       } catch (error) {
@@ -121,18 +101,13 @@ function AddCSR() {
   const handleImageUpload1 = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     setIsUploading(true);
     setUploadProgress(0);
-
     try {
       const url = await Upload(file, (progress) => {
         setUploadProgress(progress);
       }, "image");
-
       setImageUrls((prevUrls) => [...prevUrls, url]);
-
-
       if (uploadStep === 1) {
         setUploadStep(2);
       } else if (uploadStep === 2) {
@@ -759,7 +734,7 @@ function AddCSR() {
                             }
                             value={addressDetails.mandal || null}
                             onChange={
-                              pincode != null
+                              pincode !== null
                                 ? (value) =>
                                   setAddressDetails((prev) => ({
                                     ...prev,
@@ -887,7 +862,7 @@ function AddCSR() {
                               }
                               value={addressDetails.village || undefined}
                               onChange={
-                                pincode != null || pincode != ""
+                                pincode !== null || pincode !== ""
                                   ? (value) =>
                                     setAddressDetails((prev) => ({
                                       ...prev,

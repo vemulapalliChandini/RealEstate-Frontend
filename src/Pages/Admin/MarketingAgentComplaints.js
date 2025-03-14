@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Table, Spin, Button, Typography, Modal, Empty, Row,Col,Input,Card} from "antd";
 import { _get } from "../../Service/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
 
 import { EnvironmentOutlined,MailOutlined} from "@ant-design/icons";
-import Complaints from "./Complaints";
 
 export default function MarketingAgentComplaints() {
   const [complaints, setComplaints] = useState([]);
@@ -18,9 +16,6 @@ export default function MarketingAgentComplaints() {
   const[filteredBuyers,setFilteredBuyers]=useState(null);
   const [searchLocation,setSearchLocation]=useState("");
   const role=6;
-
-  const navigate = useNavigate();
-
   useEffect(() => {
     const fetchBuyerComplaints = async () => {
       setLoading(true);

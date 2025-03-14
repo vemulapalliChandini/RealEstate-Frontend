@@ -438,10 +438,10 @@ import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import EstateManagement from "./Pages/Admin/EstateManagement";
 
 
-import AdminHomePage from "./Pages/Admin/TotalRevenue";
+
 import AgentList from "./Pages/Admin/AgentList";
 import Complaints from "./Pages/Admin/Complaints";
-import Users from "./Pages/Admin/Users";
+
 import Clients from "./Pages/Admin/Clients";
 import SellerList from "./Pages/Admin/SellerList";
 import SellerHome from "./Pages/Seller/SellerHome";
@@ -473,7 +473,7 @@ import AdminAgents from "./Pages/Admin/AdminAgents";
 import PropertiesCSR from "./Pages/CSR/PropertiesCSR";
 import MarketingAgent from "./Pages/CSR/MarketingAgents";
 import Promotions from "./Pages/CSR/Promotions";
-import AssignAgent from "./Pages/CSR/AssignAgent";
+
 // import ScheduleMeet from "./Pages/Agent/ScheduleMeet";
 import Meetings from "./Pages/Buyers/Meetings";
 import Deals from "./Pages/CSR/Deals";
@@ -484,7 +484,7 @@ import DealDetailsPage from "./Pages/CSR/DealDetailsPage";
 import MyDeals from "./Pages/Agent/MyDeals";
 import PostIssuesMarketingAgent from "./Pages/MarketingAgents/PostIssuesMarketingAgent.js";
 import Tasks from "./Pages/MarketingAgents/Tasks.js";
-import CustomerDeals from "./Pages/MarketingAgents/CustomerDeals.js";
+
 import AssignedProperties from "./Pages/MarketingAgents/AssignedProperties.js";
 import Customers from "./Pages/CSR/Customers.js";
 import MarketingAgentsList from "./Pages/Admin/MarketingAgentsList.js";
@@ -538,7 +538,6 @@ function AppContent() {
         window.removeEventListener("storage", handleStorageChange); // Cleanup listener on unmount
       };
     }, []);
-  const findanagent = localStorage.getItem("findanagent");
   return (
     <>
       {console.log(agentrole)}

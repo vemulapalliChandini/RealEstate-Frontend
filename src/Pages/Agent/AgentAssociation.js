@@ -4,15 +4,13 @@ import {
     Card,
     List,
     Badge,
-    Spin,
     Input,
     Empty,
     Row,
     Col,
     Skeleton,
     Pagination,
-    Menu,
-    Dropdown,
+   
     Modal,
     Form,
     Calendar,
@@ -32,14 +30,13 @@ import {
     HomeOutlined,
     InfoCircleOutlined,
     UserOutlined,
-    EllipsisOutlined,
     PlusCircleFilled
 } from "@ant-design/icons";
 
 import { FaHandsHelping } from "react-icons/fa";
 
 import ShowModal from "../Agent/ShowModal";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import AddDeal from "../CSR/AddDeal";
 
 const { TabPane } = Tabs;
@@ -52,28 +49,19 @@ const AgentAssociation = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(null);
-    const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-    const [dealId, setDealId] = useState(null);
-    const [agentId, setAgentId] = useState(null);
-    const [activities, setActivites] = useState(null);
-    const [isAddActivityModalOpen, setIsAddActivityModalOpen] = useState(false);
+   
     //    new code from here..
     const [selectedStartTime, setSelectedStartTime] = useState(null);
-    const [selectedEndTime, setSelectedEndTime] = useState(null);
-    const [details, setDetails] = useState([]);
+    const [details] = useState([]);
 
-    const [meetings, setMeetings] = useState([]);
     const [form] = Form.useForm();
-    const [isPropertyView, setIsPropertyView] = useState(false);
-    const [isDealModalOpen, setIsDealModalOpen] = useState(false);
     const [isDateSelect, setIsDateSelect] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
 
     const [calendarForm] = Form.useForm();
 
-    const [selectedCardId, setSelectedCardId] = useState(null);
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [meetingDetails, setMeetingDetails] = useState({
@@ -153,12 +141,12 @@ const AgentAssociation = () => {
     };
 
     const handleCancel = () => {
-        setIsActivityModalOpen(false);
+        // setIsActivityModalOpen(false);
         setIsCalendarModalOpen(false);
         setIsDateSelect(false);
-        setIsDealModalOpen(false);
+        // setIsDealModalOpen(false);
         setSelectedDate(null);
-        setIsPropertyView(false);
+        // setIsPropertyView(false);
         form.resetFields();
     };
 
@@ -182,7 +170,7 @@ const AgentAssociation = () => {
             console.log("Combined End DateTime:", combinedDateTime);
 
 
-            setSelectedEndTime(combinedDateTime);
+            // setSelectedEndTime(combinedDateTime);
 
             console.log(meetingDetails.customerMail);
             const requestData = {
@@ -208,26 +196,7 @@ const AgentAssociation = () => {
     };
 
 
-    const onScheduleMeet = (
-        dealingId,
-        agentId,
-        propertyId,
-        propertyName,
-        customerMail,
-        customerId
-    ) => {
-        setSelectedCardId(dealingId);
-        setMeetingDetails({
-            dealingId,
-            agentId,
-
-            propertyId,
-            propertyName,
-            customerMail,
-            customerId,
-        });
-        setIsCalendarModalOpen(true);
-    };
+   
 
     const onDateSelect = (date) => {
         setSelectedDate(date.format("YYYY-MM-DD"));
@@ -241,7 +210,7 @@ const AgentAssociation = () => {
             try {
                 const response = await _get('/meeting/getAllScheduledMeetings');
                 console.log(response.data.data);
-                setMeetings(response.data.data);
+                // setMeetings(response.data.data);
             } catch (error) {
                 console.error('Error fetching meetings:', error);
             }
@@ -576,7 +545,7 @@ const AgentAssociation = () => {
                                                         backgroundColor: "#0d416b",
                                                         color: "#fff",
                                                         border: "none",
-                                                        padding: "2px",
+                                                       
                                                         cursor: "pointer",
                                                         fontWeight: "bold",
                                                         padding: "5px 10px",
@@ -611,7 +580,7 @@ const AgentAssociation = () => {
                         <div
                             style={{
                                 backgroundColor: "#0d416b",
-                                padding: "10px 20px",
+                            
                                 borderRadius: "12px",
                                 color: "#ffffff",
                                 fontWeight: "bold",
@@ -817,7 +786,7 @@ const AgentAssociation = () => {
                                                     backgroundColor: "#0d416b",
                                                     color: "#fff",
                                                     border: "none",
-                                                    padding: "2px",
+                                                 
 
                                                     cursor: "pointer",
                                                     fontWeight: "bold",

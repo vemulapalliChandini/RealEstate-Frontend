@@ -60,7 +60,7 @@ const formItemLayout = {
 const { Panel } = Collapse;
 const { useBreakpoint } = Grid;
 const CommercialForm = ({ setShowFormType }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const screens = useBreakpoint();
   const [componentVariant, setComponentVariant] = useState("filled");
   const [ltype, setLtype] = useState(null);
@@ -68,18 +68,12 @@ const CommercialForm = ({ setShowFormType }) => {
   const [amount, setAmount] = useState(0);
   const [time1, setTime1] = useState(0);
   const [time2, setTime2] = useState(0);
-  const [totalAmount1, setTotalAmount1] = useState(0);
-  const [totalAmount2, setTotalAmount2] = useState(0);
   const [unit, setUnit] = useState("sq. ft");
-  const [totalinacres, settotalInAcres] = useState(0);
-  const [activeTab, setActiveTab] = useState(["ownerDetails"]);
-  const [hasErrors, setHasErrors] = useState(false);
-  const [price, setPrice] = useState(0);
   const [showDis, setShowDis] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  const [plotSize, setPlotSize] = useState(0);
+  const [plotSize] = useState(0);
   const [loading, setLoading] = useState(false);
   const [landMark, setlandMark] = useState("");
   const [isCurrentLocation, setIsCurrentLocation] = useState(false);
@@ -215,51 +209,45 @@ const CommercialForm = ({ setShowFormType }) => {
   };
   const handlePriceChange = (data) => {
     // setPricePerAcre(data);
-    setPrice(form.getFieldValue("price"));
-    const conversionFactors = {
-      acres: 43560,
-      "sq. ft": 1,
-      "sq.yards": 9,
-      "sq.m": 10.764,
-      cents: 435.6,
-    };
-    if (type == "sq. ft") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      settotalInAcres(
-        (form.getFieldValue("size1") *
-          form.getFieldValue("price") *
-          conversionFactors[form.getFieldValue("landsizeunit")]) /
-        form.getFieldValue("size")
-      );
-    }
+    // setPrice(form.getFieldValue("price"));
+  
+    // if (type == "sq. ft") {
+    //   settotalInAcres(price * landmeasure);
+    // } else {
+    //   settotalInAcres(
+    //     (form.getFieldValue("size1") *
+    //       form.getFieldValue("price") *
+    //       conversionFactors[form.getFieldValue("landsizeunit")]) /
+    //     form.getFieldValue("size")
+    //   );
+    // }
   };
 
   const handleUnitChange = (value) => {
     console.log("hiiii");
     console.log(form.getFieldValue("landsizeunit"));
 
-    setType(form.getFieldValue("landsizeunit"));
+    // setType(form.getFieldValue("landsizeunit"));
 
     setUnit(value);
-    const conversionFactors = {
-      acres: 43560,
-      "sq. ft": 1,
-      "sq.yards": 9,
-      "sq.m": 10.764,
-      cents: 435.6,
-    };
-    if (type == "sq.ft") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      if (price && type && landmeasure)
-        settotalInAcres(
-          (form.getFieldValue("size1") *
-            form.getFieldValue("price") *
-            conversionFactors[form.getFieldValue("landsizeunit")]) /
-          form.getFieldValue("size")
-        );
-    }
+    // const conversionFactors = {
+    //   acres: 43560,
+    //   "sq. ft": 1,
+    //   "sq.yards": 9,
+    //   "sq.m": 10.764,
+    //   cents: 435.6,
+    // };
+    // if (type == "sq.ft") {
+    //   settotalInAcres(price * landmeasure);
+    // } else {
+    //   if (price && type && landmeasure)
+    //     settotalInAcres(
+    //       (form.getFieldValue("size1") *
+    //         form.getFieldValue("price") *
+    //         conversionFactors[form.getFieldValue("landsizeunit")]) /
+    //       form.getFieldValue("size")
+    //     );
+    // }
   };
 
   const handleAmountChange = (value) => {
@@ -267,27 +255,21 @@ const CommercialForm = ({ setShowFormType }) => {
   };
 
   const handleSizeChange = (data) => {
-    const conversionFactors = {
-      acres: 43560,
-      "sq. ft.": 1,
-      "sq.yards": 9,
-      "sq.m": 10.764,
-      cents: 435.6,
-    };
-    if (type == "acres") {
-      settotalInAcres(price * landmeasure);
-    } else {
-      if (type == "acres") {
-        settotalInAcres(price * landmeasure);
-      } else {
-        settotalInAcres(
-          (form.getFieldValue("size1") *
-            form.getFieldValue("price") *
-            conversionFactors[form.getFieldValue("landsizeunit")]) /
-          form.getFieldValue("size")
-        );
-      }
-    }
+  
+    // if (type == "acres") {
+    //   settotalInAcres(price * landmeasure);
+    // } else {
+    //   if (type == "acres") {
+    //     settotalInAcres(price * landmeasure);
+    //   } else {
+    //     settotalInAcres(
+    //       (form.getFieldValue("size1") *
+    //         form.getFieldValue("price") *
+    //         conversionFactors[form.getFieldValue("landsizeunit")]) /
+    //       form.getFieldValue("size")
+    //     );
+    //   }
+    // }
   };
 
   const [form] = Form.useForm();
@@ -498,9 +480,7 @@ const CommercialForm = ({ setShowFormType }) => {
   const deletingImage = (index) => {
     setImageUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
-  const calculateTotalAmount = (amount, time) => {
-    return Math.round(amount * time);
-  };
+ 
   const [addressDetails, setAddressDetails] = useState({
     district: "",
     mandal: "",
@@ -511,8 +491,6 @@ const CommercialForm = ({ setShowFormType }) => {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [villages, setVillages] = useState([]);
   const [pincode, setPincode] = useState(null);
-  const [landmeasure, setLandMeasure] = useState(0);
-  const [type, setType] = useState("acres");
   const handlevillageChange = async (value) => {
     setAddressDetails((prev) => ({ ...prev, village: value }));
   };
@@ -999,7 +977,7 @@ const CommercialForm = ({ setShowFormType }) => {
               value={time1}
               onChange={(e) => {
                 setTime1(e.target.value);
-                setTotalAmount1(calculateTotalAmount(amount, e.target.value));
+                // setTotalAmount1(calculateTotalAmount(amount, e.target.value));
               }}
             />
           </Form.Item>
@@ -1191,7 +1169,7 @@ const CommercialForm = ({ setShowFormType }) => {
             value={time2}
             onChange={(e) => {
               setTime2(e.target.value);
-              setTotalAmount2(calculateTotalAmount(amount, e.target.value));
+              // setTotalAmount2(calculateTotalAmount(amount, e.target.value));
             }}
           />
         </Form.Item>
@@ -1306,8 +1284,8 @@ const CommercialForm = ({ setShowFormType }) => {
         })
       );
       form.setFields(errorsToSet); // Set form fields with errors
-      setActiveTab([...panelsWithErrors]);
-      setHasErrors(true);
+      // setActiveTab([...panelsWithErrors]);
+      // setHasErrors(true);
     }
 
     // Only continue if there are no validation errors
@@ -1511,7 +1489,7 @@ const CommercialForm = ({ setShowFormType }) => {
           "Amenities",
           "uploadPhotos",
         ]}
-        onChange={setActiveTab}
+        // onChange={setActiveTab}
       >
         {/* agent details..... */}
 
@@ -2207,7 +2185,7 @@ const CommercialForm = ({ setShowFormType }) => {
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,

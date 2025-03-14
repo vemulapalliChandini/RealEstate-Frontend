@@ -3,9 +3,7 @@ import { Card, Col, Row, Statistic, Table, Tag, Divider, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
   DollarCircleOutlined,
-  TeamOutlined,
-  HomeOutlined,
-  ToolsOutlined,
+
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import {

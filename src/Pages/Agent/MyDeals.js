@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Badge, Calendar, Modal, Form, Input, Spin, Button, Row, Col, Table, TimePicker, Card, Radio, Empty, Pagination, DatePicker, Menu, message, Select, Skeleton, Popover } from "antd";
+import { Calendar, Modal, Form, Input, Button, Row, Col, Table, TimePicker, Card, Radio, Pagination, DatePicker,Select, Skeleton, Popover } from "antd";
 import moment from "moment";
 import { FaWhatsapp } from "react-icons/fa";
 import { _get, _post, _put } from "../../Service/apiClient";
@@ -12,27 +12,20 @@ import ShowModal from "./ShowModal";
 
 import AddDeal from "../CSR/AddDeal";
 const { Option } = Select;
-const { Search } = Input;
 const MyDeals = ({ data }) => {
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
   const [isDealModalOpen, setIsDealModalOpen] = useState(false);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCardId, setSelectedCardId] = useState(null);  // To store the selected card ID
   const [form] = Form.useForm();
-  const [meetings, setMeetings] = useState([]);
-  const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [viewOption, setViewOption] = useState('today');
-  const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [details, setDetails] = useState([]);
+  const [details] = useState([]);
   const [dealId, setDealId] = useState(null);
   const [agentId, setAgentId] = useState(null);
   const [isSold, setIsSold] = useState(false);
   const [isDateSelect, setIsDateSelect] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
-  const [selectedEndTime, setSelectedEndTime] = useState(null);
   const [activeCardId, setActiveCardId] = useState(null);
   const [activities, setActivites] = useState([]);
   const [isPropertyView, setIsPropertyView] = useState(false);
@@ -45,7 +38,6 @@ const MyDeals = ({ data }) => {
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
   const [CustomerNames, setCustomerNames] = useState([]);
 
-  const [PropertyNames, setPropertyNames] = useState([]);
   const [role, setRole] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [isAddModalOPen, setIsAddModalOpen] = useState(false);
@@ -102,10 +94,10 @@ const MyDeals = ({ data }) => {
       );
 
 
-      setPropertyNames(
-        [...new Set(response.data.data.map((agent) => `${agent.propertyName}`))]
+      // setPropertyNames(
+      //   [...new Set(response.data.data.map((agent) => `${agent.propertyName}`))]
 
-      )
+      // )
 
       setLoading(false);
     } catch (error) {
@@ -354,7 +346,7 @@ const MyDeals = ({ data }) => {
       console.log("Combined End DateTime:", combinedDateTime);
 
 
-      setSelectedEndTime(combinedDateTime);
+      // setSelectedEndTime(combinedDateTime);
 
       console.log(meetingDetails.customerMail);
       const requestData = {
@@ -383,7 +375,7 @@ const MyDeals = ({ data }) => {
       try {
         const response = await _get('/meeting/getAllScheduledMeetings');
         console.log(response.data.data);
-        setMeetings(response.data.data);
+        // setMeetings(response.data.data);
       } catch (error) {
         console.error('Error fetching meetings:', error);
       }
@@ -395,7 +387,7 @@ const MyDeals = ({ data }) => {
   };
 
   const onScheduleMeet = (dealingId, agentId, propertyId, propertyName, customerMail, customerId) => {
-    setSelectedCardId(dealingId);
+    // setSelectedCardId(dealingId);
     setMeetingDetails({
       dealingId,
       agentId,
@@ -593,21 +585,6 @@ const MyDeals = ({ data }) => {
 
   };
 
-  const handleDateClick = (value, item) => {
-    const selectedDate = new Date(value);
-    const dateMeetings = meetings.filter(meeting => {
-      const meetingDate = new Date(meeting.meetingStartTime);
-      return meetingDate.toDateString() === selectedDate.toDateString();
-    });
-
-    setSelectedDateMeetings(dateMeetings);
-    setSelectedDate(selectedDate.toDateString());
-    setSelectedMeeting(dateMeetings.length > 0 ? dateMeetings[0] : null);
-    setIsCalendarModalOpen(true);
-    setIsDateSelect(false);
-    setDetailsModalOpen(true);
-    setDetails(item);
-  };
 
   const dateCellRender = (value) => {
     // Return an empty render, so only the dates are shown in the calendar.

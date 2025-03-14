@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Spin, Button, Typography, Modal, Empty, Row,Card,Col,Input} from "antd";
 import { _get } from "../../Service/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaWhatsapp } from "react-icons/fa";
+import {  FaWhatsapp } from "react-icons/fa";
 
 import { EnvironmentOutlined, MailOutlined } from "@ant-design/icons";
 
@@ -12,12 +11,10 @@ export default function AgentComplaints() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-    const [currentPage, setCurrentPage] = useState(1);
 
  const [searchName, setSearchName] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [filteredAgents,setFilteredAgents]=useState(null);
-  const navigate = useNavigate();
  const [expandedComment, setExpandedComment] = useState(null); // To track which comment is expanded
  const role=1;
     const handleToggle = (id) => {
@@ -53,7 +50,6 @@ export default function AgentComplaints() {
       );
     });
     setFilteredAgents(filtered);
-    setCurrentPage(1);
   };
 
   
