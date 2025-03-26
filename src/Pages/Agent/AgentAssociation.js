@@ -64,7 +64,7 @@ const AgentAssociation = () => {
 
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [meetingDetails, setMeetingDetails] = useState({
+    const [meetingDetails] = useState({
         dealingId: '',
         agentId: '',
 

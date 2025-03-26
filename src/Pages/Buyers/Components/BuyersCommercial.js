@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback } from "react";
 import moment from 'moment';
 import {
   Card,
@@ -46,12 +46,13 @@ export default function GetCommercial({ filters }) {
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const role1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [role1]);
  
   useEffect(() => {
     console.log("called");
@@ -195,151 +196,144 @@ export default function GetCommercial({ filters }) {
       setIsSubmitDisabled(true);
     }
   };
-  useEffect(() => {
-    console.log("filters", filters)
-    fetchProperties();
-
-  }, []);
-  useEffect(() => {
-    console.log("filters", filters)
-    applyFilters(filters);
-  }, [filters]);
-  const fetchProperties = async () => {
-    try {
-      const response = await _get(`/commercials/getallcommercials`);
-      console.log(response.data);
-      setProperties(response.data);
-      setFilteredProperties(response.data);
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-    }
+const dataRef = useRef(null);
+ const fetchLocation = useCallback(async () => {
+   try {
+     const type = localStorage.getItem("type");
+     let searchText = filters?.searchText || "all"; // Handle undefined filters safely
+ 
+     const response = await _get(`/property/location/${type}/${searchText}`);
+ 
+     if (response?.data) {
+       dataRef.current = Array.isArray(response.data) ? response.data : [response.data]; // Ensure data is always an array
+     } else {
+       dataRef.current = [];
+     }
+   } catch (error) {
+     console.error("Error fetching location data:", error);
+     dataRef.current = [];
+   }
+ }, [filters]); 
+  
+const applyFilters = useCallback(async (filters) => {
+  let filtered = [];
+  let backendFilteredData = [];
+  const amenityMapping = {
+    "Parking": "Parking",
+    "Security": "Security",
+    "PowerBackUp": "PowerBackUp",
+    "Road Faced": "Road Faced",
   };
 
-  let data2;
-  const fetchLocation = async () => {
-    try {
-      const type = localStorage.getItem("type");
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all"
-      }
-      const response = await _get(`/property/location/${type}/${searchText}`);
-      data2 = response.data;
-    }
-    catch (error) {
-      setFilteredProperties("");
-    }
-  };
+  let amenitiesJson = "";
+  if (filters.commercialAmenities && filters.commercialAmenities.length > 0) {
+    const amenitiesObject = {};
+    Object.keys(amenityMapping).forEach((amenity) => {
+      amenitiesObject[amenityMapping[amenity]] = filters.commercialAmenities.includes(amenity)
+        ? "true"
+        : "false";
+    });
+    amenitiesJson = JSON.stringify(amenitiesObject);
+  }
 
-  const applyFilters = async (filters) => {
-    let filtered = [];
-    let backendFilteredData = [];
-    const amenityMapping = {
-      "Parking": "Parking",
-      "Security": "Security",
-      "PowerBackUp": "PowerBackUp",
-      "Road Faced": "Road Faced",
-
-    };
-
-
-    let amenitiesJson = "";
-    if (filters.commercialAmenities && filters.commercialAmenities.length > 0) {
-      const amenitiesObject = {};
-      Object.keys(amenityMapping).forEach((amenity) => {
-        amenitiesObject[amenityMapping[amenity]] = filters.commercialAmenities.includes(amenity) ? "true" : "false";
-      });
-      amenitiesJson = JSON.stringify(amenitiesObject);
-    }
-
-
-    try {
-      if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
-        // Backend filtering
-        const response = await _get(`/filterRoutes/commercialSearch?location=&propertyFor=${filters.commercialPurpose}&usage=${filters.commercialUsage}&amenities=${amenitiesJson}`);
-
-        if (response.data && response.data.data.length > 0) {
-          backendFilteredData = response.data.data;
-        } else {
-          console.warn("No data found for the selected filters.");
-        }
+  try {
+    if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
+      // Backend filtering
+      const response = await _get(
+        `/filterRoutes/commercialSearch?location=&propertyFor=${filters.commercialPurpose}&usage=${filters.commercialUsage}&amenities=${amenitiesJson}`
+      );
+      if (response.data && response.data.data.length > 0) {
+        backendFilteredData = response.data.data;
       } else {
-        // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
-        const response = await _get(`/filterRoutes/commercialSearch?location=&propertyFor=${filters.commercialPurpose}&usage=${filters.commercialUsage}&amenities=${amenitiesJson}`);
-        backendFilteredData = response.data?.data || [];
+        console.warn("No data found for the selected filters.");
       }
-
-      filtered = backendFilteredData;
-
-      // Frontend filtering
-      if (filters.searchText) {
-        const searchText = filters.searchText.toLowerCase();
-        if (searchText !== "" && searchText !== "all") {
-          await fetchLocation();
-          filtered = data2;
-        }
-      }
-      console.log("hllp", filters.propertyName)
-      let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
-      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
-      if (nameSearch2 !== "") {
-        filtered = filtered.filter((property) => {
-          const nameMatch2 = isPropertyIdSearch
-            ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-            : property.propertyTitle && property.propertyTitle.toLowerCase().includes(nameSearch2);
-
-          return nameMatch2;
-        });
-      }
-      if (filters.priceRange) {
-        filtered = filtered.filter((property) =>
-          property.propertyDetails.landDetails.rent.totalAmount
-            ? Number(property.propertyDetails.landDetails.rent.totalAmount) >=
-            filters.priceRange[0] &&
-            Number(property.propertyDetails.landDetails.rent.totalAmount) <=
-            filters.priceRange[1]
-            : property.propertyDetails.landDetails.lease.totalAmount
-              ? Number(property.propertyDetails.landDetails.lease.totalAmount) >=
-              filters.priceRange[0] &&
-              Number(property.propertyDetails.landDetails.lease.totalAmount) <=
-              filters.priceRange[1]
-              : Number(property.propertyDetails.landDetails.sell.totalAmount) >=
-              filters.priceRange[0] &&
-              Number(property.propertyDetails.landDetails.sell.totalAmount) <=
-              filters.priceRange[1]
-        );
-      }
-
-      if (filters.sizeRange) {
-        filtered = filtered.filter((property) =>
-          property.propertyDetails.landDetails.rent.plotSize
-            ? Number(property.propertyDetails.landDetails.rent.plotSize) >=
-            filters.sizeRange[0] &&
-            Number(property.propertyDetails.landDetails.rent.plotSize) <=
-            filters.sizeRange[1]
-            : property.propertyDetails.landDetails.lease.plotSize
-              ? Number(property.propertyDetails.landDetails.lease.plotSize) >=
-              filters.sizeRange[0] &&
-              Number(property.propertyDetails.landDetails.lease.plotSize) <=
-              filters.sizeRange[1]
-              : Number(property.propertyDetails.landDetails.sell.plotSize) >=
-              filters.sizeRange[0] &&
-              Number(property.propertyDetails.landDetails.sell.plotSize) <=
-              filters.sizeRange[1]
-        );
-      }
-
-      setFilteredProperties(filtered);
-      console.log("Final Filtered Products:", filtered);
-
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setFilteredProperties([]);
+    } else {
+      // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
+      const response = await _get(
+        `/filterRoutes/commercialSearch?location=&propertyFor=${filters.commercialPurpose}&usage=${filters.commercialUsage}&amenities=${amenitiesJson}`
+      );
+      backendFilteredData = response.data?.data || [];
     }
-  };
+
+    filtered = backendFilteredData;
+
+    if (filters.searchText) {
+      const searchText = filters.searchText.toLowerCase();
+      if (searchText !== "" && searchText !== "all") {
+        if (!dataRef.current) {
+          await fetchLocation(); 
+        }
+        filtered = dataRef.current || [];
+      }
+    }
+    console.log("hllp", filters.propertyName);
+    let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
+    const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+    if (nameSearch2 !== "") {
+      filtered = filtered.filter((property) => {
+        const nameMatch2 = isPropertyIdSearch
+          ? property.propertyId &&
+            property.propertyId.toString().toLowerCase().includes(nameSearch2)
+          : property.propertyTitle &&
+            property.propertyTitle.toLowerCase().includes(nameSearch2);
+        return nameMatch2;
+      });
+    }
+
+    if (filters.priceRange) {
+      filtered = filtered.filter((property) =>
+        property.propertyDetails.landDetails.rent.totalAmount
+          ? Number(property.propertyDetails.landDetails.rent.totalAmount) >= filters.priceRange[0] &&
+            Number(property.propertyDetails.landDetails.rent.totalAmount) <= filters.priceRange[1]
+          : property.propertyDetails.landDetails.lease.totalAmount
+          ? Number(property.propertyDetails.landDetails.lease.totalAmount) >= filters.priceRange[0] &&
+            Number(property.propertyDetails.landDetails.lease.totalAmount) <= filters.priceRange[1]
+          : Number(property.propertyDetails.landDetails.sell.totalAmount) >= filters.priceRange[0] &&
+            Number(property.propertyDetails.landDetails.sell.totalAmount) <= filters.priceRange[1]
+      );
+    }
+
+    if (filters.sizeRange) {
+      filtered = filtered.filter((property) =>
+        property.propertyDetails.landDetails.rent.plotSize
+          ? Number(property.propertyDetails.landDetails.rent.plotSize) >= filters.sizeRange[0] &&
+            Number(property.propertyDetails.landDetails.rent.plotSize) <= filters.sizeRange[1]
+          : property.propertyDetails.landDetails.lease.plotSize
+          ? Number(property.propertyDetails.landDetails.lease.plotSize) >= filters.sizeRange[0] &&
+            Number(property.propertyDetails.landDetails.lease.plotSize) <= filters.sizeRange[1]
+          : Number(property.propertyDetails.landDetails.sell.plotSize) >= filters.sizeRange[0] &&
+            Number(property.propertyDetails.landDetails.sell.plotSize) <= filters.sizeRange[1]
+      );
+    }
+
+    setFilteredProperties(filtered);
+    console.log("Final Filtered Products:", filtered);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    setFilteredProperties([]);
+  }
+}, [fetchLocation, setFilteredProperties]);
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await _get(`/commercials/getallcommercials`);
+        console.log(response.data);
+        setProperties(response.data);
+        setFilteredProperties(response.data);
+        applyFilters(filters, response.data);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      }
+    };
+    fetchProperties();
+  }, [applyFilters,filters]);
+
+
+ 
+  
+  
+
+  
   // const applyFilters = async (filters, data) => {
   //   const searchText = filters.searchText;
   //   if (searchText != "" && searchText!="all") {
@@ -474,9 +468,6 @@ export default function GetCommercial({ filters }) {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
 
 
   const handleViewAuction = (property) => {
@@ -524,10 +515,10 @@ export default function GetCommercial({ filters }) {
       )
       }
       <Row gutter={[24, 24]} justify="start">
-        {properties != null && (
-          properties.length != 0 ? (
+        {properties !== null && (
+          properties.length !== 0 ? (
             <>
-              {filteredProperties.length == 0 ? (
+              {filteredProperties.length === 0 ? (
                 <Col
                   span={24}
                   style={{ textAlign: "centre" }}

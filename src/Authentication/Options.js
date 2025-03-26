@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Spin, Empty, Badge } from "antd";
 import { _get } from "../Service/apiClient";
+import "./Styles/Options.css"
 const { Meta } = Card;
 const Options = () => {
   const [landDetails, setLandDetails] = useState([]);
@@ -29,70 +30,42 @@ const Options = () => {
       return price.toString();
     }
   };
-  const badgeStyle = {
-    backgroundColor: "rgb(33,101,155)",
-    color: "white",
-    fontSize: "20px",
-    fontWeight: "bold",
-    position: "relative",
-    marginTop: "-18px",
-    animation: "slideBackForth 2s ease-in-out infinite",
-    padding: "7px",
-    border: "solid 2px",
-
+  const bannerImg = {
+    display: "block",
+    width: "200px",
+    borderRadius: "8px 8px 0 0",
+    height: "12vh",
+    objectFit: "cover"
   };
-  const keyframes = `
-    @keyframes slideBackForth {
-      0% {
-        transform: translateX(0); 
-      }
-      50% {
-        transform: translateX(10px); /* Move slightly to the right */
-      }
-      100% {
-        transform: translateX(0); /* Return to the original position */
-      }
-    }
-  `;
+  
+  const bannerText = {
+    width: "100%",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    borderRadius: "8px",
+    transition: "transform 0.2s ease-in-out"
+  };
+  
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ display: "flex" }}>
-        <style>{keyframes}</style>
-
-        <Badge count={<span style={badgeStyle}>New Launch</span>} />
-      </div>
-      <div style={{ width: "8%", margin: "-2% 0% 0% 3%" }}>
-        {landDetails.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "10px",
-              marginTop: "20%",
-              height: "10px",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <Spin size="large" />
-            <p>Loading latest properties...</p>
-          </div>
+       
+          <div style={{ display: "flex" }}>
+      <Badge count={<span className="badge">New Launch</span>} />
+    </div>
+    <div className="loading-container">
+      {landDetails.length === 0 ? (
+        <div className="loading-box">
+          <Spin size="large" />
+          <p>Loading latest properties...</p>
+        </div>
+    
         ) : (
           <div style={{ display: "flex" }}>
-            <div style={{ width: "100%", margin: "0% 0% 0% 3%" }}>
-              {landDetails.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "10px",
-                    marginTop: "20%",
-                    height: "10px",
-                    overflow: "hidden",
-                    position: "relative",
-                  }}
-                >
-                  <Spin size="large" />
-                  <p>Loading latest properties...</p>
-                </div>
+            <div className="loading-container">
+      {landDetails.length === 0 ? (
+        <div className="loading-box">
+          <Spin size="large" />
+          <p>Loading latest properties...</p>
+        </div>
               ) : (
                 <div className="horizontal-banner-container">
                   <div className="scrolling-cards">
@@ -101,11 +74,7 @@ const Options = () => {
                         <div
                           key={item._id}
                           className="vertical-banner-item"
-                          style={{
-                            marginBottom: "-60px",
-                            marginRight: "50px",
-                            width: "300%",
-                          }}
+                         
                           onWheel={(e) => {
                             e.preventDefault();
                             e.currentTarget.scrollBy({
@@ -131,21 +100,10 @@ const Options = () => {
                                         ? "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582181/agricultural_b1cmq0.png"
                                         : "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"
                                   }
-                                  style={{
-                                    display: "block",
-                                    width: "200px",
-                                    borderRadius: "8px 8px 0 0",
-                                    height: "12vh",
-                                    objectFit: "cover",
-                                  }}
+                                  style={bannerImg} 
                                 />
                               }
-                              style={{
-                                width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
-                                borderRadius: "8px", 
-                                transition: "transform 0.2s ease-in-out",
-                              }}
+                              style={bannerText}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                             >
@@ -182,21 +140,10 @@ const Options = () => {
                                 <img
                                   alt={item.propertyTitle}
                                   src={item.propertyDetails.uploadPics[0] || "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"}
-                                  style={{
-                                    display: "block",
-                                    width: "200px",
-                                    borderRadius: "8px 8px 0 0",
-                                    height: "12vh",
-                                    objectFit: "cover",
-                                  }}
+                                  style={bannerImg} 
                                 />
                               }
-                              style={{
-                                width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
-                                borderRadius: "8px",
-                                transition: "transform 0.2s ease-in-out", 
-                              }}
+                              style={bannerText}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                             >
@@ -272,21 +219,10 @@ const Options = () => {
                                 <img
                                   alt={item.layoutDetails.layoutTitle || "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"}
                                   src={item.uploadPics[0] || "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"}
-                                  style={{
-                                    display: "block",
-                                    width: "200px",
-                                    borderRadius: "8px 8px 0 0",
-                                    height: "12vh",
-                                    objectFit: "cover",
-                                  }}
+                                  style={bannerImg} 
                                 />
                               }
-                              style={{
-                                width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
-                                borderRadius: "8px", 
-                                transition: "transform 0.2s ease-in-out", 
-                              }}
+                              style={bannerText}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                             >
@@ -296,8 +232,7 @@ const Options = () => {
                                     <Row
                                       gutter={[16, 0]}
                                       style={{
-                                        marginBottom: "-2%",
-                                        marginRight: "-40px",
+                                       
                                         color: "#1a1918",
                                       }}
                                     >
@@ -356,21 +291,10 @@ const Options = () => {
                                           ? item.uploadPics
                                           : item.propPhotos || "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"
                                   }
-                                  style={{
-                                    display: "block",
-                                    width: "200px",
-                                    borderRadius: "8px 8px 0 0",
-                                    height: "12vh",
-                                    objectFit: "cover",
-                                  }}
+                                  style={bannerImg} 
                                 />
                               }
-                              style={{
-                                width: "100%",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
-                                borderRadius: "8px", 
-                                transition: "transform 0.2s ease-in-out", 
-                              }}
+                              style={bannerText}
                               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                             >

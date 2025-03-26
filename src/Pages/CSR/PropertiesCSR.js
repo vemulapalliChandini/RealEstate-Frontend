@@ -244,15 +244,7 @@ function PropertiesCSR() {
 
     console.log(selectedProperty);
   };
-   const fetchPropetiesData = async (path) => {
-    console.log("called");
-    try {
-      const response = await _get(`/fields/${path}`);
-      console.log("res",response)
-     } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  
  
   const shareProperties = async () => {
     console.log("selepropert", selectedProperties);

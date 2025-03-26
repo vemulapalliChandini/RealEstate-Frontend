@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Modal, Badge, Card, Select, Row, Col, Empty, Pagination, Collapse } from 'antd';
+import { Calendar, Modal, Badge, Card, Row, Col, Empty, Pagination, Collapse } from 'antd';
 import { ScheduleOutlined } from '@ant-design/icons';
 import { _get } from "../../Service/apiClient";
+import "../Agent/ScheduleMeet.css";
 const { Panel } = Collapse;
 
 function Meetings() {

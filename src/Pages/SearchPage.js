@@ -1327,7 +1327,9 @@ export default function SearchPage() {
         let first = checkedValues.includes("sold") ? "sold" : "@";
         let second = checkedValues.includes("unSold") ? "unsold" : "@";
         let type = showData.toLowerCase(); // Convert to lowercase for consistency
-  
+        if(type === "agriculture"){
+          type="agricultural"
+        }
         const response = await _get(`property/maxSizeForAllProps/${type}/@/@/@/@/@/${first}/${second}`);
         const data = response.data.maxSize;
   

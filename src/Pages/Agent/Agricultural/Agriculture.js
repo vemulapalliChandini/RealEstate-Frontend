@@ -273,36 +273,38 @@ const Agriculture = ({ path, filters, filters1 }) => {
       });
     }
   };
- const [data2,setData2]=useState();
-   const fetchLocation = useCallback(async () => {
-     try {
-       let type = "";
-       let searchText = "";
-   
-       if (filters !== undefined) {
-         searchText = filters.searchText;
-       } else {
-         searchText = filters1.searchText;
-       }
-   
-       if (!searchText) {
-         searchText = "all";
-       }
-   
-       if (path === "getlayouts") {
-         type = localStorage.getItem("mtype");
-         const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
-         setData2(response.data); // Use state instead of modifying `data2` directly
-       } else {
-         type = localStorage.getItem("type");
-         const response = await _get(`/property/location/${type}/${searchText}`);
-         setData2(response.data); // Use state instead of modifying `data2` directly
-       }
-     } catch (error) {
-       setFilteredData([]);
+//  const [data2,setData2]=useState();
+ const dataRef = useRef(null);
+
+ const fetchLocation = useCallback(async () => {
+   try {
+     let type = "";
+     let searchText = "";
+ 
+     if (filters !== undefined) {
+       searchText = filters.searchText;
+     } else {
+       searchText = filters1.searchText;
      }
-   }, [filters, filters1, path]);
-   
+ 
+     if (!searchText) {
+       searchText = "all";
+     }
+ 
+     if (path === "getlayouts") {
+       type = localStorage.getItem("mtype");
+       const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
+       dataRef.current = response.data;
+     } else {
+       type = localStorage.getItem("type");
+       const response = await _get(`/property/location/${type}/${searchText}`);
+       dataRef.current = response.data; 
+     }
+   } catch (error) {
+     setFilteredData([]);
+   }
+ }, [filters, filters1, path]); 
+ 
    
 
   const paginatedData = filteredData.slice(
@@ -318,17 +320,16 @@ const Agriculture = ({ path, filters, filters1 }) => {
       propertyName,
       data
     ) => {
-      console.log("apply filters called");
-      console.log("data", data);
+      
   
-      if (filters != null) {
+      if (filters != null || filters !== undefined) {
         checkedValues = filters.checkedValues;
         searchText = filters.searchText;
         priceRange = filters.priceRange;
         sizeRange = filters.sizeRange;
         propertyName = filters.propertyName;
       }
-      if (filters1 != null) {
+      if (filters1 != null || filters1 !== undefined) {
         checkedValues = filters1.checkedValues;
         searchText = filters1.searchText;
         priceRange = filters1.priceRange;
@@ -340,10 +341,13 @@ const Agriculture = ({ path, filters, filters1 }) => {
       let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
       const isPropertyIdSearch = /\d/.test(nameSearch2);
   
-      if (searchText !== "" && searchText !== "all") {
+     
+    if (searchText !== "" && searchText !== "all") {
+      if (!dataRef.current) { // ✅ Prevents unnecessary API calls
         await fetchLocation();
-        data = data2;
       }
+      data = dataRef.current;
+    }
       console.log("data12", data);
   
       let filtered = data;
@@ -390,7 +394,7 @@ const Agriculture = ({ path, filters, filters1 }) => {
       setFilteredData(filtered);
       localStorage.setItem("isLoading", false);
     },
-    [filters, filters1, fetchLocation, setFilteredData,data2]
+    [filters, filters1, fetchLocation, setFilteredData]
   );
   
  
@@ -405,26 +409,44 @@ const Agriculture = ({ path, filters, filters1 }) => {
       return price.toString(); // Display as is for smaller values
     }
   };
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await _get(`/fields/${path}`);
-      console.log("Fetched data:", response.data);
-      setData(response.data.data);
-      setFilteredData(response.data.data);
-  
-      // Apply filters if any
-      applyFilters(
-        checkedValues,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
-        response.data.data
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [path, setData, setFilteredData, applyFilters, checkedValues, searchText, priceRange, sizeRange, propertyName]);
+ const filterValuesRef = useRef({
+  checkedValues: [],
+  searchText: "",
+  priceRange: [],
+  sizeRange: [],
+  propertyName: "",
+});
+
+useEffect(() => {
+  filterValuesRef.current = {
+    checkedValues,
+    searchText,
+    priceRange,
+    sizeRange,
+    propertyName,
+  };
+}, [checkedValues, searchText, priceRange, sizeRange, propertyName]);
+
+const fetchData = useCallback(async () => {
+  try {
+    const response = await _get(`/fields/${path}`);
+    console.log("Fetched data:", response.data);
+    if (!response.data || !response.data.data) return;
+
+    setData(response.data.data);
+    setFilteredData(response.data.data);
+    applyFilters(
+      filterValuesRef.current.checkedValues,
+      filterValuesRef.current.searchText,
+      filterValuesRef.current.priceRange,
+      filterValuesRef.current.sizeRange,
+      filterValuesRef.current.propertyName,
+      response.data.data
+    );
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, [path,applyFilters]);
   const maxsizefromAPI = useCallback(async () => {
     try {
       const first = checkedValues.includes("sold") ? "sold" : "@";
@@ -441,10 +463,11 @@ const Agriculture = ({ path, filters, filters1 }) => {
   }, [checkedValues, setSizeRange]);
   
   useEffect(() => {
+    console.log ("sdjhijshjidhs");
     maxsizefromAPI();
     fetchData();
 
-  }, [filters, filters1,fetchData,maxsizefromAPI]);
+  }, [fetchData,maxsizefromAPI,filters,filters1]);
 
   return (
     <div ref={targetCardRef}>

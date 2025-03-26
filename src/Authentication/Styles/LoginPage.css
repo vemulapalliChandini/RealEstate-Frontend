@@ -34,3 +34,72 @@
 .para {
   text-align: center;
 }
+/* Modal styles */
+.login-modal--visible {
+  margin-top: 2%;
+}
+
+.login-modal--hidden {
+  margin-top: -6.5%;
+}
+
+.modal-title {
+  text-align: center;
+}
+
+/* Language switch container */
+.language-switch-container {
+  margin-bottom: 5%;
+}
+
+.language-switch {
+  margin-left: 2%;
+}
+
+/* Form styles */
+.login-form {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Error text */
+.error-text {
+  color: red;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+/* Register link styling */
+.register-link {
+  color: #1890ff;
+  cursor: pointer;
+}
+
+/* Center aligned form items */
+.form-center {
+  text-align: center;
+}
+
+/* Submit buttons */
+.submit-button {
+  width: 50%;
+}
+
+/* Centered text and buttons */
+.center-text {
+  text-align: center;
+}
+
+.center-button {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Radio Group styling */
+.radio-group {
+  margin-left: 2%;
+}
+.register-text{
+  justify-self: center;
+  margin-bottom: 2%;
+}

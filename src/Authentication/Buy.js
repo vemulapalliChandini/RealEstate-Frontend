@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Button } from "antd";
-import Option from "./Option";
 import { useNavigate } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import "./Styles/Buy.css"; // Import the external CSS file
+import Options from "./Options";
 
 const Buy = () => {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
@@ -90,7 +90,7 @@ const Buy = () => {
         </Row>
 
         <h1 className="buy-latest-properties-heading">Latest Properties</h1>
-        <Option />
+        <Options />
 
         <Row gutter={[16, 16]} className="buy-properties-row">
           <Col xs={24} md={12} className="buy-property-col">

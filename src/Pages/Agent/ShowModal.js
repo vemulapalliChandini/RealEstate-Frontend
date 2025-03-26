@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { MdElevator, MdSecurity, MdSchool } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
@@ -121,26 +121,28 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
   const handleCancel1 = () => {
     setIsEditing(false);
   };
+
+const showTotalViews = useCallback(async () => {
+  try {
+    const response = await _get(
+      `views/totalViews1/${selectedProperty._id}/${selectedProperty.propertyType}`
+    );
+    console.log(response.data);
+    setTotalViews(response.data.viewCount);
+    setBuyersCount(response.data.viewrsCount);
+  } catch (error) {
+    console.error("Error fetching total views:", error);
+  }
+}, [selectedProperty._id, selectedProperty.propertyType]);
   useEffect(() => {
     console.log("useeffect", selectedProperty);
     setIsPropertyOnHold(selectedProperty?.propertyOnHold);
     showTotalViews();
     console.log(role);
     console.log("Selectedpropertychanges")
-  }, [viewsModal, selectedProperty]);
+  }, [viewsModal, selectedProperty,role,showTotalViews]);
 
 
-  const showTotalViews = async () => {
-
-    try {
-      const response = await _get(`views/totalViews1/${selectedProperty._id}/${selectedProperty.propertyType}`);
-      console.log(response.data);
-      setTotalViews(response.data.viewCount);
-      setBuyersCount(response.data.viewrsCount)
-    } catch (error) {
-      console.error("Error fetching total views:", error);
-    }
-  };
   const calculateInitialBid1 = (totalPrice) => {
     const bidIncrement = 1000;
     const bidLevel = Math.floor(totalPrice / 20000);
@@ -554,7 +556,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                 title={
                   <>
                     Owner Details
-                    {parseInt(role) === 1 || role === 3 && (
+                    {(parseInt(role) === 1 || role === 3) && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -643,7 +645,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                 title={
                   <>
                     Amenities
-                    {role === 1 || role === 3 && (
+                    {(role === 1 || role === 3) && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -763,7 +765,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                   <>
                     Address
 
-                    {role === 1 || role === 3 && (
+                    {(role === 1 || role === 3) && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -910,7 +912,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                   <>
                     Land Details
 
-                    {role === 1 || role === 3 && (
+                    {(role === 1 || role === 3) && (
                       <Button
                         icon={<EditOutlined />}
                         size="small"
@@ -2073,12 +2075,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                 // title="Amenities"
                 title={<span style={{ color: "#0d416b" }}>Amenities</span>}
                 style={{
-                  height:
-                    !(
-                      selectedProperty.amenities.medical &&
-                      selectedProperty.amenities.educational &&
-                      !screens.xs
-                    ) && "100%",
+                 
 
                   margin: 0,
                   padding: 5,
@@ -2501,7 +2498,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                     {selectedProperty.propPhotos.map((photo, index) => (
                       <div key={index}>
                         <img
-                          alt={`Property Photo ${index + 1}`}
+                          alt={`Property  ${index + 1}`}
                           src={photo}
                           className="carousel"
                         />
@@ -2527,7 +2524,7 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                   {selectedProperty.propPhotos.map((photo, index) => (
                     <div key={index}>
                       <img
-                        alt={`Property Photo ${index + 1}`}
+                        alt={`Property  ${index + 1}`}
                         src={photo}
                         className="carousel"
                       />
@@ -2834,7 +2831,6 @@ const ShowModal = ({ path, selectedProperty, isModalVisible, handleCancel, onPay
                 style={{
                   marginBottom: "30px",
                   width: "100%",
-                  height: "90%",
                   // marginBottom: "30px",
                   // width: "100%",
                   margin: 0,

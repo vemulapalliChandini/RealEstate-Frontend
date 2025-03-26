@@ -45,7 +45,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
   const [searchText] = useState(["", "", ""]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const [pageSize, setPageSize] = useState(6);
   const [plotCount, setPlotCount] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -192,7 +192,8 @@ const GetLayout = ({ path, filters, filters1 }) => {
   //     console.error("Error fetching village data:", error);
   //   }
   // };
-  const [data2,setData2]=useState();
+ const dataRef = useRef(null);
+ 
   const fetchLocation = useCallback(async () => {
     try {
       let type = "";
@@ -211,16 +212,16 @@ const GetLayout = ({ path, filters, filters1 }) => {
       if (path === "getlayouts") {
         type = localStorage.getItem("mtype");
         const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
-        setData2(response.data); // Use state instead of modifying `data2` directly
+        dataRef.current = response.data;
       } else {
         type = localStorage.getItem("type");
         const response = await _get(`/property/location/${type}/${searchText}`);
-        setData2(response.data); // Use state instead of modifying `data2` directly
+        dataRef.current = response.data; 
       }
     } catch (error) {
       setFilteredData([]);
     }
-  }, [filters, filters1, path]);
+  }, [filters, filters1, path]); 
   
   
   const handleCardClick = (property) => {
@@ -309,9 +310,11 @@ const GetLayout = ({ path, filters, filters1 }) => {
       let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
       const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
   
-      if (searchText !== "") {
-        await fetchLocation();
-        data = data2;
+      if (searchText !== "" && searchText !== "all") {
+        if (!dataRef.current) { // ✅ Prevents unnecessary API calls
+          await fetchLocation();
+        }
+        data = dataRef.current;
       }
   
       console.log("datasss", data);
@@ -369,7 +372,6 @@ const GetLayout = ({ path, filters, filters1 }) => {
       filters,
       filters1,
       fetchLocation,
-      data2,
       setFilteredData, // Include set state functions in dependency array
     ]
   );
@@ -434,6 +436,28 @@ const GetLayout = ({ path, filters, filters1 }) => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const filterValuesRef = useRef({
+      checkedValues: [],
+     
+      searchText: "",
+      priceRange: [],
+      sizeRange: [],
+      propertyName: "",
+    });
+    
+    useEffect(() => {
+      filterValuesRef.current = {
+        checkedValues,
+        searchText,
+        priceRange,
+        sizeRange,
+        propertyName,
+      };
+    }, [ checkedValues,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName]);
   const fetchData = useCallback(async () => {
     try {
       const response = await _get(`/layout/${path}`);
@@ -441,17 +465,17 @@ const GetLayout = ({ path, filters, filters1 }) => {
       setData(response.data);
       setFilteredData(response.data);
       applyFilters(
-        checkedValues,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
+        filterValuesRef.current.checkedValues,
+        filterValuesRef.current.searchText,
+        filterValuesRef.current.priceRange,
+        filterValuesRef.current.sizeRange,
+        filterValuesRef.current.propertyName,
         response.data
       );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [path, checkedValues, searchText, priceRange, sizeRange, propertyName,applyFilters]);
+  }, [path,applyFilters]);
   
   const maxsizefromAPI = useCallback(async () => {
     try {

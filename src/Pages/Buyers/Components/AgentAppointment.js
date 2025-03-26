@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback} from "react";
 
 import { getSocket } from "../../../Authentication/Socket"
 import { jwtDecode } from "jwt-decode";
@@ -31,7 +31,7 @@ import Chatbot from "../../Chatbot";
 
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { _delete, _get } from "../../../Service/apiClient";
+import {  _get } from "../../../Service/apiClient";
 
 // const socket = io("http://172.17.13.106:5000"); // Backend URL
 
@@ -43,7 +43,7 @@ const AgentAppointment = ({ path }) => {
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isBookAppointmentModalOpen, setIsBookAppointmentModalOpen] =
+  const [isBookAppointmentModalOpen] =
     useState(false);
 
   const [selectedFilter, setSelectedFilter] = useState("All");
@@ -167,7 +167,7 @@ const AgentAppointment = ({ path }) => {
         console.log(userId);
       }
     }
-  }, []);
+  }, [userId]);
 
   const handleSendMessage = () => {
     if (typedMessage.trim() !== "") {
@@ -199,33 +199,7 @@ const socket = getSocket();
     setAppointments([]);
 
   }, [path, isBookAppointmentModalOpen]);
-
-  useEffect(() => {
-    filterAppointments();
-  }, [appointments, selectedFilter, searchQuery]);
-
-  const fetchAppointments = async () => {
-    try {
-      setLoading(true);
-      const response = await _get(`/booking/buyerreqs`);
-
-      setAppointments(response.data);
-      checkAppointmentsStatus(response.data);
-      setLoading(false);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-      setLoading(false);
-    }
-  };
-  const checkAppointmentsStatus = (appointments) => {
-    const hasPending = appointments.some(
-      (appointment) => appointment.status === 0
-    );
-  
-  };
-
-  const filterAppointments = () => {
+  const filterAppointments = useCallback(()=>{
     let filtered = appointments;
     if (selectedFilter === "Accepted") {
       filtered = appointments.filter((appointment) => appointment.status === 1);
@@ -245,7 +219,33 @@ const socket = getSocket();
       );
     }
     setFilteredAppointments(filtered);
+  },[appointments,searchQuery,selectedFilter]);
+  useEffect(() => {
+    filterAppointments();
+  }, [appointments, selectedFilter, searchQuery,filterAppointments]);
+
+
+  const fetchAppointments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await _get(`/booking/buyerreqs`);
+      setAppointments(response.data);
+      checkAppointmentsStatus(response.data);
+      setLoading(false);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      setLoading(false);
+    }
+  }, []);
+  const checkAppointmentsStatus = (appointments) => {
+    // const hasPending = appointments.some(
+    //   (appointment) => appointment.status === 0
+    // );
+  
   };
+
+
 
   const label1 = (status, cdate) => {
     const curDate = new Date();
@@ -274,9 +274,7 @@ const socket = getSocket();
     setSearchQuery(value);
   };
 
-  const handleOpenBookAppointmentModal = () => {
-    setIsBookAppointmentModalOpen(true);
-  };
+ 
 
   const formatTimeTo12Hour = (time) => {
     const [hour, minute] = time.split(":");
@@ -312,14 +310,6 @@ const socket = getSocket();
     currentPage * pageSize
   );
 
-  const handleDelete = async (apId) => {
-    const response = await _delete(
-      `booking/delete/${apId}`,
-      "Appointment deleted successfully",
-      "Failed to delete appointment"
-    );
-    fetchAppointments();
-  };
 
   const handleFetchFilteredData = (name, status) => {
     setSelectedFilter(status);
@@ -338,12 +328,9 @@ const socket = getSocket();
   useEffect(() => {
     setAppointments([]);
     fetchAppointments();
-  }, [path]);
-const socket = getSocket(); 
-  const setConnection = () => {
-    socket.emit("register_user", localStorage.getItem("userId"));
-    setChatModal(!chatModal);
-  };
+  }, [path,fetchAppointments]);
+
+
   const formatPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return "";
     const cleaned = phoneNumber.replace(/\D/g, "");

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import {
   Row,
   Col,
@@ -14,7 +14,6 @@ import {
 
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet"; // Import Leaflet
 
 
 
@@ -39,7 +38,6 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import Bookappointment from "./BookAppointment";
-import GoogleApiWrapper from "./Map";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEnvelope,
@@ -89,14 +87,12 @@ export default function ResidentialDetails() {
   const [loading, setLoading] = useState(true);
   const [hoveredFurnish, setHoveredFurnish] = useState(false);
   const [hoveredLayout, setHoveredLayout] = useState(false);
-  const [agents, setAgents] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
   const [isModalVis, setIsModalVis] = useState(false);
   const [agentId, setAgentId] = useState(null);
-  const [agentName, setAgentName] = useState(null);
   const [wishlist, setWishlist] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage] = useState(1);
   const [showInterestButton, setShowInterestButton] = useState(false);
   const [properties, setProperties] = useState(null);
   const [ShownInterest, setShownInterest] = useState(null);
@@ -107,17 +103,15 @@ export default function ResidentialDetails() {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isLoading, setisLoading] = useState(false);
   const [showNextDay, setShowNextDay] = useState(false);
   const itemsPerPages = 8;
   const userId=localStorage.getItem("userId");
-  const pageSize = 4;
+  // const pageSize = 4;
    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [windowHeight, setWindowHeight] = useState(window.innerHeight);
     // const userId=localStorage.getItem("userId");
@@ -134,23 +128,51 @@ export default function ResidentialDetails() {
         window.removeEventListener('resize', handleResize);
       };
     }, []);
-  const fetchData = async (id) => {
+    const fetchData = useCallback(async (id) => {
+      setLoading(true);
+      try {
+        const response = await _get(`/deal/customerInterest/${id}`);
+        console.log(response.data.data[0]);
+        const data = response.data.data[0];
+        console.log(data);
+        setProperties(data);
+        setShownInterest(data.interestIn);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, []); // Ensure dependencies are minimal
+    
+  const [showBalloons, setShowBalloons] = useState(true);
+  const fetchProduct = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await _get(`/deal/customerInterest/${id}`);
-      console.log(response.data.data[0]);
-      const data = response.data.data[0];
-      console.log(data);
-      setProperties(data);
-      setShownInterest(data.interestIn);
+      const response = await _get(`/property/getpropbyid/Residential/${id}`);
+  
+      setProduct(response.data);
+      setIsPropertyOnHold(response.data.propertyOnHold);
+      setShownInterest(response.data.interestedIn);
+      setLoading(false);
+  
+      if (response.data?.auctionData?.[0]?.endDate) {
+        const endDate = response.data.auctionData[0].endDate;
+        const nextDay = moment(endDate).add(1, "days");
+        const today = moment();
+  
+        if (today.isBefore(nextDay)) {
+          setShowNextDay(true);
+          console.log("✅ Showing balloons");
+        } else {
+          setShowNextDay(false);
+          console.log("❌ Hiding balloons");
+        }
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
+      console.error("Error fetching product:", error);
       setLoading(false);
     }
-  };
-  const [showBalloons, setShowBalloons] = useState(true);
-  
+  }, [id]);
     useEffect(() => {
       const timer = setTimeout(() => {
         setShowBalloons(false);
@@ -194,20 +216,7 @@ export default function ResidentialDetails() {
     setSelectedProperty(property);
     setIsAuctionViewModalVisible(true);
   };
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+ 
   useEffect(() => {
     console.log("called");
     if (selectedProperty) {
@@ -223,7 +232,7 @@ export default function ResidentialDetails() {
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
         : selectedProperty?.auctionData?.[0]?.amount;
 
-      setReservationAmount(initialBid);
+      // setReservationAmount(initialBid);2
       setBackendMoney(amount);
       setRequiredBid(initialBid);
       // Determine the initial state message
@@ -260,7 +269,7 @@ export default function ResidentialDetails() {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
+    // setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -354,16 +363,28 @@ export default function ResidentialDetails() {
     setIsAuctionViewModalVisible(false);
     setSelectedProperty(null);
   };
+  const countViews = useCallback(async () => {
+    console.log("I am still in this page");
+    console.log(id);
+    try {
+      await _put(`views/updateViewCount`, {
+        propertyId: id,
+        propertyType: "Residential",
+      });
+    } catch (error) {
+      console.error("Error updating view count:", error);
+    }
+  }, [id]); 
   useEffect(() => {
-
     fetchProduct();
     fetchData();
+
     const interval = setTimeout(() => {
       countViews();
-    }, 10000); //10 seconds interval
+    }, 10000); // 10 seconds interval
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearTimeout(interval);
+  }, [fetchProduct, fetchData, countViews]); 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowInterestButton(true);
@@ -374,19 +395,20 @@ export default function ResidentialDetails() {
 
   const [agentrole, setAgentRole] = useState(null);
   const role = parseInt(localStorage.getItem("role"));
+  const agentrole1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [agentrole1]);
   const toggleWishlist = async (product) => {
-    let res = "";
+    // let res = "";
     try {
       let propertyType = "Residential";
 
       if (wishlist.includes(product._id)) {
-        res = await _delete(
+        await _delete(
           `/wishlist/delete/${product._id}`,
           `${product.propertyDetails.apartmentName} removed from wishlist`
         );
@@ -411,7 +433,7 @@ export default function ResidentialDetails() {
         };
 
         // Send the request
-        const response = await _post(
+        await _post(
           "/deal/createDeal",
           payload,
           `${product.propertyDetails.apartmentName} added to wishlist`, // Success message
@@ -489,44 +511,8 @@ export default function ResidentialDetails() {
   //   setShowInterestButton(false); // Temporarily disable the button
   //   setTimeout(() => setShowInterestButton(true), 3000); // Re-enable after 2 seconds
   // };
-  const countViews = async () => {
-    console.log("I am still in this page");
-    console.log(id);
-    try {
-      const response = await _put(`views/updateViewCount`, {
-        propertyId: id,
-        propertyType: "Residential",
-      });
-    } catch (error) { }
-  }
-  const fetchProduct = async () => {
-    try {
-      const response = await _get(`/property/getpropbyid/Residential/${id}`);
-      const temp = response.data.address.district;
-      setProduct(response.data);
-      setIsPropertyOnHold(response.data.propertyOnHold);
-      setShownInterest(response.data.interestedIn);
-      setLoading(false);
-      if (response.data?.auctionData?.[0]?.endDate) {
-              const endDate = response.data?.auctionData[0].endDate;
-              const nextDay = moment(endDate).add(1, "days");
-              const today = moment();
-      
-      
-              if (today.isBefore(nextDay)) {
-                setShowNextDay(true);
-                console.log("✅ Showing balloons");
-              } else {
-                setShowNextDay(false);
-                console.log("❌ Hiding balloons");
-              }
-            }
-      
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      setLoading(false);
-    }
-  };
+
+ 
 
   if (loading) {
     return (
@@ -573,8 +559,6 @@ export default function ResidentialDetails() {
 
   const totalStars = averageRating > 0 ? fullStars + (hasHalfStar ? 1 : 0) : 0;
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
 
   const formatNumberWithCommas = (num) => {
     return new Intl.NumberFormat("en-IN").format(num);
@@ -673,7 +657,7 @@ export default function ResidentialDetails() {
                     ).map((photo, index) => (
                       <div key={index}>
                         <img
-                          alt={`Property Photo ${index + 1}`}
+                          alt={`Property  ${index + 1}`}
                           src={photo || "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"}
                           style={{
                             width: "100%",
@@ -1015,7 +999,7 @@ export default function ResidentialDetails() {
                       </div>
 
                       <div>
-                        {(role == 3 || agentrole === 11) && (
+                        {(role === 3 || agentrole === 11) && (
                           <>
                             {isPropertyOnHold === "no" ? (
                               <Button
@@ -1261,7 +1245,7 @@ export default function ResidentialDetails() {
                               onClick={() => {
                                 handleContactClick();
                                 setAgentId(product.userId);
-                                setAgentName(product.agentName);
+                                // setAgentName(product.agentName);
                                 setIsModalVis(true);
                               }}
                             >

@@ -460,11 +460,6 @@
 
 
 
-
-
-
-
-
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey, faPhone } from "@fortawesome/free-solid-svg-icons";
@@ -475,6 +470,8 @@ import { useNavigate } from "react-router-dom";
 import { _post, _get } from "../Service/apiClient";
 import { jwtDecode } from "jwt-decode";
 import "./Styles/FloatingLabel.css";
+import "./Styles/LoginPage.css"; // Import the external CSS file
+
 const LoginPage = ({ visible, handleLoginClose }) => {
   const [otpCheck, setOtpCheck] = useState("");
   const [password, setPassword] = useState("");
@@ -494,6 +491,9 @@ const LoginPage = ({ visible, handleLoginClose }) => {
   const [emailPasswordError, setPasswordError] = useState("");
   const usernameRef = useRef(null);
   const [isAgent, setIsAgent] = useState(false);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (usernameRef.current) {
       usernameRef.current.focus();
@@ -509,8 +509,8 @@ const LoginPage = ({ visible, handleLoginClose }) => {
       }
     }
   }, [count]);
+
   let role = 0;
-  const navigate = useNavigate();
 
   const cleaninginputError = () => {
     setInputError("");
@@ -518,7 +518,6 @@ const LoginPage = ({ visible, handleLoginClose }) => {
 
   const passwordVerifivation = () => {
     let endpoint = "";
-
     if (AfterValidation !== "otp") {
       endpoint = _post(
         "/login",
@@ -550,7 +549,7 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         localStorage.setItem("role", role);
         localStorage.setItem("agentrole", 0);
         localStorage.setItem("name", name);
-        localStorage.setItem("userId", decoded.user.userId)
+        localStorage.setItem("userId", decoded.user.userId);
         localStorage.setItem("type", "Agriculture");
         localStorage.setItem("mtype", "Agriculture");
         localStorage.setItem("phoneNumber", phoneNumber);
@@ -560,26 +559,27 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         if (role !== 1) {
           handleLoginClose();
         }
-        if(role !==1){
+        if (role !== 1) {
           navigate(
-            `/dashboard/${role === 3
-              ? "buyer"
-              : role === 1
+            `/dashboard/${
+              role === 3
+                ? "buyer"
+                : role === 1
                 ? "agent"
                 : role === 4
-                  ? "eClient"
-                  : role === 0
-                    ? "admin"
-                    : role === 6
-                      ? "marketingagent"
-                      : role === 5
-                        ? "csr"
-                        : "seller"
+                ? "eClient"
+                : role === 0
+                ? "admin"
+                : role === 6
+                ? "marketingagent"
+                : role === 5
+                ? "csr"
+                : "seller"
             }`
           );
-        }else if(localStorage.getItem ("agentrole")===12){
-          console.log("sihsiwh")
-          navigate("/dashboard")
+        } else if (localStorage.getItem("agentrole") === 12) {
+          console.log("sihsiwh");
+          navigate("/dashboard");
         }
       })
       .catch((error) => {
@@ -592,20 +592,22 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         }
       });
   };
+
   const [selectedAgentRole, setSelectedAgentRole] = useState("");
   const handleSubmit = () => {
     if (selectedAgentRole) {
       localStorage.setItem("agentrole", selectedAgentRole);
     }
-    if(selectedAgentRole === 11){
+    if (selectedAgentRole === 11) {
       localStorage.setItem("agentrole", 11);
-      navigate("/dashboard/agent")
+      navigate("/dashboard/agent");
     }
-    if(selectedAgentRole === 12){
+    if (selectedAgentRole === 12) {
       localStorage.setItem("agentrole", 12);
       navigate("/dashboard/agent");
     }
   };
+
   const validateInput = () => {
     if (AfterValidation === "otp") {
       setResendOTP(false);
@@ -625,9 +627,7 @@ const LoginPage = ({ visible, handleLoginClose }) => {
             { phoneNumber: inputValue },
             `${t("login.Otp Sent Successfully")}`,
             `${t("login.Failed to send OTP")}`
-          )
-            
-            
+          );
         })
         .catch((error) => {
           console.error(error);
@@ -653,10 +653,12 @@ const LoginPage = ({ visible, handleLoginClose }) => {
       }
     }
   };
+
   const showRegisterModal = () => {
     setIsLoginVisible(false);
     form.resetFields();
   };
+
   const handleLoginCancel = () => {
     setResendOTP(false);
     setInputError("");
@@ -668,22 +670,25 @@ const LoginPage = ({ visible, handleLoginClose }) => {
     form.resetFields();
     handleLoginClose();
   };
+
   const handleRegisterCancel = () => {
     form.resetFields();
     setIsLoginVisible(true);
     handleLoginClose();
   };
+
   const changeLanguage = (checked) => {
     let x = checked ? "te" : "en";
     i18n.changeLanguage(x);
     setNewLanguage(x);
   };
+
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds
-      }`;
+    return `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
+
   const resending = () => {
     setOtpCheck("");
     setPassword("");
@@ -698,21 +703,20 @@ const LoginPage = ({ visible, handleLoginClose }) => {
       `${t("login.Otp Sent Successfully")}`,
       `${t("login.Failed to send OTP")}`
     )
-      .then((res) => {
-      })
-      .catch(() => { });
-
+      .then((res) => {})
+      .catch(() => {});
     setCount(120);
   };
+
   return (
     <>
       <Modal
-        style={{ marginTop: isLoginVisible ? "2%" : "-6.5%" }}
+        className={`login-modal ${isLoginVisible ? "login-modal--visible" : "login-modal--hidden"}`}
         title={
           isLoginVisible ? (
-            <p style={{ textAlign: "center" }}>{t("login.Login")}</p>
+            <p className="modal-title">{t("login.Login")}</p>
           ) : (
-            <p style={{ textAlign: "center" }}>{t("login.Register")}</p>
+            <p className="modal-title">{t("login.Register")}</p>
           )
         }
         width={isLoginVisible ? 380 : 800}
@@ -720,16 +724,16 @@ const LoginPage = ({ visible, handleLoginClose }) => {
         onCancel={isLoginVisible ? handleLoginCancel : handleRegisterCancel}
         footer={null}
       >
-        <div style={{ marginBottom: "5%" }}>
+        <div className="language-switch-container">
           <span>
-            Switch to {i18n.language !== "te" ? "తెలుగు" : "English"}:{" "}
+            Switch to {i18n.language !== "te" ? "తెలుగు" : "English"}:
           </span>
           <Switch
+            className="language-switch"
             checkedChildren="తెలుగు"
             unCheckedChildren="English"
             onChange={changeLanguage}
             defaultChecked={i18n.language === "te"}
-            style={{ marginLeft: "2%" }}
           />
         </div>
         {isLoginVisible ? (
@@ -738,14 +742,15 @@ const LoginPage = ({ visible, handleLoginClose }) => {
               <Form
                 form={form}
                 name="basic"
+                className="login-form"
                 initialValues={{ remember: true }}
-                style={{ maxWidth: "100%", margin: "0 auto" }}
                 autoComplete="off"
               >
                 {!BeforeValidation ? (
                   <>
                     <Form.Item name="beforelogin">
-                      <Input ref={usernameRef}
+                      <Input
+                        ref={usernameRef}
                         placeholder="Enter your Phone Number or Email"
                         prefix={<FontAwesomeIcon icon={faUser} />}
                         className="custom-input"
@@ -760,36 +765,21 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                       />
                     </Form.Item>
                     {inputError !== "" && (
-                      <p
-                        style={{
-                          color: "red",
-                          textAlign: "center",
-                          fontFamily: "sans-serif",
-                        }}
-                      >
-                        {inputError}
-                      </p>
+                      <p className="error-text">{inputError}</p>
                     )}
-                    <p style={{ textAlign: "center" }}>
+                    <p className="register-text">
                       {t("login.Don't have an account?")}{" "}
-                      <span
-                        style={{ color: "#1890ff", cursor: "pointer" }}
-                        onClick={showRegisterModal}
-                      >
+                      <span className="register-link" onClick={showRegisterModal}>
                         {t("login.Register")}
                       </span>
                     </p>
-
-                    <Form.Item
-                      style={{ textAlign: "center" }}
-                      name="beforesubmit"
-                    >
+                    <Form.Item className="form-center" name="beforesubmit">
                       <Button
                         onClick={validateInput}
                         disabled={beforesubmitbutton}
                         type="primary"
                         htmlType="submit"
-                        style={{ width: "50%" }}
+                        className="submit-button"
                       >
                         {t("login.Submit")}
                       </Button>
@@ -798,7 +788,8 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                 ) : AfterValidation === "otp" ? (
                   <>
                     <Form.Item name="logPhone">
-                      <Input ref={usernameRef}
+                      <Input
+                        ref={usernameRef}
                         onChange={(e) => {
                           setOtpCheck(e.target.value);
                           setOtpButtonDisable(false);
@@ -811,24 +802,16 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                         className="custom-input"
                         value={otpCheck}
                       />
-                      <Form.Item style={{ textAlign: "center" }}>
+                      <Form.Item className="form-center">
                         {emailPasswordError !== "" ? (
-                          <p style={{ color: "red", textAlign: "center" }}>
-                            {emailPasswordError}
-                          </p>
+                          <p className="error-text">{emailPasswordError}</p>
                         ) : (
                           <p></p>
                         )}
                         {!resendOTP ? (
-                          <p style={{ textAlign: "center" }}>
-                            {formatTime(count)}
-                          </p>
+                          <p className="center-text">{formatTime(count)}</p>
                         ) : (
-                          <Button
-                            type="primary"
-                            onClick={resending}
-                            style={{ display: "block", margin: "0 auto" }}
-                          >
+                          <Button type="primary" onClick={resending} className="center-button">
                             Resend OTP
                           </Button>
                         )}
@@ -838,7 +821,7 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                         disabled={otpButtonDisable}
                         type="primary"
                         htmlType="submit"
-                        style={{ display: "block", margin: "0 auto" }}
+                        className="center-button"
                       >
                         {t("login.Submit")}
                       </Button>
@@ -847,7 +830,8 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                 ) : !isAgent ? (
                   <>
                     <Form.Item name="logemail">
-                      <Input.Password ref={usernameRef}
+                      <Input.Password
+                        ref={usernameRef}
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
@@ -861,23 +845,18 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                         className="custom-input"
                       />
                     </Form.Item>
-                   {emailPasswordError !== "" ? (
-                      <p style={{ color: "red", textAlign: "center" }}>
-                        {emailPasswordError}
-                      </p>
+                    {emailPasswordError !== "" ? (
+                      <p className="error-text">{emailPasswordError}</p>
                     ) : (
                       <p></p>
                     )}
-                    <Form.Item
-                      style={{ textAlign: "center" }}
-                      name="emailsubmit"
-                    >
+                    <Form.Item className="form-center" name="emailsubmit">
                       <Button
                         onClick={passwordVerifivation}
                         disabled={passwordDisable}
                         type="primary"
-                        htmlType="submit.."
-                        style={{ width: "50%" }}
+                        htmlType="submit"
+                        className="submit-button"
                       >
                         {t("login.Submit")}
                       </Button>
@@ -888,19 +867,19 @@ const LoginPage = ({ visible, handleLoginClose }) => {
                     <Form.Item name="agentRole">
                       <Radio.Group
                         value={selectedAgentRole}
-                        onChange={(e) => setSelectedAgentRole(e.target.value)} 
-                       style={{marginLeft:"2%"}}
+                        onChange={(e) => setSelectedAgentRole(e.target.value)}
+                        className="radio-group"
                       >
-                        <Radio value={11}  >Buyer's Agent</Radio>
+                        <Radio value={11}>Buyer's Agent</Radio>
                         <Radio value={12}>Seller's Agent</Radio>
                       </Radio.Group>
                     </Form.Item>
-                    <Form.Item style={{ textAlign: "center" }} name="agentSubmit">
+                    <Form.Item className="form-center" name="agentSubmit">
                       <Button
-                        onClick={handleSubmit} 
+                        onClick={handleSubmit}
                         type="primary"
                         htmlType="submit"
-                        style={{ width: "50%" }}
+                        className="submit-button"
                       >
                         Login
                       </Button>
@@ -911,12 +890,11 @@ const LoginPage = ({ visible, handleLoginClose }) => {
             </Col>
           </Row>
         ) : (
-          <Registration
-            setIsLoginVisible={setIsLoginVisible}
-          />
+          <Registration setIsLoginVisible={setIsLoginVisible} />
         )}
       </Modal>
     </>
   );
 };
+
 export default LoginPage;

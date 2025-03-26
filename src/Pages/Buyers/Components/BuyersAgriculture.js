@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 import {
   Card,
@@ -38,12 +38,13 @@ const BuyersAgriculture = ({ filters }) => {
   const targetCardRef = useRef(null);
   const [agentrole, setAgentRole] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const role1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [role1]);
   const [form] = Form.useForm();
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
@@ -189,32 +190,138 @@ const BuyersAgriculture = ({ filters }) => {
     setSelectedProperty(null);
   };
 
+const fetchLocation = useCallback(async () => {
+  try {
+    const type = localStorage.getItem("type");
+    let searchText = filters?.searchText || "all"; // Handle undefined filters safely
+
+    const response = await _get(`/property/location/${type}/${searchText}`);
+
+    if (response?.data) {
+      dataRef.current = Array.isArray(response.data) ? response.data : [response.data]; // Ensure data is always an array
+    } else {
+      dataRef.current = [];
+    }
+  } catch (error) {
+    console.error("Error fetching location data:", error);
+    dataRef.current = [];
+  }
+}, [filters]); 
+
+  const applyFilters = useCallback(async (filters) => {
+    let filtered = [];
+    let backendFilteredData = [];
+  
+    const amenityMapping = {
+      "Electricity Facility": "Electricity Facility",
+      "Bore Facility": "Bore Facility",
+      "Storage Facility": "Storage Facility",
+    };
+  
+    let amenitiesJson = "";
+    if (filters.agricultureAmenities && filters.agricultureAmenities.length > 0) {
+      const amenitiesObject = {};
+      Object.keys(amenityMapping).forEach((amenity) => {
+        amenitiesObject[amenityMapping[amenity]] = filters.agricultureAmenities.includes(amenity) ? "true" : "false";
+      });
+      amenitiesJson = JSON.stringify(amenitiesObject);
+    }
+  
+    try {
+      if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
+        // Backend filtering
+        const response = await _get(
+          `/filterRoutes/agriSearch?litigation=${filters.litigation}&amenities=${amenitiesJson}&landType=${filters.landType}&location&minPrice&maxPrice&road=${filters.agricultureDistanceFromRoad}`
+        );
+        backendFilteredData = response.data?.data || [];
+      } else {
+        // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
+        const response = await _get(
+          `/filterRoutes/agriSearch?litigation=${filters.litigation}&amenities=${amenitiesJson}&landType=${filters.landType}&location&minPrice&maxPrice&road=${filters.agricultureDistanceFromRoad}`
+        );
+        backendFilteredData = response.data?.data || [];
+      }
+  
+      filtered = backendFilteredData;
+  
+      // Frontend filtering
+      if (filters.searchText) {
+        const searchText = filters.searchText.toLowerCase();
+        if (searchText !== "" && searchText !== "all") {
+          if (!dataRef.current) {
+            await fetchLocation(); // Fetch data only if not already fetched
+          }
+          filtered = dataRef.current || [];
+        }
+      }
+      console.log("dhdjhd",filtered);
+      console.log("hllp", filters.propertyName);
+      let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+      if (nameSearch2 !== "") {
+        filtered = filtered.filter((property) => {
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId &&
+              property.propertyId.toString().toLowerCase().includes(nameSearch2)
+            : property.landDetails.title &&
+              property.landDetails.title.toLowerCase().includes(nameSearch2);
+          return nameMatch2;
+        });
+      }
+  
+      if (filters.priceRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.landDetails.totalPrice) >= filters.priceRange[0] &&
+            Number(property.landDetails.totalPrice) <= filters.priceRange[1]
+        );
+      }
+  
+      if (filters.sizeRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.landDetails.size) >= filters.sizeRange[0] &&
+            Number(property.landDetails.size) <= filters.sizeRange[1]
+        );
+      }
+  
+      setFilteredData(filtered);
+      console.log("Final Filtered Products:", filtered);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setFilteredData([]);
+    }
+  }, [fetchLocation, setFilteredData]); // Removed `data2` dependency
+  
   useEffect(() => {
     if (filters) {
-      { console.log("useeffect called") }
+      console.log("useEffect called");
+  
+      const fetchData = async () => {
+        try {
+          const response = await _get(`/fields/getallfields`);
+          setData(response.data.data);
+          setFilteredData(response.data.data);
+  
+          applyFilters(filters, response.data.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+  
       fetchData();
     }
-  }, []);
-  useEffect(() => {
-    console.log("filters", filters)
-    applyFilters(filters);
-  }, [filters]);
-  const fetchData = async () => {
-    try {
-      const response = await _get(`/fields/getallfields`);
-      const productsData = response.data.data;
-      const initialWishlist = productsData
-        .filter((item) => item.wishStatus === 1)
-        .map((item) => item._id);
+  }, [filters,applyFilters]);
+  
+  const dataRef = useRef(null); // Use ref instead of state
 
-      setData(response.data.data);
-      setFilteredData(response.data.data);
 
-      // applyFilters(filters, response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+
+// useEffect(() => {
+//   console.log("filters", filters);
+//   applyFilters(filters);
+// }, [filters, applyFilters]);
+
   const formatPrice = (price) => {
     if (price >= 1_00_00_000) {
       return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
@@ -226,106 +333,7 @@ const BuyersAgriculture = ({ filters }) => {
       return price.toString(); // Display as is for smaller values
     }
   };
-  let data2;
-  const fetchLocation = async () => {
-    try {
-      const type = localStorage.getItem("type");
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all"
-      }
-      const response = await _get(`/property/location/${type}/${searchText}`);
-      data2 = response.data;
-    }
-    catch (error) {
-      setFilteredData("");
-    }
-  };
-  const applyFilters = async (filters) => {
-    let filtered = [];
-    let backendFilteredData = [];
-    const amenityMapping = {
-      "Electricity Facility": "Electricity Facility",
-      "Bore Facility": "Bore Facility",
-      "Storage Facility": "Storage Facility",
 
-    };
-
-    let amenitiesJson = "";
-    if (filters.agricultureAmenities && filters.agricultureAmenities.length > 0) {
-      const amenitiesObject = {};
-      Object.keys(amenityMapping).forEach((amenity) => {
-        amenitiesObject[amenityMapping[amenity]] = filters.agricultureAmenities.includes(amenity) ? "true" : "false";
-      });
-      amenitiesJson = JSON.stringify(amenitiesObject);
-    }
-
-    try {
-      if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
-        // Backend filtering
-
-        const response = await _get(`/filterRoutes/agriSearch?litigation=${filters.litigation}&amenities=${amenitiesJson}&landType=${filters.landType}&location&minPrice&maxPrice&road=${filters.agricultureDistanceFromRoad}`);
-        if (response.data && response.data.data.length > 0) {
-          backendFilteredData = response.data.data;
-        } else {
-          console.warn("No data found for the selected filters.");
-        }
-      } else {
-        // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
-        const response = await _get(`/filterRoutes/agriSearch?litigation=${filters.litigation}&amenities=${amenitiesJson}&landType=${filters.landType}&location&minPrice&maxPrice&road=${filters.agricultureDistanceFromRoad}`);
-        backendFilteredData = response.data?.data || [];
-      }
-
-      filtered = backendFilteredData;
-
-      // Frontend filtering
-      if (filters.searchText) {
-        const searchText = filters.searchText.toLowerCase();
-        if (searchText !== "" && searchText !== "all") {
-          await fetchLocation();
-          filtered = data2;
-        }
-      }
-      console.log("hllp", filters.propertyName)
-      let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
-      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
-      if (nameSearch2 !== "") {
-        filtered = filtered.filter((property) => {
-          const nameMatch2 = isPropertyIdSearch
-            ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-            : property.landDetails.title && property.landDetails.title.toLowerCase().includes(nameSearch2);
-
-          return nameMatch2;
-        });
-      }
-
-      if (filters.priceRange) {
-        filtered = filtered.filter(
-          (property) =>
-            Number(property.landDetails.totalPrice) >= filters.priceRange[0] &&
-            Number(property.landDetails.totalPrice) <= filters.priceRange[1]
-        );
-      }
-
-      if (filters.sizeRange) {
-        filtered = filtered.filter(
-          (property) =>
-            Number(property.landDetails.size) >= filters.sizeRange[0] &&
-            Number(property.landDetails.size) <= filters.sizeRange[1]
-        );
-      }
-
-      setFilteredData(filtered);
-      console.log("Final Filtered Products:", filtered);
-
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setFilteredData([]);
-    }
-  };
   // const applyFilters = async (filters, data) => {
   //   console.log("data", data);
   //   const searchText = filters.searchText;
@@ -386,7 +394,7 @@ const BuyersAgriculture = ({ filters }) => {
       });
     }
   };
-  { console.log("filtered", filteredData) };
+ 
   const paginatedData = useMemo(() => {
     return filteredData.slice(
       (currentPage - 1) * pageSize,

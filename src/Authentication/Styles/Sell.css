@@ -1,0 +1,109 @@
+.buy-property-img {
+    width: 100%;
+    height: 350px;
+    border-radius: 10px;
+    object-fit: cover;
+    transition: transform 0.1s ease-in-out;
+  }
+  
+  .buy-property-img:hover {
+    transform: scale(1.1);
+  }
+  
+  .buy-property-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .buy-property-overlay h1,
+  .buy-property-overlay p {
+    margin-bottom: 10px;
+  }
+  
+  .buy-property-btn {
+    padding: 8px 15px;
+    background-color: #0d416b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .banner-img {
+    width: 100%;
+    height: 430px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: -2%;
+}
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 440px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin-top: -2%;
+}
+.banner-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5); /* Corrected rgba syntax */
+    color: #FFFFFF;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+.banner-heading {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+}
+.property-card1 {
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 10%;
+    margin-bottom: 2%;
+    margin-top: -3%;
+    background-color: rgb(248, 250, 255);
+}
+
+.property-card-text {
+    margin-left: 40px;
+    margin-right: 40px;
+    color: #0D416b;
+}
+
+.find-agent-button {
+    padding: 8px 15px;
+    background-color: #0d416b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 40%;
+    margin-bottom: 2%;
+}
+.heading{
+    font-weight: bold;
+    justify-self: center;
+    margin-bottom: 2%;
+}
+.details {
+    font-size: 18px;
+    color: black;
+    margin-top: 10px;
+    margin-right: 27%;
+}

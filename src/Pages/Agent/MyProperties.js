@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import {
   Row,
@@ -98,17 +98,131 @@ export default function SearchPage() {
     setShowFormType(type);
   };
   
+  const maxsizefromAPI = useCallback(async () => {
+    if (showData === "Agriculture") {
+      try {
+        const first = checkedValues.includes("sold") ? "sold" : "@";
+        const second = checkedValues.includes("unSold") ? "unsold" : "@";
+        const response = await _get(
+          `property/maxSizeForAllProps/agricultural/@/@/@/@/@/${first}/${second}`
+        );
+        const data = response.data.maxSize;
+        setMaxSize(data);
+        setMaxSizeAPIvalue(data);
+        setSizeRange([0, data]);
+      } catch (error) {
+        console.error("Error fetching village data:", error);
+      }
+    } else if (showData === "Commercial") {
+      try {
+        const first = checkedValues.includes("sold") ? "sold" : "@";
+        const second = checkedValues.includes("unSold") ? "unsold" : "@";
+        const response = await _get(
+          `property/maxSizeForAllProps/commercial/@/@/@/@/@/${first}/${second}`
+        );
+        const data = response.data.maxSize;
+        setMaxSize(data);
+        setMaxSizeAPIvalue(data);
+        setSizeRange([0, data]);
+      } catch (error) {
+        console.error("Error fetching village data:", error);
+      }
+    } else if (showData === "Layout") {
+      try {
+        const first = checkedValues.includes("sold") ? "sold" : "@";
+        const second = checkedValues.includes("unSold") ? "unsold" : "@";
+        const response = await _get(
+          `property/maxSizeForAllProps/layout/@/@/@/@/@/${first}/${second}`
+        );
+        const data = response.data.maxSize;
+        setMaxSize(data);
+        setMaxSizeAPIvalue(data);
+        setSizeRange([0, data]);
+      } catch (error) {
+        console.error("Error fetching village data:", error);
+      }
+    } else if (showData === "Residential") {
+      try {
+        const first = checkedValues.includes("sold") ? "sold" : "@";
+        const second = checkedValues.includes("unSold") ? "unsold" : "@";
+        const response = await _get(
+          `property/maxSizeForAllProps/residential/@/@/@/@/@/${first}/${second}`
+        );
+        const data = response.data.maxSize;
+        setMaxSize(data);
+        setMaxSizeAPIvalue(data);
+        setSizeRange([0, data]);
+      } catch (error) {
+        console.error("Error fetching village data:", error);
+      }
+    }
+  }, [showData, checkedValues]); // include any additional dependencies as needed
+  
+  // Wrap fetchMaxPrice in useCallback.
+  const fetchMaxPrice = useCallback(async () => {
+    try {
+      if (showData === "Agriculture") {
+        const aresponse = await _get(
+          "/property/maxPriceForAllProps/agricultural/@/@/@/@/@"
+        );
+        const amaxPriceFromAPI = aresponse.data.maxPrice;
+        setMaxPriceFromAPI1(amaxPriceFromAPI);
+        setMaxPrice(amaxPriceFromAPI);
+        setSliderRange([0, amaxPriceFromAPI]);
+      } else if (showData === "Layout") {
+        const lresponse = await _get(
+          "/property/maxPriceForAllProps/layout/@/@/@/@/@"
+        );
+        const lmaxPriceFromAPI = lresponse.data.maxPrice;
+        setMaxPrice(lmaxPriceFromAPI);
+        setMaxPriceFromAPI1(lmaxPriceFromAPI);
+        setSliderRange([0, lmaxPriceFromAPI]);
+      } else if (showData === "Residential") {
+        const housetype = ["@", "@"];
+        if (checkedHouseType.includes("Flat")) {
+          housetype[0] = "flat";
+        }
+        if (checkedHouseType.includes("House")) {
+          housetype[1] = "house";
+        }
+        const rresponse = await _get(
+          `/property/maxPriceForAllProps/residential/@/@/@/${housetype[0]}/${housetype[1]}`
+        );
+        const rmaxPriceFromAPI = rresponse.data.maxPrice;
+        setMaxPrice(rmaxPriceFromAPI);
+        setMaxPriceFromAPI1(rmaxPriceFromAPI);
+        setSliderRange([0, rmaxPriceFromAPI]);
+      } else if (showData === "Commercial") {
+        const types = ["@", "@", "@"];
+        if (checkedTypes.includes("sell")) {
+          types[0] = "sell";
+        }
+        if (checkedTypes.includes("rent")) {
+          types[1] = "rent";
+        }
+        if (checkedTypes.includes("lease")) {
+          types[2] = "lease";
+        }
+        const cresponse = await _get(
+          `property/maxPriceForAllProps/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
+        );
+        const cmaxPriceFromAPI = cresponse.data.maxPrice;
+        setMaxPrice(cmaxPriceFromAPI);
+        setMaxPriceFromAPI1(cmaxPriceFromAPI);
+        setSliderRange([0, cmaxPriceFromAPI]);
+      }
+    } catch (error) {
+      console.error("Error fetching max price:", error);
+    }
+  }, [showData, checkedHouseType, checkedTypes]);
+  
+  // Now update the useEffect to include these functions.
   useEffect(() => {
     setSelectedType(localStorage.getItem("mtype"));
     setShowData(localStorage.getItem("mtype"));
-    // fetchVillages();
     setSliderVisible(true);
     setSliderVisible1(true);
-    setAddressDetails({
-      district: "",
-      mandal: "",
-      village: "",
-    });
+  
     maxsizefromAPI();
     fetchMaxPrice();
     setFilters1({
@@ -119,9 +233,10 @@ export default function SearchPage() {
       sizeRange: [0, Infinity],
       checkedTypes: "All",
       checkedHouseType: "All",
-      purposeType:"All",
+      purposeType: "All",
     });
     setSearchText("");
+  
     function hideError(e) {
       if (
         e.message ===
@@ -141,82 +256,15 @@ export default function SearchPage() {
         }
       }
     }
-
+  
     window.addEventListener("error", hideError);
     return () => {
-      window.addEventListener("error", hideError);
+      window.removeEventListener("error", hideError);
     };
-  }, [showData]);
+  }, [showData, maxsizefromAPI, fetchMaxPrice]);
 
 
-  const maxsizefromAPI = async () => {
-    if (showData === "Agriculture") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/agricultural/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
 
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        // setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    } else if (showData === "Commercial") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/commercial/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        // setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    } else if (showData === "Layout") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/layout/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        // setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    }
-    if (showData === "Residential") {
-      try {
-        const first = checkedValues.includes("sold") ? "sold" : "@";
-        const second = checkedValues.includes("unSold") ? "unsold" : "@";
-        const response = await _get(
-          `property/maxSizeForAllProps/residential/@/@/@/@/@/${first}/${second}`
-        );
-        const data = await response.data.maxSize;
-
-        setMaxSize(data);
-        setMaxSizeAPIvalue(data);
-        // setSliderRangesize([0, data]);
-        setSizeRange([0, data]);
-      } catch (error) {
-        console.error("Error fetching village data:", error);
-      }
-    }
-  };
   const handleMinSizeChange = (value) => {
     setMinSize(value);
     setSizeRange([value, maxsize]);
@@ -250,66 +298,7 @@ export default function SearchPage() {
     setShowData(type);
   };
 
-  const fetchMaxPrice = async () => {
-    try {
-      if (showData === "Agriculture") {
-        const aresponse = await _get(
-          "/property/maxPriceForAllProps/agricultural/@/@/@/@/@"
-        );
-        const amaxPriceFromAPI = aresponse.data.maxPrice;
-        setMaxPriceFromAPI1(amaxPriceFromAPI);
-        setMaxPrice(amaxPriceFromAPI);
-        setSliderRange([0, amaxPriceFromAPI]);
-      } else if (showData === "Layout") {
-        const lresponse = await _get(
-          "/property/maxPriceForAllProps/layout/@/@/@/@/@"
-        );
-        const lmaxPriceFromAPI = lresponse.data.maxPrice;
-        setMaxPrice(lmaxPriceFromAPI);
-        setMaxPriceFromAPI1(lmaxPriceFromAPI);
-        setSliderRange([0, lmaxPriceFromAPI]);
-      } else if (showData === "Residential") {
-        const housetype = ["@", "@"];
-
-        if (checkedHouseType.includes("Flat")) {
-          housetype[0] = "flat";
-        }
-        if (checkedHouseType.includes("House")) {
-          housetype[1] = "house";
-        }
-        const rresponse = await _get(
-          `/property/maxPriceForAllProps/residential/@/@/@/${housetype[0]}/${housetype[1]}`
-        );
-        const rmaxPriceFromAPI = rresponse.data.maxPrice;
-        setMaxPrice(rmaxPriceFromAPI);
-        setMaxPriceFromAPI1(rmaxPriceFromAPI);
-        setSliderRange([0, rmaxPriceFromAPI]);
-      } else if (showData == "Commercial") {
-        const data = checkedTypes;
-
-        const types = ["@", "@", "@"];
-
-        if (checkedTypes.includes("sell")) {
-          types[0] = "sell";
-        }
-        if (checkedTypes.includes("rent")) {
-          types[1] = "rent";
-        }
-        if (checkedTypes.includes("lease")) {
-          types[2] = "lease";
-        }
-        const cresponse = await _get(
-          `property/maxPriceForAllProps/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
-        );
-        const cmaxPriceFromAPI = await cresponse.data.maxPrice;
-        setMaxPrice(cmaxPriceFromAPI);
-        setMaxPriceFromAPI1(cmaxPriceFromAPI);
-        setSliderRange([0, cmaxPriceFromAPI]);
-      }
-    } catch (error) {
-      console.error("Error fetching max price:", error);
-    }
-  };
+  
   const handleSliderChange = (value) => {
     setMaxPrice(value);
     setSliderRange(value);
@@ -338,13 +327,7 @@ export default function SearchPage() {
     setCheckedValuesHouseType(value);
   };
 
-  const [addressDetails, setAddressDetails] = useState({
-    country: "",
-    state: "",
-    district: "",
-    mandal: "",
-    village: "",
-  });
+
 
   const clearingFilters = () => {
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback} from "react";
 import { Button, Form, Collapse, Grid, Table } from "antd";
 
 import Upload from "../Upload";
@@ -388,17 +388,7 @@ const ResidentialForm = ({ setShowFormType }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
-    try {
-      const response = await _get(
-        `/csr/getAssignedAgents/${csrId}`
-      );
-      console.log("Agent Emails:", response.data);
-      setAgentEmails(response.data || []);
-    } catch (error) {
-      console.error("Error fetching agent emails:", error);
-    }
-  };
+ 
   const [videoUrl, setvideoUrl] = useState(null);
   const handleImageUpload1 = async (event) => {
     const file = event.target.files[0];
@@ -457,9 +447,19 @@ const ResidentialForm = ({ setShowFormType }) => {
   };
 
 
+  const fetchAgentEmails = useCallback(async () => {
+    try {
+      const response = await _get(`/csr/getAssignedAgents/${csrId}`);
+      console.log("Agent Emails:", response.data);
+      setAgentEmails(response.data || []);
+    } catch (error) {
+      console.error("Error fetching agent emails:", error);
+    }
+  }, [csrId]);
+  
   useEffect(() => {
     fetchAgentEmails();
-  }, []);
+  }, [fetchAgentEmails]);
 
 
   useEffect(() => {
@@ -469,10 +469,6 @@ const ResidentialForm = ({ setShowFormType }) => {
     }
   }, []);
 
-  const showMapModal = () => {
-    setIsModalVisible(true);
-  };
-
   const handleOk = () => {
     setIsModalVisible(false);
   };
@@ -481,23 +477,13 @@ const ResidentialForm = ({ setShowFormType }) => {
     setIsModalVisible(false);
   };
 
-  const handleLatitudeChange = (e) => {
-    setLatitude(e.target.value);
-    if (e.target.value && longitude) {
-      setSelectedLocation([e.target.value, longitude]);
-    }
-  };
+  
 
   const handleLandMark = (e) => {
     setlandMark(e.target.value); // Update state on input change
   };
 
-  const handleLongitudeChange = (e) => {
-    setLongitude(e.target.value);
-    if (latitude && e.target.value) {
-      setSelectedLocation([latitude, e.target.value]);
-    }
-  };
+  
 
   const customIcon = new L.Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/128/1483/1483336.png",
@@ -535,7 +521,7 @@ const ResidentialForm = ({ setShowFormType }) => {
 
     setUnit(value); // Update unit based on selected value
 
-    if (type == "acres") {
+    if (type === "acres") {
       settotalInAcres(price * landmeasure);
     } else {
       if (price && type && landmeasure) {
@@ -572,7 +558,7 @@ const ResidentialForm = ({ setShowFormType }) => {
 
     setPrice(form.getFieldValue("price"));
 
-    if (type == "acres") {
+    if (type === "acres") {
       settotalInAcres(price * landmeasure);
     } else {
       settotalInAcres(
@@ -581,19 +567,16 @@ const ResidentialForm = ({ setShowFormType }) => {
     }
   };
 
-  const [flatSize, setFlatSize] = useState(0);
-  const [size, setSize] = useState(0);
+  
   const [totalinacres, settotalInAcres] = useState(0);
   const [landmeasure, setLandMeasure] = useState(0);
   const [price, setPrice] = useState(0);
   const [type, setType] = useState("sq.ft");
 
   const [imageUrls, setImageUrls] = useState([]);
-  const [activeTab, setActiveTab] = useState(["ownerDetails"]);
-  const [hasErrors, setHasErrors] = useState(false);
-  const [extraAmmenitiesData, setExtraAmmenitiesData] = useState([]);
+
   const { Panel } = Collapse;
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [addressDetails, setAddressDetails] = useState({
     district: "",
     mandal: "",
@@ -787,9 +770,6 @@ const ResidentialForm = ({ setShowFormType }) => {
     return errors;
   };
 
-  const handleuploadPics = (imageUrls1) => {
-    setImageUrls(imageUrls1);
-  };
 
   const onValuesChange = (changedValues) => {
     console.log("Changed Values:", changedValues); // Log the changed values
@@ -816,8 +796,7 @@ const ResidentialForm = ({ setShowFormType }) => {
         })
       );
       form.setFields(errorsToSet); // Set form fields with errors
-      setActiveTab([...panelsWithErrors]);
-      setHasErrors(true);
+
     }
 
 
@@ -932,7 +911,7 @@ const ResidentialForm = ({ setShowFormType }) => {
       console.log(object);
       setLoading(true);
       try {
-        const response = await _post(
+      await _post(
           "/residential/add",
           object,
           "Property Added Successfully",
@@ -1057,7 +1036,7 @@ const ResidentialForm = ({ setShowFormType }) => {
           "Amenities",
           "uploadPhotos",
         ]}
-        onChange={setActiveTab}
+        // onChange={setActiveTab}
       >
         {/* agent details.. */}
 
@@ -1463,7 +1442,7 @@ const ResidentialForm = ({ setShowFormType }) => {
               </Form.Item>
             </Col>
 
-            {propertyType != "Apartment" && (
+            {propertyType !== "Apartment" && (
               <Col xs={24} sm={12} md={8} lg={8} xl={6}>
                 <Form.Item
                   label="Property Layout"
@@ -1480,7 +1459,7 @@ const ResidentialForm = ({ setShowFormType }) => {
                   </Select>
                 </Form.Item>
               </Col>)}
-            {propertyType != "Apartment" && (
+            {propertyType !== "Apartment" && (
               <>
                 <Col xs={24} sm={12} md={8} lg={8} xl={6}>
                   <Form.Item
@@ -1656,7 +1635,7 @@ const ResidentialForm = ({ setShowFormType }) => {
                 />
               </Form.Item>
             </Col>
-            {propertyType != "Apartment" && (
+            {propertyType !== "Apartment" && (
 
               <Col xs={24} sm={12} md={8} lg={6} xl={6}>
                 <Form.Item
@@ -2036,7 +2015,7 @@ const ResidentialForm = ({ setShowFormType }) => {
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,
@@ -2211,7 +2190,7 @@ const ResidentialForm = ({ setShowFormType }) => {
           }
           key="Amenities"
         >
-          <Amenities setExtraAmmenitiesData={setExtraAmmenitiesData} />
+          <Amenities  />
         </Panel>
 
         <Panel

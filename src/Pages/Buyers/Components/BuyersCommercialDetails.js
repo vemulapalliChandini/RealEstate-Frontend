@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Typography,
   Row,
   Col,
   Carousel,
@@ -8,9 +7,7 @@ import {
   Button,
   Modal,
   Tag,
-  Pagination,
-  Rate,
-  Empty,
+  
   Tooltip,
   Grid,
   Spin,
@@ -27,14 +24,11 @@ import {
 
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 
-import { useParams, useNavigate } from "react-router-dom";
-import GoogleApiWrapper from "./Map";
+import { useParams, useNavigate} from "react-router-dom";
 import Bookappointment from "./BookAppointment";
 import {
   faEnvelope,
-  faPhone,
   faWater,
   faRoad,
   faBalanceScale,
@@ -43,10 +37,8 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import AgentAppointment from "./AgentAppointment";
 import { _get, _put, _delete, _post } from "../../../Service/apiClient";
 import moment from "moment";
-import { useTranslation } from "react-i18next";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { ThumbsUp } from "lucide-react";
 import { toast } from "react-toastify";
@@ -59,31 +51,21 @@ const GetCommercialDetail = () => {
   const screens = useBreakpoint();
   const agentsRef = useRef(null);
   const { id } = useParams();
-  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [tokenData, setTokenData] = useState(
-    localStorage.getItem(`token${localStorage.getItem("role")}`)
-  );
-  const [findAgents, setFindAgents] = useState(false);
+  const [viewsCount, setViewsCount] = useState(0);
+
+  const [findAgents] = useState(false);
   const [property, setProperty] = useState(null);
   const [properties, setProperties] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [agents, setAgents] = useState([]);
   const [wishlist, setWishlist] = useState("");
   const [isModalVis, setIsModalVis] = useState(false);
   const [showInterestButton, setShowInterestButton] = useState(false);
   const [ShownInterest, setShownInterest] = useState(null);
-  const [agentId, setAgentId] = useState(null);
-  const [agentsId, setAgentsId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 4;
+  // const [currentPage] = useState(1);
+  // const pageSize = 4;
    const [showNextDay, setShowNextDay] = useState(false);
-  const [agentName, setAgentName] = useState(null);
-  const [isBookAppointmentModalOpen, setIsBookAppointmentModalOpen] =
-    useState(false);
   const [selectedProperty, setSelectedProperty] = useState(false);
-  const [isAuctoonModalVisible, setIsAuctionModalVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [agentrole, setAgentRole] = useState(null);
   const [isPropertyOnHold, setIsPropertyOnHold] = useState("no");
   const [isAuctoonViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
@@ -91,27 +73,19 @@ const GetCommercialDetail = () => {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [reservationAmount, setReservationAmount] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setisLoading] = useState(false);
   const userId=localStorage.getItem("userId");
+  const role1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+  }, [role1]);
+ 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
@@ -128,12 +102,7 @@ const GetCommercialDetail = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+  
   const revertPropertyReservation = async (property) => {
     const body = {
       propertyId: property._id,
@@ -175,7 +144,7 @@ const GetCommercialDetail = () => {
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
         :selectedProperty?.auctionData?.[0]?.amount;
 
-      setReservationAmount(initialBid);
+      // setReservationAmount(initialBid);
       setBackendMoney(amount);
       setRequiredBid(initialBid);
       // Determine the initial state message
@@ -213,7 +182,7 @@ const GetCommercialDetail = () => {
   // Handle money input change
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
+    // setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -355,7 +324,7 @@ const GetCommercialDetail = () => {
         };
 
         // Send the request
-        const response = await _post(
+        await _post(
           "/deal/createDeal",
           payload,
           `${property.propertyTitle} added to wishlist`, // Success message
@@ -392,40 +361,26 @@ const GetCommercialDetail = () => {
 
     return () => clearTimeout(timer);
   }, []);
-  useEffect(() => {
-
-    fetchProperty();
-    fetchData();
-    const interval = setTimeout(() => {
-      countViews();
-    }, 10000); //10 seconds interval
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const countViews = async () => {
+  const countViews = useCallback(async () => {
     console.log("I am still in this page");
     console.log(id);
+  
     try {
       const response = await _put(`views/updateViewCount`, {
         propertyId: id,
         propertyType: "Commercial",
       });
-    } catch (error) { }
-  }
-  const formatPrice = (price) => {
-    if (price >= 1_00_00_000) {
-      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
-    } else if (price >= 1_00_000) {
-      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
-    } else if (price >= 1_000) {
-      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
-    } else {
-      return price.toString(); // Display as is for smaller values
+  
+      if (response.data) {
+        setViewsCount(response.data.viewsCount || 0); // Update the views count in state
+      }
+  
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error updating view count:", error);
     }
-  };
-
-  const fetchProperty = async () => {
+  }, [id, setViewsCount]);
+  const fetchProperty = useCallback(async () => {
     try {
       const response = await _get(`/property/getpropbyid/Commercial/${id}`);
       setProperty(response.data);
@@ -451,7 +406,32 @@ const GetCommercialDetail = () => {
       console.error("Error fetching property details:", error);
       setLoading(false);
     }
+  },[id]);
+  useEffect(() => {
+
+    fetchProperty();
+    fetchData();
+    const interval = setTimeout(() => {
+      countViews();
+    }, 10000); //10 seconds interval
+
+    return () => clearInterval(interval);
+  }, [fetchProperty,countViews]);
+
+  
+  const formatPrice = (price) => {
+    if (price >= 1_00_00_000) {
+      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
+    } else if (price >= 1_00_000) {
+      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
+    } else if (price >= 1_000) {
+      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
+    } else {
+      return price.toString(); // Display as is for smaller values
+    }
   };
+
+ 
 
 
   const handleCloseBookAppointmentModal = () => {
@@ -483,37 +463,37 @@ const GetCommercialDetail = () => {
 
   const totalStars = averageRating > 0 ? fullStars + (hasHalfStar ? 1 : 0) : 0;
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentAgents = agents.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * pageSize;
+  // const endIndex = startIndex + pageSize;
+//   const currentAgents = agents.slice(startIndex, endIndex);
 
-  const bounceAnimation = {
-    animation: "bounce 2s ease infinite",
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-  };
+//   const bounceAnimation = {
+//     animation: "bounce 2s ease infinite",
+//     position: "absolute",
+//     top: "10px",
+//     right: "10px",
+//   };
 
-  const bounceKeyframes = `
-@keyframes bounce {
-0%, 20%, 50%, 80%, 100% {
-transform: translateX(0); /* Start and end at the original position */
-}
-40% {
-transform: translateX(30px); /* Move 30px to the right */
-}
-60% {
-transform: translateX(15px); /* Move slightly to the right */
-}
-}
-`;
-  const handleRatingSubmission = (id, newRatingStatus) => {
-    setAgents((prevAgents) =>
-      prevAgents.map((agent) =>
-        agent._id === id ? { ...agent, ratingStatus: newRatingStatus } : agent
-      )
-    );
-  };
+//   const bounceKeyframes = `
+// @keyframes bounce {
+// 0%, 20%, 50%, 80%, 100% {
+// transform: translateX(0); /* Start and end at the original position */
+// }
+// 40% {
+// transform: translateX(30px); /* Move 30px to the right */
+// }
+// 60% {
+// transform: translateX(15px); /* Move slightly to the right */
+// }
+// }
+// `;
+//   const handleRatingSubmission = (id, newRatingStatus) => {
+//     setAgents((prevAgents) =>
+//       prevAgents.map((agent) =>
+//         agent._id === id ? { ...agent, ratingStatus: newRatingStatus } : agent
+//       )
+//     );
+//   };
   const formatNumberWithCommas = (num) => {
     return new Intl.NumberFormat("en-IN").format(num);
   };
@@ -792,6 +772,20 @@ transform: translateX(15px); /* Move slightly to the right */
                   </Carousel>
                 </Col>
               </Row>
+               <Row style={{ marginTop: "10px" }}>
+                              <Col span={24}>
+                                <div
+                                  style={{
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                    color: "#333",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  Total Views: {viewsCount}
+                                </div>
+                              </Col>
+                            </Row>
             </Card>
           </Col>
 
@@ -851,7 +845,7 @@ transform: translateX(15px); /* Move slightly to the right */
                   </div>
                   {console.log(isPropertyOnHold)}
                   <div>
-                    {(role == 3 || agentrole === 11) && (
+                    {(role === 3 || agentrole === 11) && (
                       <>
                         {isPropertyOnHold === "no" ? (
                           <Button
@@ -1093,8 +1087,8 @@ transform: translateX(15px); /* Move slightly to the right */
                           }}
                           onClick={() => {
                             handleContactClick();
-                            setAgentId(property.userId);
-                            setAgentName(property.agentName);
+                            // setAgentId(property.userId);
+                            // setAgentName(property.agentName);
                             setIsModalVis(true);
                           }}
                         >

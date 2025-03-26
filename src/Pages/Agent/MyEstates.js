@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   Card,
   Row,
@@ -30,11 +30,7 @@ const MyEstates = () => {
   const [paginatedData, setPaginatedData] = useState([]);
   const targetCardRef = useRef(null);
 
-  useEffect(() => {
-    fetchEstates();
-  }, [currentPage, pageSize]);
-
-  const fetchEstates = async () => {
+  const fetchEstates = useCallback(async () => {
     try {
       const response = await _get("emAgent/getAgentEstates");
       console.log(response.data);
@@ -47,7 +43,12 @@ const MyEstates = () => {
     } catch (error) {
       console.error("Error fetching estates:", error);
     }
-  };
+  }, [currentPage, pageSize]);
+  
+  useEffect(() => {
+    fetchEstates();
+  }, [fetchEstates]);
+  
 
   const handlePaginationChange = (page, pageSize) => {
     setCurrentPage(page);

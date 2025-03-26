@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Calendar, Modal, Form, Input, Button, Row, Col, Table, TimePicker, Card, Radio, Pagination, DatePicker,Select, Skeleton, Popover } from "antd";
 import moment from "moment";
 import { FaWhatsapp } from "react-icons/fa";
@@ -51,12 +51,13 @@ const MyDeals = ({ data }) => {
   const toggleMenu = (id) => {
     setActiveCardId((prevId) => (prevId === id ? null : id));
   };
+  const role1=localStorage.getItem("role");
   useEffect(() => {
     const role = localStorage.getItem("role");
     setRole(Number(role));
 
 
-  }, [localStorage.getItem("role")]);
+  }, [role1]);
   const handleAddClick = async () => {
     setIsAddModalOpen(true);
   }
@@ -77,34 +78,27 @@ const MyDeals = ({ data }) => {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState(null);
-  useEffect(() => {
-
-    fetchDeals();
-  }, []);
-  const fetchDeals = async () => {
+  const fetchDeals = useCallback(async () => {
     setLoading(true);
     try {
       const response = await _get("/deal/getAgentDealings");
       console.log(response.data.data);
       setDeals(response.data.data);
-      console.log(deals);
-      setLoading(false);
+      // Logging the deals state immediately after setting it may not reflect the updated value
+      // console.log(deals);
       setCustomerNames(
         [...new Set(response.data.data.map((customer) => `${customer.customer.firstName} ${customer.customer.lastName}`))]
       );
-
-
-      // setPropertyNames(
-      //   [...new Set(response.data.data.map((agent) => `${agent.propertyName}`))]
-
-      // )
-
       setLoading(false);
     } catch (error) {
       console.error("Error fetching deals:", error);
       setLoading(false);
     }
-  };
+  }, []); // Add any additional dependencies if needed
+  
+  useEffect(() => {
+    fetchDeals();
+  }, [fetchDeals]);
   const filteredActivities = useMemo(() => {
     let filtered = [...activities];
     console.log(activities);
@@ -716,7 +710,7 @@ const MyDeals = ({ data }) => {
           </Col>
 
           <Col span={4}>
-            {role === 5 || role === 1 && (
+            {(role === 5 || role === 1) && (
               <Button onClick={handleAddClick} style={{ backgroundColor: "#0D416B", color: "white", marginLeft: "40%" }}>
                 <PlusCircleFilled /> Add Deal
               </Button>

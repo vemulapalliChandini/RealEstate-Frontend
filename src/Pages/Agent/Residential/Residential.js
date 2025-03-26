@@ -3,7 +3,7 @@ import {
   EnvironmentOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback} from "react";
 import "./Residential.css";
 import { Empty, Pagination, Modal, Skeleton, Form, Input, Table, DatePicker } from "antd";
 import { Card, Col, Row } from "antd";
@@ -15,7 +15,7 @@ import moment from "moment";
 export default function Residential({ path, filters, filters1 }) {
   const { t } = useTranslation();
   const targetCardRef = useRef(null);
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProduct1, setSelectedProduct1] = useState(null);
@@ -44,12 +44,8 @@ export default function Residential({ path, filters, filters1 }) {
   // const [maxsizefromAPIvalue, setMaxSizeAPIvalue] = useState(100000);
   // const [sliderRangesize, setSliderRangesize] = useState([0, 100000]);
   const [propertyId, setPropertyId] = useState(null);
-  useEffect(() => {
-    maxsizefromAPI();
-    fetchData();
-    // fetchVillages();
-    maxPricefromAPI();
-  }, [sold, rating, filters, checkedHouseType, filters1]);
+  const [sizeRange, setSizeRange] = useState([0, Infinity]);
+
   const columns = [
     {
       title: 'Buyer Name',
@@ -135,27 +131,7 @@ export default function Residential({ path, filters, filters1 }) {
     setSelectedProduct(null);
     setSelectedProduct1(null);
   };
-  const maxPricefromAPI = async () => {
-    const parameters = ["@", "@"];
-    if (checkedHouseType.includes("Flat")) {
-      parameters[0] = "flat";
-    }
-    if (checkedHouseType.includes("House")) {
-      parameters[1] = "house";
-    }
-    try {
-      const response = await _get(
-        `property/maxPrice/residential/@/@/@/${parameters[0]}/${parameters[1]}`
-      );
-      const data = await response.data.maxPrice;
-      setMaxPrice(data);
-      // setMaxPriceAPI(data);
-      // setSliderRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
-  let data2;
+  
   const formatPrice = (price) => {
     if (price == null) {
       return "N/A"; // Return 'N/A' or any other default value for invalid prices
@@ -175,56 +151,267 @@ export default function Residential({ path, filters, filters1 }) {
     if (!str) return ""; // Handle empty or undefined values
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
-  const fetchLocation = async () => {
-    try {
-      let type = "";
-
-      let searchText = "";
-      if (filters !== undefined) {
+   const dataRef = useRef(null);
+   
+    const fetchLocation = useCallback(async () => {
+      try {
+        let type = "";
+        let searchText = "";
+    
+        if (filters !== undefined) {
+          searchText = filters.searchText;
+        } else {
+          searchText = filters1.searchText;
+        }
+    
+        if (!searchText) {
+          searchText = "all";
+        }
+    
+        if (path === "getlayouts") {
+          type = localStorage.getItem("mtype");
+          const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
+          dataRef.current = response.data; 
+        } else {
+          type = localStorage.getItem("type");
+          const response = await _get(`/property/location/${type}/${searchText}`);
+          dataRef.current = response.data;
+        }
+      } catch (error) {
+        setFilteredData([]);
+      }
+    }, [filters, filters1, path]);
+  const applyFilters = useCallback(
+    async (
+      checkedValues,
+      searchText,
+      priceRange,
+      propertyName,
+      sizeRange,
+      checkedHouseType,
+      purposeType,
+      data
+    ) => {
+      if (filters != null) {
+        checkedValues = filters.checkedValues;
         searchText = filters.searchText;
-      } else {
+        priceRange = filters.priceRange;
+        sizeRange = filters.sizeRange;
+        propertyName = filters.propertyName;
+        checkedHouseType = filters.checkedHouseType;
+        purposeType = filters.purposeType;
+      }
+      if (filters1 != null) {
+        checkedValues = filters1.checkedValues;
         searchText = filters1.searchText;
+        priceRange = filters1.priceRange;
+        sizeRange = filters1.sizeRange;
+        propertyName = filters1.propertyName;
+        checkedHouseType = filters1.checkedHouseType;
+        purposeType = filters1.purposeType;
       }
-      if (searchText === null) {
-        searchText = "all";
+      let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+  
+      if (searchText !== "" && searchText !== "all") {
+        if (!dataRef.current) { 
+          await fetchLocation();
+        }
+        data = dataRef.current;
       }
-      if (path === "getting") {
-        type = localStorage.getItem("mtype");
-        const response = await _get(
-          `/property/mypropslocation/${type}/${searchText}`
+      let filtered = data;
+  
+      if (checkedValues === "All") {
+        filtered = data;
+      } else if (checkedValues === "Sold") {
+        filtered = data.filter((property) => property.status === 1);
+      } else if (checkedValues === "Unsold") {
+        filtered = data.filter((property) => property.status === 0);
+      }
+  
+      if (checkedHouseType === "Flat") {
+        filtered = filtered.filter(
+          (property) => property.propertyDetails.type === "Flat"
         );
-        data2 = response.data;
-      } else {
-        type = localStorage.getItem("type");
-        const response = await _get(`/property/location/${type}/${searchText}`);
-        data2 = response.data;
+      } else if (checkedHouseType === "House") {
+        filtered = filtered.filter(
+          (property) => property.propertyDetails.type === "House"
+        );
+      } else if (checkedHouseType === "Apartment") {
+        filtered = filtered.filter(
+          (property) => property.propertyDetails.type === "Apartment"
+        );
       }
-    } catch (error) {
-      setFilteredData("");
-    }
-  };
+  
+      if (purposeType === "sell") {
+        filtered = filtered.filter(
+          (property) =>
+            property.propertyDetails.propertyPurpose === "sell"
+        );
+      } else if (purposeType === "rent") {
+        filtered = filtered.filter(
+          (property) =>
+            property.propertyDetails.propertyPurpose === "rent"
+        );
+      } else if (purposeType === "lease") {
+        filtered = filtered.filter(
+          (property) =>
+            property.propertyDetails.propertyPurpose === "lease"
+        );
+      }
+  
+      const [district, mandal, village] = Array.isArray(searchText)
+        ? searchText
+        : ["", "", ""];
+      if (district) {
+        filtered = filtered.filter((property) =>
+          property.address?.district
+            .toLowerCase()
+            .startsWith(district.toLowerCase())
+        );
+      }
+      if (mandal) {
+        filtered = filtered.filter((property) =>
+          property.address?.mandal
+            .toLowerCase()
+            .startsWith(mandal.toLowerCase())
+        );
+      }
+      if (village) {
+        filtered = filtered.filter((property) =>
+          property.address?.village
+            .toLowerCase()
+            .startsWith(village.toLowerCase())
+        );
+      }
+  
+      if (priceRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.propertyDetails.flatCost) >= priceRange[0] &&
+            Number(property.propertyDetails.flatCost) <= priceRange[1]
+        );
+      }
+  
+      if (sizeRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.propertyDetails.flatSize) >= sizeRange[0] &&
+            Number(property.propertyDetails.flatSize) <= sizeRange[1]
+        );
+      }
+      if (nameSearch2 !== "") {
+        filtered = filtered.filter((property) => {
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId &&
+              property.propertyId
+                .toString()
+                .toLowerCase()
+                .includes(nameSearch2)
+            : property.propertyDetails.apartmentName &&
+              property.propertyDetails.apartmentName
+                .toLowerCase()
+                .includes(nameSearch2);
+          return nameMatch2;
+        });
+      }
+  
+      setFilteredData(filtered);
+      localStorage.setItem("isLoading", false);
+    },
+    [filters, filters1, fetchLocation, setFilteredData]
+  );
 
-  const fetchData = async () => {
+const maxsizefromAPI = useCallback(async () => {
+    try {
+      const first = checkedValues.includes("sold") ? "sold" : "@";
+      const second = checkedValues.includes("unSold") ? "unsold" : "@";
+      const response = await _get(
+        `property/maxSize/residential/@/@/@/@/@/${first}/${second}`
+      );
+      const data = response.data.maxSize;
+      setSizeRange([0, data]);
+    } catch (error) {
+      console.error("Error fetching village data:", error);
+    }
+  }, [checkedValues]); // depends on checkedValues
+  const filterValuesRef = useRef({
+        checkedValues: [],
+        checkedHouseType: [],
+        purposeType: [],
+        searchText: "",
+        priceRange: [],
+        sizeRange: [],
+        propertyName: "",
+      });
+      
+      useEffect(() => {
+        filterValuesRef.current = {
+          checkedValues,
+          searchText,
+          priceRange,
+          sizeRange,
+          propertyName,
+          checkedHouseType,
+          purposeType,
+        };
+      }, [checkedValues,
+        searchText,
+        priceRange,
+        sizeRange,
+        propertyName,
+        checkedHouseType,
+        purposeType]);
+  const fetchData = useCallback(async () => {
     try {
       const response = await _get(`/residential/${path}`);
       console.log(response.data);
       setData(response.data);
       setFilteredData(response.data);
       applyFilters(
-        checkedValues,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
-        checkedHouseType,
-        purposeType,
+        filterValuesRef.current.checkedValues,
+        filterValuesRef.current.checkedHouseType,
+        filterValuesRef.current.purposeType,
+        filterValuesRef.current.searchText,
+        filterValuesRef.current.priceRange,
+        filterValuesRef.current.sizeRange,
+        filterValuesRef.current.propertyName,
         response.data
       );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-
+  }, [
+    path,
+   
+    applyFilters,
+  ]);
+  
+  const maxPricefromAPI = useCallback(async () => {
+    const parameters = ["@", "@"];
+    if (checkedHouseType.includes("Flat")) {
+      parameters[0] = "flat";
+    }
+    if (checkedHouseType.includes("House")) {
+      parameters[1] = "house";
+    }
+    try {
+      const response = await _get(
+        `property/maxPrice/residential/@/@/@/${parameters[0]}/${parameters[1]}`
+      );
+      const data = response.data.maxPrice;
+      setMaxPrice(data);
+    } catch (error) {
+      console.error("Error fetching village data:", error);
+    }
+  }, [checkedHouseType,setMaxPrice]);
+  
+  // Now include these functions in the effect's dependency array.
+  useEffect(() => {
+    maxsizefromAPI();
+    fetchData();
+    maxPricefromAPI();
+  }, [sold, rating, filters, checkedHouseType, filters1, maxsizefromAPI, fetchData, maxPricefromAPI]);
 
   const handleCardClick = (product) => {
     setPropertyId(product._id);
@@ -262,139 +449,8 @@ export default function Residential({ path, filters, filters1 }) {
     const bidLevel = Math.floor(totalPrice / 2500000); // Calculate how many times ₹25,00,000 fits into totalPrice
     return baseBid + (bidLevel * increment);
   };
-  const applyFilters = async (
-    checkedValues,
-    searchText,
-    priceRange,
-    propertyName,
-    sizeRange,
-    checkedHouseType,
-    purposeType,
-    data
-  ) => {
-    if (filters != null) {
-      checkedValues = filters.checkedValues;
-      searchText = filters.searchText;
-      priceRange = filters.priceRange;
-      sizeRange = filters.sizeRange;
-      propertyName = filters.propertyName;
-      checkedHouseType = filters.checkedHouseType;
-      purposeType = filters.purposeType;
-    }
-    if (filters1 != null) {
-      checkedValues = filters1.checkedValues;
-      searchText = filters1.searchText;
-      priceRange = filters1.priceRange;
-      sizeRange = filters1.sizeRange;
-      propertyName = filters1.propertyName;
-      checkedHouseType = filters1.checkedHouseType;
-      purposeType = filters1.purposeType;
-    }
-    let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
-    const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+ 
 
-    if (searchText !== "") {
-      await fetchLocation();
-      data = data2;
-    }
-    let filtered = data;
-
-    if (checkedValues === "All") {
-      filtered = data;
-    } else if (checkedValues === "Sold") {
-      filtered = data.filter((property) => property.status === 1);
-    } else if (checkedValues === "Unsold") {
-      filtered = data.filter((property) => property.status === 0);
-    }
-
-    if (checkedHouseType === "All") {
-      filtered = filtered;
-    } else if (checkedHouseType === "Flat") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.type === "Flat"
-      );
-    } else if (checkedHouseType === "House") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.type === "House"
-      );
-    } else if (checkedHouseType === "Apartment") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.type === "Apartment"
-      );
-    }
-
-    if (purposeType === "All") {
-      filtered = filtered;
-    } else if (purposeType === "sell") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.propertyPurpose === "sell"
-      );
-    } else if (purposeType === "rent") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.propertyPurpose === "rent"
-      );
-    } else if (purposeType === "lease") {
-      filtered = filtered.filter(
-        (property) => property.propertyDetails.propertyPurpose === "lease"
-      );
-    }
-    const [district, mandal, village] = Array.isArray(searchText)
-      ? searchText
-      : ["", "", ""];
-    if (district) {
-      filtered = filtered.filter((property) =>
-        property.address?.district
-          .toLowerCase()
-          .startsWith(district.toLowerCase())
-      );
-    }
-    if (mandal) {
-      filtered = filtered.filter((property) =>
-        property.address?.mandal.toLowerCase().startsWith(mandal.toLowerCase())
-      );
-    }
-    if (village) {
-      filtered = filtered.filter((property) =>
-        property.address?.village
-          .toLowerCase()
-          .startsWith(village.toLowerCase())
-      );
-    }
-
-    if (priceRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.propertyDetails.flatCost) >= priceRange[0] &&
-          Number(property.propertyDetails.flatCost) <= priceRange[1]
-      );
-    }
-
-    if (sizeRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.propertyDetails.flatSize) >= sizeRange[0] &&
-          Number(property.propertyDetails.flatSize) <= sizeRange[1]
-      );
-    }
-    if (nameSearch2 !== "") {
-      filtered = filtered.filter((property) => {
-
-        const nameMatch2 = isPropertyIdSearch
-          ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-          : property.propertyDetails.apartmentName && property.propertyDetails.apartmentName.toLowerCase().includes(nameSearch2);
-
-        // Log the property name or ID
-
-
-        return nameMatch2;
-      });
-    }
-
-    setFilteredData(filtered);
-    localStorage.setItem("isLoading", false);
-  };
-
-  const [sizeRange, setSizeRange] = useState([0, Infinity]);
 
   const handleStartAuction = (property) => {
     setIsModalVisible(false);
@@ -432,22 +488,7 @@ export default function Residential({ path, filters, filters1 }) {
     currentPage * pageSize
   );
 
-  const maxsizefromAPI = async () => {
-    try {
-      const first = checkedValues.includes("sold") ? "sold" : "@";
-      const second = checkedValues.includes("unSold") ? "unsold" : "@";
-      const response = await _get(
-        `property/maxSize/residential/@/@/@/@/@/${first}/${second}`
-      );
-      const data = await response.data.maxSize;
-      // setMaxSize(data);
-      // setMaxSizeAPIvalue(data);
-      // setSliderRangesize([0, data]);
-      setSizeRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+
 
 
   return (
@@ -495,15 +536,15 @@ export default function Residential({ path, filters, filters1 }) {
                           margin: 0,
                           boxShadow:
                             path !== "getting" && "#c3e3f7 0px 5px 10px",
-                          border: product.status != 0 && "1px solid #979ba1",
+                          border: product.status !== 0 && "1px solid #979ba1",
                         }}
                         bodyStyle={{ padding: 0 }}
                         // onClick={() => handleCardClick(product)}
                         extra={
-                          path === "getting" && product.status == 0 ? (
+                          path === "getting" && product.status === 0 ? (
                             <button
                               style={{
-                                color: product.status == 0 ? "green" : "red",
+                                color: product.status === 0 ? "green" : "red",
                                 flexWrap: "wrap",
                                 float: "right",
                                 width: "100%",
@@ -520,13 +561,13 @@ export default function Residential({ path, filters, filters1 }) {
                               Mark as Sold
                             </button>
                           ) : (
-                            product.status == 1 &&
+                            product.status === 1 &&
                             path === "getting" && (
                               <span>
                                 <button
                                   style={{
                                     color:
-                                      product.status == 0 ? "green" : "red",
+                                      product.status === 0 ? "green" : "red",
                                     flexWrap: "wrap",
                                     float: "right",
                                     width: "100%",
@@ -571,7 +612,7 @@ export default function Residential({ path, filters, filters1 }) {
                               </div>
                             )}
 
-                            {product.propPhotos.length != 0 ? (
+                            {product.propPhotos.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={product.propPhotos[0]}

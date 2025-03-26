@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback } from "react";
 import {
   Card,
-  Typography,
   Row,
   Col,
   Input,
-  Spin,
   Empty,
   Tooltip,
   Pagination,
   Tag,
-  Grid,
   Skeleton,
   Button,
   Modal,
@@ -18,75 +15,174 @@ import {
 } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCouch,
-  faMedkit,
+ 
   faRuler,
-  fas,
+ 
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import {
-  HeartOutlined,
-  HeartFilled,
-  EnvironmentFilled,
+  
   InfoCircleOutlined
 } from "@ant-design/icons";
-import { _post, _get, _delete, _put } from "../../../Service/apiClient";
+import { _get, _put } from "../../../Service/apiClient";
 import { useTranslation } from "react-i18next";
 import Meta from "antd/es/card/Meta";
 import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import { toast } from "react-toastify";
-const { useBreakpoint } = Grid;
 
 export default function BuyersResidential({ filters }) {
-  const { t, i18n } = useTranslation();
-  const screens = useBreakpoint();
+  const { t } = useTranslation();
   const [products, setProducts] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [wishlist, setWishlist] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   const [form] = Form.useForm();
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [isAuctoonViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
   const [agentrole, setAgentRole] = useState(null);
+  const role1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [role1]);
+  
+   const dataRef = useRef(null);
+     const fetchLocation = useCallback(async () => {
+       try {
+         const type = localStorage.getItem("type");
+         let searchText = filters?.searchText || "all"; // Handle undefined filters safely
+     
+         const response = await _get(`/property/location/${type}/${searchText}`);
+     
+         if (response?.data) {
+           dataRef.current = Array.isArray(response.data) ? response.data : [response.data]; // Ensure data is always an array
+         } else {
+           dataRef.current = [];
+         }
+       } catch (error) {
+         console.error("Error fetching location data:", error);
+         dataRef.current = [];
+       }
+     }, [filters]); 
+  const applyFilters = useCallback(async (filters) => {
+    let filtered = [];
+    let backendFilteredData = [];
+    const amenityMapping = {
+      Parking: "parking",
+      PowerBackUp: "PowerBackUp",
+      Park: "park",
+      Swimming: "swimming",
+      Lift: "lift",
+      Gym: "gym",
+      Security: "security"
+    };
+
+    let amenitiesJson = "";
+    if (filters.amenities && filters.amenities.length > 0) {
+      const amenitiesObject = {};
+      Object.keys(amenityMapping).forEach((amenity) => {
+        amenitiesObject[amenityMapping[amenity]] = filters.amenities.includes(amenity) ? "true" : "false";
+      });
+      amenitiesJson = JSON.stringify(amenitiesObject);
+    }
+
+    try {
+      if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
+        // Backend filtering
+        const response = await _get(`/filterRoutes/residentialSearch?purchaseType=${filters.lookingFor}&location=&propertyName=&furniture=${filters.furnished}&bedRoom=&facing=${filters.propertyFacing}&propertyLayout=${filters.BHKS}&amenities=${amenitiesJson}&medical=${filters.distanceMedicine}&educational=${filters.distanceEducation}&road=${filters.distanceFromRoad}&minPrice=&maxPrice=&minSize=&maxSize=&propertyType=${filters.propertyType}`);
+
+        if (response.data && response.data.data.length > 0) {
+          backendFilteredData = response.data.data;
+        } else {
+          console.warn("No data found for the selected filters.");
+        }
+      } else {
+        // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
+        const response = await _get(`/filterRoutes/residentialSearch?purchaseType=${filters.lookingFor}&location=&furniture=${filters.furnished}&facing=${filters.propertyFacing}&propertyLayout=${filters.BHKS}&amenities=${amenitiesJson}&medical=${filters.distanceMedicine}&educational=${filters.distanceEducation}&road=${filters.distanceFromRoad}&propertyType=${filters.propertyType}`);
+
+        backendFilteredData = response.data?.data || [];
+      }
+
+      filtered = backendFilteredData;
+
+      // Frontend filtering
+      if (filters.searchText) {
+        const searchText = filters.searchText.toLowerCase();
+        if (searchText !== "" && searchText !== "all") {
+          if (!dataRef.current) {
+            await fetchLocation(); 
+          }
+          filtered = dataRef.current || [];
+        }
+      }
+      console.log("hllp", filters.propertyName)
+      let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+      if (nameSearch2 !== "") {
+        filtered = filtered.filter((property) => {
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
+            : property.propertyDetails.apartmentName && property.propertyDetails.apartmentName.toLowerCase().includes(nameSearch2);
+
+          return nameMatch2;
+        });
+      }
+
+      if (filters.priceRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.propertyDetails.totalCost) >= filters.priceRange[0] &&
+            Number(property.propertyDetails.totalCost) <= filters.priceRange[1]
+        );
+      }
+
+      if (filters.sizeRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.propertyDetails.flatSize) >= filters.sizeRange[0] &&
+            Number(property.propertyDetails.flatSize) <= filters.sizeRange[1]
+        );
+      }
+
+      setFilteredProducts(filtered);
+      console.log("Final Filtered Products:", filtered);
+
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setFilteredProducts([]);
+    }
+  },[setFilteredProducts,fetchLocation]);
   useEffect(() => {
-    console.log("filters", filters)
+    const fetchProducts = async () => {
+      try {
+        const response = await _get(`/residential/getallresidentials`);
+        const productsData = response.data;
+        console.log(productsData);
+        // const initialWishlist = productsData
+        //   .filter((product) => product.wishlistStatus === 1)
+        //   .map((product) => product._id);
+        // setWishlist(initialWishlist);
+        setProducts(response.data);
+        setFilteredProducts(response.data);
+        applyFilters(filters, response.data);
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        // setLoading(false);
+      }
+    };
     fetchProducts();
 
-  }, []);
-  useEffect(() => {
-    console.log("filters", filters)
-    applyFilters(filters);
-  }, [filters]);
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+  }, [filters,applyFilters]);
   useEffect(() => {
     console.log("called");
     if (selectedProperty) {
@@ -225,7 +321,7 @@ export default function BuyersResidential({ filters }) {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
+    // setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -234,130 +330,10 @@ export default function BuyersResidential({ filters }) {
       setIsSubmitDisabled(true);
     }
   };
-  const fetchProducts = async () => {
-    try {
-      const response = await _get(`/residential/getallresidentials`);
-      const productsData = response.data;
-      console.log(productsData);
-      const initialWishlist = productsData
-        .filter((product) => product.wishlistStatus === 1)
-        .map((product) => product._id);
-      setWishlist(initialWishlist);
-      setProducts(response.data);
-      setFilteredProducts(response.data);
-      // applyFilters(filters, response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setLoading(false);
-    }
-  };
-  let data2;
+  
+ 
 
-  const fetchLocation = async () => {
-    try {
-      const type = localStorage.getItem("type");
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all"
-      }
-      const response = await _get(`/property/location/${type}/${searchText}`);
-      data2 = response.data;
-    }
-    catch (error) {
-      setFilteredProducts("");
-    }
-  };
-
-  const applyFilters = async (filters) => {
-    let filtered = [];
-    let backendFilteredData = [];
-    const amenityMapping = {
-      Parking: "parking",
-      PowerBackUp: "PowerBackUp",
-      Park: "park",
-      Swimming: "swimming",
-      Lift: "lift",
-      Gym: "gym",
-      Security: "security"
-    };
-
-    let amenitiesJson = "";
-    if (filters.amenities && filters.amenities.length > 0) {
-      const amenitiesObject = {};
-      Object.keys(amenityMapping).forEach((amenity) => {
-        amenitiesObject[amenityMapping[amenity]] = filters.amenities.includes(amenity) ? "true" : "false";
-      });
-      amenitiesJson = JSON.stringify(amenitiesObject);
-    }
-
-    try {
-      if (!filters.searchText && !filters.priceRange && !filters.sizeRange) {
-        // Backend filtering
-        const response = await _get(`/filterRoutes/residentialSearch?purchaseType=${filters.lookingFor}&location=&propertyName=&furniture=${filters.furnished}&bedRoom=&facing=${filters.propertyFacing}&propertyLayout=${filters.BHKS}&amenities=${amenitiesJson}&medical=${filters.distanceMedicine}&educational=${filters.distanceEducation}&road=${filters.distanceFromRoad}&minPrice=&maxPrice=&minSize=&maxSize=&propertyType=${filters.propertyType}`);
-
-        if (response.data && response.data.data.length > 0) {
-          backendFilteredData = response.data.data;
-        } else {
-          console.warn("No data found for the selected filters.");
-        }
-      } else {
-        // If searchText, priceRange, or sizeRange is present, perform backend fetch first and then apply frontend filters
-        const response = await _get(`/filterRoutes/residentialSearch?purchaseType=${filters.lookingFor}&location=&furniture=${filters.furnished}&facing=${filters.propertyFacing}&propertyLayout=${filters.BHKS}&amenities=${amenitiesJson}&medical=${filters.distanceMedicine}&educational=${filters.distanceEducation}&road=${filters.distanceFromRoad}&propertyType=${filters.propertyType}`);
-
-        backendFilteredData = response.data?.data || [];
-      }
-
-      filtered = backendFilteredData;
-
-      // Frontend filtering
-      if (filters.searchText) {
-        const searchText = filters.searchText.toLowerCase();
-        if (searchText != "" && searchText != "all") {
-          await fetchLocation();
-          filtered = data2;
-        }
-      }
-      console.log("hllp", filters.propertyName)
-      let nameSearch2 = filters.propertyName ? filters.propertyName.toLowerCase() : "";
-      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
-      if (nameSearch2 !== "") {
-        filtered = filtered.filter((property) => {
-          const nameMatch2 = isPropertyIdSearch
-            ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-            : property.propertyDetails.apartmentName && property.propertyDetails.apartmentName.toLowerCase().includes(nameSearch2);
-
-          return nameMatch2;
-        });
-      }
-
-      if (filters.priceRange) {
-        filtered = filtered.filter(
-          (property) =>
-            Number(property.propertyDetails.totalCost) >= filters.priceRange[0] &&
-            Number(property.propertyDetails.totalCost) <= filters.priceRange[1]
-        );
-      }
-
-      if (filters.sizeRange) {
-        filtered = filtered.filter(
-          (property) =>
-            Number(property.propertyDetails.flatSize) >= filters.sizeRange[0] &&
-            Number(property.propertyDetails.flatSize) <= filters.sizeRange[1]
-        );
-      }
-
-      setFilteredProducts(filtered);
-      console.log("Final Filtered Products:", filtered);
-
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setFilteredProducts([]);
-    }
-  };
+  
 
   const handleCardClick = (product) => {
     if (agentrole === 11) {
@@ -385,9 +361,6 @@ export default function BuyersResidential({ filters }) {
     ? filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : [];
 
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
   const formatPrice = (price) => {
     // Ensure price is a valid number
     if (price === undefined || price === null || isNaN(price)) {
@@ -485,7 +458,7 @@ export default function BuyersResidential({ filters }) {
                                 borderBottom: "none",
                               }}
                             /> */}
-                            {product.propPhotos.length != 0 ? (
+                            {product.propPhotos.length !== 0 ? (
                               <img
                                 alt="property"
                                 src={product.propPhotos[0]}

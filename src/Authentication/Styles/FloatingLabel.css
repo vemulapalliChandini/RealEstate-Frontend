@@ -1,6 +1,7 @@
 .floating-label {
   position: relative;
   margin-bottom: 24px;
+  height: 37px;
 }
 
 .floating-label select,
@@ -76,4 +77,7 @@
 .required {
   color: red;
   margin-right: 4px;
+}
+.input-height{
+  height: 37px;
 }

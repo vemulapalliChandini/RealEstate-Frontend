@@ -236,10 +236,7 @@ function Registration({ setIsLoginVisible }) {
               ]}
             >
               <Select
-                style={{
-                  width: "90%",
-                  height: "37px",
-                }}
+               className="input-height"
                 placeholder={
                   <span>
                     <span style={{ color: "red" }}>*</span>&nbsp;
@@ -358,12 +355,7 @@ function Registration({ setIsLoginVisible }) {
             >
               <Input
                 type="text"
-                style={{
-                  width: "100%",
-                  height: "37px",
-                  border: "1px solid #d9d9d9",
-                  backgroundColor: "white",
-                }}
+                className="input-height"
                 readOnly
               />
             </Form.Item>
@@ -376,12 +368,7 @@ function Registration({ setIsLoginVisible }) {
             >
               <Input
                 type="text"
-                style={{
-                  width: "100%",
-                  height: "37px",
-                  border: "1px solid #d9d9d9",
-                  backgroundColor: "white",
-                }}
+              className="input-height"
                 readOnly
               />
             </Form.Item>
@@ -422,9 +409,7 @@ function Registration({ setIsLoginVisible }) {
                 <div>
                   {" "}
                   <Select
-                    style={{
-                      height: "37px",
-                    }}
+                    // className="input-height"
                     placeholder={t("registration.Select District")}
                     value={addressDetails.district || undefined}
                     onChange={(value) => handleDistrictChange(value)}
@@ -444,11 +429,9 @@ function Registration({ setIsLoginVisible }) {
               ) : (
                 <div>
                   <Input
-                    style={{
-                      height: "37px",
-                    }}
+                   
                     placeholder={t("registration.Select District")}
-                    className="input-box"
+                    className="input-height"
                     value={addressDetails.district}
                     readOnly
                   />
@@ -464,10 +447,8 @@ function Registration({ setIsLoginVisible }) {
                     <div>
                       {" "}
                       <Input
-                        style={{
-                          height: "37px",
-                        }}
-                        className="input-box"
+                         className="input-height"
+                        // className="input-box"
                         value={addressDetails.mandal}
                         readOnly
                       />
@@ -475,9 +456,7 @@ function Registration({ setIsLoginVisible }) {
                   ) : (
                     <div>
                       <Select
-                        style={{
-                          height: "37px",
-                        }}
+                         className="input-height"
                         placeholder={
                           selectedDistrict
                             ? t("registration.Select Mandal")
@@ -498,12 +477,10 @@ function Registration({ setIsLoginVisible }) {
               ) : (
                 <div>
                   {mandals.length === 1 ? (
-                    <Input className="input-box" value={mandals[0]} readOnly />
+                    <Input  className="input-height" value={mandals[0]} readOnly />
                   ) : (
                     <Select
-                      style={{
-                        height: "37px",
-                      }}
+                      // className="input-height"
                       placeholder={
                         selectedDistrict
                           ? t("registration.Select Mandal")
@@ -519,7 +496,7 @@ function Registration({ setIsLoginVisible }) {
                               }))
                           : (value) => handleMandalChange(value)
                       }
-                      className="select-custom"
+                      className="input-height"
                     >
                       {mandals.length === 0 && selectedDistrict && (
                         <Option disabled>
@@ -548,10 +525,8 @@ function Registration({ setIsLoginVisible }) {
                     <div>
                       {" "}
                       <Input
-                        style={{
-                          height: "37px",
-                        }}
-                        className="input-box"
+                        className="input-height"
+                        // className="input-box"
                         value={addressDetails.village}
                         readOnly
                       />
@@ -559,9 +534,7 @@ function Registration({ setIsLoginVisible }) {
                   ) : (
                     <div>
                       <Select
-                        style={{
-                          height: "37px",
-                        }}
+                         className="input-height"
                         placeholder={
                           selectedMandal
                             ? t("registration.Select Village")
@@ -590,10 +563,8 @@ function Registration({ setIsLoginVisible }) {
                     <div className="floating-label">
                       {" "}
                       <Input
-                        style={{
-                          height: "37px",
-                        }}
-                        className="input-box"
+                         className="input-height"
+                        // className="input-box"
                         value={villages[0]}
                         readOnly
                       />
@@ -602,9 +573,7 @@ function Registration({ setIsLoginVisible }) {
                     <div className="floating-label">
                       {" "}
                       <Select
-                        style={{
-                          height: "37px",
-                        }}
+                        className="input-height"
                         placeholder={
                           selectedMandal
                             ? t("registration.Select Village")

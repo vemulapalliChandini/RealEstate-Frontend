@@ -119,7 +119,7 @@ const Plans = () => {
         };
 
         fetchData();
-    }, []);
+    }, [plans]);
 
 
 

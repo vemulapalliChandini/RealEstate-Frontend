@@ -1,4 +1,3 @@
-/* Ensure borders are added to the date cells */
 :where(.css-dev-only-do-not-override-1wwf28x).ant-picker-calendar
   .ant-picker-content
   td {
@@ -26,4 +25,11 @@
   line-height: 1.57; 
   cursor: pointer; 
   transition: all 0.3s ease; 
+}
+:where(.css-dev-only-do-not-override-tjsggz).ant-picker-calendar .ant-picker-content th, :where(.css-dev-only-do-not-override-tjsggz).ant-picker-calendar .ant-picker-content td {
+  position: relative;
+  min-width: 24px;
+  font-weight: normal;
+  border: 1px solid lightgray;
+  height: 90px;
 }

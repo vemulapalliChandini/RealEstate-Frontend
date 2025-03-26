@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
 import "./Wishlist.css";
 
-import { _delete, _get } from "../../../Service/apiClient";
+import { _get } from "../../../Service/apiClient";
 
 import {
   MoneyCollectOutlined,
@@ -14,7 +14,6 @@ import {
   AppstoreOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
 const { Meta } = Card;
 
 const ReservedProperties = () => {
@@ -302,19 +301,19 @@ const ReservedProperties = () => {
                               </>
                             ) : (
                               <>
-                                {property?.property.propertyDetails?.landDetails?.sell?.plotSize && (
+                                {property?.property?.propertyDetails?.landDetails?.sell?.plotSize && (
                                   <Col span={24}>
                                     <AppstoreOutlined className="GlobalOutlined" />{" "}
                                     <span>
 
-                                      {property?.property.propertyDetails?.landDetails?.sell.plotSize}  {property.propertyDetails.landDetails?.sell.sizeUnit}
+                                      {property?.property?.propertyDetails?.landDetails?.sell.plotSize}  {property?.propertyDetails?.landDetails?.sell.sizeUnit}
                                     </span>
                                     <br />
 
                                   </Col>
                                 )}
 
-                                {property?.property.propertyDetails?.landDetails?.lease?.plotSize && (
+                                {property?.property?.propertyDetails?.landDetails?.lease?.plotSize && (
                                   <Col span={24}>
                                     <AppstoreOutlined className="GlobalOutlined" />{" "}
                                     <span>

@@ -27,8 +27,6 @@ const SellerRequests = () => {
   const { t } = useTranslation();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [users, setUsers] = useState([]);
-  const [userId, setUserId] = useState(null);
-  const [detailsVisible, setDetailsVisible] = useState({});
   useEffect(() => {
     localStorage.setItem("form", false);
     fetchUserData(3);
@@ -65,7 +63,7 @@ const SellerRequests = () => {
         ? "Rejected successfully"
         : "Updated successfully";
     try {
-      const res = await _put(
+     await _put(
         `booking/updatebookingstatus/${_id}/${status}`,
         {}, successMessage
       );
@@ -92,20 +90,7 @@ const SellerRequests = () => {
 
     return `${year}-${month}-${day}`;
   }
-  const toggleDetails = async (userId, agentId) => {
-    try {
-      const response = await _get(
-        `/booking/bookingdetails/${userId}/${agentId}`
-      );
-      setDetailsVisible((prevState) => ({
-        ...prevState,
-        [userId]: response.data.booking,
-      }));
-      console.log("details", detailsVisible);
-    } catch (error) {
-      console.error("Error fetching booking details:", error);
-    }
-  };
+ 
 
   // const handleFilterChange = (value) => {
   //   setSelectedStatus(value);
@@ -340,9 +325,7 @@ const SellerRequests = () => {
                 }}
                 bodyStyle={{ padding: "20px 0", textAlign: "center" }}
                 hoverable
-                onClick={() => {
-                  setUserId(user._id);
-                }}
+               
               >
                 <div style={{ position: "relative" }}>
                   <Avatar

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback } from "react";
 import {
   Button,
   Form,
@@ -132,22 +132,19 @@ const CommercialForm = ({ setShowFormType }) => {
 
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
+  const fetchAgentEmails = useCallback(async () => {
     try {
-      const response = await _get(
-        `/csr/getAssignedAgents/${csrId}`
-      );
+      const response = await _get(`/csr/getAssignedAgents/${csrId}`);
       console.log("Agent Emails:", response.data);
       setAgentEmails(response.data || []);
     } catch (error) {
       console.error("Error fetching agent emails:", error);
     }
-  };
-
-
+  }, [csrId]); 
+  
   useEffect(() => {
     fetchAgentEmails();
-  }, []);
+  }, [fetchAgentEmails]);
 
   //  for map...
 
