@@ -1,4 +1,4 @@
-
+/* Header Styles */
 .header {
   display: flex;
   justify-content: space-between;
@@ -12,78 +12,106 @@
   height: 64px;
   box-sizing: border-box;
   overflow: hidden;
-  /* background-color:rgba(0, 0, 0, 0.5); */
   background-color: rgba(0, 0, 0, 0.4);
- } 
- .responsive-heading {
+}
+
+/* Responsive Heading */
+.responsive-heading {
   color: white;
   font-size: 16px;
- 
- 
-  @media (min-width: 576px) {
-  font-size: 20px;
-  font-weight: bold;
+}
+
+@media (min-width: 576px) {
+  .responsive-heading {
+    font-size: 20px;
+    font-weight: bold;
   }
- 
-  
-  @media (min-width: 768px) {
-  font-size: 22px;
-  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .responsive-heading {
+    font-size: 22px;
+    font-weight: bold;
   }
- 
- 
-  @media (min-width: 992px) {
-  font-size: 25px;
-  font-weight: bold;
+}
+
+@media (min-width: 992px) {
+  .responsive-heading {
+    font-size: 25px;
+    font-weight: bold;
   }
- 
- 
-  @media (min-width: 1200px) {
-  font-size: 27px;
-  font-weight: bold;
+}
+
+@media (min-width: 1200px) {
+  .responsive-heading {
+    font-size: 27px;
+    font-weight: bold;
   }
- }
- 
- .heading1 {
+}
+
+/* Heading1 for logo */
+.heading1 {
   position: relative;
   background-image: url("../../images/logo.jpg");
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center;
   color: #FFF;
-  width:100%;
- 
+  width: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
- .menuStyle {
+}
+
+/* Menu Styles */
+.menuStyle {
   font-size: 20px;
   flex: 1;
   justify-content: flex-end;
   border: none;
-  /* background-color: rgba(0, 0, 0, 0.1); */
-  background-color: rgba(0, 0, 0, 0.4);
- }
- 
- .ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected{
-  background-color:rgba(0, 0, 0, 0.7);
- }
- 
- .ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected:hover{
-  background-color:rgba(0, 0, 0, 0.7);
- }
- 
- 
- :where(.css-dev-only-do-not-override-1wwf28x).ant-menu-dark,
-:where(.css-dev-only-do-not-override-1wwf28x).ant-menu-dark > .ant-menu {
-    color: rgba(255, 255, 255, 0.65);
-    background: transparent !important; /* Remove background color */
+  background-color: transparent;
 }
 
- 
- 
- 
- 
- 
- 
- 
- 
+.menu-item-label {
+  color: white;
+  font-size: 15px;
+}
+
+.menu-item-bold {
+  font-size: 16px;
+}
+
+.help-bold {
+  font-size: 18px;
+}
+
+.user-icon {
+  font-size: 17px !important;
+  color: white !important;
+  margin-top: 4px !important;
+}
+
+
+.user-label {
+  font-size: 17px;
+  color: white;
+  margin-left: -5%;
+}
+
+/* Language Switch Container */
+.language-switch-container {
+  display: flex;
+  align-items: center;
+  margin-top: 22px;
+}
+
+/* Override default selected menu item styles */
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Remove background from dev-only override */
+:where(.css-dev-only-do-not-override-1wwf28x).ant-menu-dark,
+:where(.css-dev-only-do-not-override-1wwf28x).ant-menu-dark > .ant-menu {
+  color: rgba(255, 255, 255, 0.65);
+  background: transparent !important;
+}

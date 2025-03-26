@@ -13,7 +13,7 @@ const BuyerDeals = ({ data }) => {
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
     const [isDealModalOpen, setIsDealModalOpen] = useState(false);
     const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
+    // const [selectedDate, setSelectedDate] = useState(null);
     const [form] = Form.useForm();
     const [detailsModalOpen, setDetailsModalOpen] = useState(false);
     const [details] = useState([]);
@@ -39,13 +39,13 @@ const BuyerDeals = ({ data }) => {
         setActivityType(value);
         console.log("Selected Activity Type:", value); // Optional: For debugging
     };
-   
+   const role1=localStorage.getItem("role");
     useEffect(() => {
         const role = localStorage.getItem("role");
         setRole(Number(role));
 
 
-    }, [localStorage.getItem("role")]);
+    }, [role1]);
    
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(2);
@@ -175,7 +175,7 @@ const BuyerDeals = ({ data }) => {
     };
 
     const onDateSelect = (date) => {
-        setSelectedDate(date.format("YYYY-MM-DD"));
+        // setSelectedDate(date.format("YYYY-MM-DD"));
         setIsCalendarModalOpen(false);
 
     };
@@ -269,7 +269,7 @@ const BuyerDeals = ({ data }) => {
         setIsActivityModalOpen(false);
         setIsCalendarModalOpen(false);
         setIsDealModalOpen(false);
-        setSelectedDate(null);
+        // setSelectedDate(null);
         setIsPropertyView(false);
         form.resetFields();
     };
@@ -456,7 +456,7 @@ const BuyerDeals = ({ data }) => {
                                             padding: "1px 10px",
                                             background: "#0d416b",
                                             color: "white",
-                                            border: "none",
+
                                             borderRadius: "5px",
                                             cursor: "pointer",
                                             transition: "background 0.3s ease",
@@ -478,7 +478,7 @@ const BuyerDeals = ({ data }) => {
                             <h3
                                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
                             >
-                                <img
+                                <img alt="agent data"
                                     src={response.agentData.profilePicture}
                                     // alt={`${response.agentData.firstName} ${response.agentData.lastName}`}
                                     style={{

@@ -73,9 +73,7 @@ const EstateReq = () => {
       );
     }
 
-    if (status === "all") {
-      filtered = filtered;
-    } else if (status === "accepted") {
+     if (status === "accepted") {
       filtered = filtered.filter((prop) => prop.status === 1);
     } else if (status === "rejected") {
       filtered = filtered.filter((prop) => prop.status === -1);

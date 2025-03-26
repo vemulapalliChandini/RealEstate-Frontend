@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Card,
   Row,
@@ -31,20 +31,21 @@ const Requests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8);
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       const response = await _get("emBooking/getAllClientRequests");
       console.log(response.data);
       setRequests(response.data);
       setFilteredData(response.data);
       fetchFilteredData(searchLocation, selectedStatus, response.data);
-    } catch (error) { }
-  };
-
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+    }
+  }, [searchLocation, selectedStatus]); // Dependencies
+  
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]); 
   const handleFilterChange = (value) => {
     setSelectedStatus(value);
     fetchFilteredData(searchLocation, value, requests);
@@ -74,9 +75,7 @@ const Requests = () => {
       );
     }
 
-    if (status === "all") {
-      filtered = filtered;
-    } else if (status === "accepted") {
+   if (status === "accepted") {
       filtered = filtered.filter((prop) => prop.status === 1);
     } else if (status === "rejected") {
       filtered = filtered.filter((prop) => prop.status === -1);

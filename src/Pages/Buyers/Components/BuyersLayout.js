@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback} from "react";
 import {
   Card,
   Row,
   Col,
-  Spin,
+
   Empty,
   Tooltip,
   Pagination,
-  Grid,
   Skeleton,
   Button,
-  Modal, Table, Input,
+  Modal, Input,
   Form
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
-  HeartOutlined,
-  HeartFilled,
-  EnvironmentFilled,
+
   InfoCircleOutlined
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,22 +23,18 @@ import {
   faRuler,
 } from "@fortawesome/free-solid-svg-icons";
 import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import { _post, _get, _delete, _put } from "../../../Service/apiClient";
+import {  _get, _put } from "../../../Service/apiClient";
 import { FaShieldAlt } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { useTranslation } from "react-i18next";
 import Meta from "antd/es/card/Meta";
 import moment from "moment";
 import { toast } from "react-toastify";
-const { useBreakpoint } = Grid;
 
 export default function BuyersLayout({ filters }) {
-  const screens = useBreakpoint();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [layouts, setLayouts] = useState(null);
   const [filteredLayouts, setFilteredLayouts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
   const [agentrole, setAgentRole] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState(null);
@@ -50,17 +43,17 @@ export default function BuyersLayout({ filters }) {
   const [remainingTime, setRemainingTime] = useState('');
   const [backendMoney, setBackendMoney] = useState(0);
   const [requiredBid, setRequiredBid] = useState(0);
-  const [enteredMoney, setEnteredMoney] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [form] = Form.useForm();
 
   const [isAuctoonViewModalVisible, setIsAuctionViewModalVisible] = useState(false);
+  const role1=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [role1]);
   const handleAcceptTerms = (e) => {
     setIsChecked(e.target.checked);
   };
@@ -145,7 +138,6 @@ export default function BuyersLayout({ filters }) {
   };
   const handleMoneyChange = (e) => {
     const value = e.target.value;
-    setEnteredMoney(value);
     if (parseFloat(value) > backendMoney) {
       setIsSubmitDisabled(false);
     } else if (parseFloat(value) > requiredBid) {
@@ -154,140 +146,27 @@ export default function BuyersLayout({ filters }) {
       setIsSubmitDisabled(true);
     }
   };
-  useEffect(() => {
-    console.log("filters", filters)
-    fetchLayouts();
 
-  }, []);
-  useEffect(() => {
-    console.log("filters", filters)
-    applyFilters(filters);
-  }, [filters]);
-  const calculateInitialBid = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = parseFloat(totalPrice);
-    console.log(baseBid);
-    const bidLevel = Math.floor(totalPrice / 10000);
-    console.log(bidLevel);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
-  useEffect(() => {
-    console.log("called");
-    if (selectedProperty) {
-      const startDate = moment(selectedProperty?.auctionData?.[0]?.startDate);
-      const endDate = moment(selectedProperty?.auctionData?.[0]?.endDate);
-      const now = moment();
-
-      const amount = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
-        ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
-        : selectedProperty?.auctionData?.[0]?.amount;
-
-      const initialBid = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
-        ?selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
-        : selectedProperty?.auctionData?.[0]?.amount;
-
-      // setReservationAmount(initialBid);
-      setBackendMoney(amount);
-      setRequiredBid(initialBid);
-      // Determine the initial state message
-      if (now.isBefore(startDate)) {
-        setRemainingTime("Auction Not Yet Started");
-      } else if (now.isBetween(startDate, endDate)) {
-        setRemainingTime(calculateCountdown(endDate)); // Start countdown
-      } else {
-        setRemainingTime("Auction Ended");
-      }
-
-      // Setup interval to update countdown if auction is ongoing
-      const interval = setInterval(() => {
-        const currentTime = moment();
-
-        if (currentTime.isBefore(startDate)) {
-          setRemainingTime("Auction Not Yet Started");
-        } else if (currentTime.isBetween(startDate, endDate)) {
-          setRemainingTime(calculateCountdown(endDate));
-        } else {
-          setRemainingTime("Auction Ended");
-          clearInterval(interval);
-        }
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [selectedProperty]);
-  const calculateCountdown = (endTime) => {
-    const now = moment();
-    const durationToEnd = moment.duration(endTime.diff(now));
-
-    return `${durationToEnd.days()} Days ${durationToEnd.hours()} Hours ${durationToEnd.minutes()} Minutes`;
-  };
-  const fetchLayouts = async () => {
-    try {
-      const response = await _get(`/layout/getalllayouts`);
-      const layoutData = response.data;
-      console.log(layoutData);
-      const initialWishlist = layoutData
-        .filter((layout) => layout.wishStatus === 1)
-        .map((layout) => layout._id);
-      setWishlist(initialWishlist);
-
-      setLayouts(layoutData);
-      setFilteredLayouts(layoutData);
-      // applyFilters(filters, response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching layouts:", error);
-      setLoading(false);
-    }
-  };
-  const formatPrice = (price) => {
-    if (!price || isNaN(price)) {
-      return "N/A"; // Return a default value if price is undefined or not a number
-    }
-
-    if (price >= 1_00_00_000) {
-      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
-    } else if (price >= 1_00_000) {
-      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
-    } else if (price >= 1_000) {
-      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
-    } else {
-      return price.toString(); // Display as is for smaller values
-    }
-  };
-
-  const handleViewAuction = (property) => {
-    setSelectedProperty(property);
-    setIsAuctionViewModalVisible(true);
-  };
-
-
-  let data2;
-  const fetchLocation = async () => {
-    try {
-      const type = localStorage.getItem("type");
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all"
-      }
-      const response = await _get(`/property/location/${type}/${searchText}`);
-      data2 = response.data;
-    }
-    catch (error) {
-      setFilteredLayouts("");
-    }
-  };
-
-  const applyFilters = async (filters) => {
+  
+  const dataRef = useRef(null);
+   const fetchLocation = useCallback(async () => {
+     try {
+       const type = localStorage.getItem("type");
+       let searchText = filters?.searchText || "all"; // Handle undefined filters safely
+   
+       const response = await _get(`/property/location/${type}/${searchText}`);
+   
+       if (response?.data) {
+         dataRef.current = Array.isArray(response.data) ? response.data : [response.data]; // Ensure data is always an array
+       } else {
+         dataRef.current = [];
+       }
+     } catch (error) {
+       console.error("Error fetching location data:", error);
+       dataRef.current = [];
+     }
+   }, [filters]); 
+  const applyFilters = useCallback(async (filters) => {
     let filtered = [];
     let backendFilteredData = [];
     const amenityMapping = {
@@ -343,9 +222,11 @@ export default function BuyersLayout({ filters }) {
       // Frontend filtering
       if (filters.searchText) {
         const searchText = filters.searchText.toLowerCase();
-        if (searchText != "" && searchText != "all") {
-          await fetchLocation();
-          filtered = data2;
+        if (searchText !== "" && searchText !== "all") {
+          if (!dataRef.current) {
+            await fetchLocation(); 
+          }
+          filtered = dataRef.current || [];
         }
       }
       console.log("hllp", filters.propertyName)
@@ -384,7 +265,102 @@ export default function BuyersLayout({ filters }) {
       console.error("Error fetching products:", error);
       setFilteredLayouts([]);
     }
+  },[setFilteredLayouts,fetchLocation]);
+  useEffect(() => {
+    const fetchLayouts = async () => {
+      try {
+        const response = await _get(`/layout/getalllayouts`);
+        const layoutData = response.data;
+        console.log(layoutData);
+  
+        setLayouts(layoutData);
+        setFilteredLayouts(layoutData);
+        applyFilters(filters, layoutData);
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error fetching layouts:", error);
+        // setLoading(false);
+      }
+    };
+  
+    fetchLayouts();
+  }, [filters,applyFilters]); 
+ 
+  useEffect(() => {
+    console.log("called");
+    if (selectedProperty) {
+      const startDate = moment(selectedProperty?.auctionData?.[0]?.startDate);
+      const endDate = moment(selectedProperty?.auctionData?.[0]?.endDate);
+      const now = moment();
+
+      const amount = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
+        ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
+        : selectedProperty?.auctionData?.[0]?.amount;
+
+      const initialBid = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
+        ?selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
+        : selectedProperty?.auctionData?.[0]?.amount;
+
+      // setReservationAmount(initialBid);
+      setBackendMoney(amount);
+      setRequiredBid(initialBid);
+      // Determine the initial state message
+      if (now.isBefore(startDate)) {
+        setRemainingTime("Auction Not Yet Started");
+      } else if (now.isBetween(startDate, endDate)) {
+        setRemainingTime(calculateCountdown(endDate)); // Start countdown
+      } else {
+        setRemainingTime("Auction Ended");
+      }
+
+      // Setup interval to update countdown if auction is ongoing
+      const interval = setInterval(() => {
+        const currentTime = moment();
+
+        if (currentTime.isBefore(startDate)) {
+          setRemainingTime("Auction Not Yet Started");
+        } else if (currentTime.isBetween(startDate, endDate)) {
+          setRemainingTime(calculateCountdown(endDate));
+        } else {
+          setRemainingTime("Auction Ended");
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedProperty]);
+  const calculateCountdown = (endTime) => {
+    const now = moment();
+    const durationToEnd = moment.duration(endTime.diff(now));
+
+    return `${durationToEnd.days()} Days ${durationToEnd.hours()} Hours ${durationToEnd.minutes()} Minutes`;
   };
+ 
+  const formatPrice = (price) => {
+    if (!price || isNaN(price)) {
+      return "N/A"; // Return a default value if price is undefined or not a number
+    }
+
+    if (price >= 1_00_00_000) {
+      return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
+    } else if (price >= 1_00_000) {
+      return (price / 1_00_000).toFixed(1) + "L"; // Convert to Lakhs
+    } else if (price >= 1_000) {
+      return (price / 1_000).toFixed(1) + "k"; // Convert to Thousands
+    } else {
+      return price.toString(); // Display as is for smaller values
+    }
+  };
+
+  const handleViewAuction = (property) => {
+    setSelectedProperty(property);
+    setIsAuctionViewModalVisible(true);
+  };
+
+
+
+
   // const applyFilters = async (filters, data) => {
   //   const searchText = filters.searchText;
   //   if (searchText != "" && searchText != "all") {
@@ -449,9 +425,7 @@ export default function BuyersLayout({ filters }) {
     ? filteredLayouts.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : [];
 
-  const formatNumberWithCommas = (num) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
+
   return (
     <div style={{ padding: "0px 20px" }} ref={targetCardRef}>
       {layouts === null && (
@@ -486,8 +460,8 @@ export default function BuyersLayout({ filters }) {
       }
 
       <Row gutter={[24, 24]} justify="start">
-        {Array.isArray(layouts) != null && (
-          Array.isArray(layouts).length != 0 ? (
+        {Array.isArray(layouts) !== null && (
+          Array.isArray(layouts).length !== 0 ? (
             <>
               {Array.isArray(filteredLayouts) && filteredLayouts.length === 0 ? (
                 <Col
@@ -527,7 +501,7 @@ export default function BuyersLayout({ filters }) {
                                 borderBottom: "none",
                               }}
                             /> */}
-                            {layout?.uploadPics?.length != 0 ? (
+                            {layout?.uploadPics?.length !== 0 ? (
                               <img
                                 alt="layout"
                                 src={layout?.uploadPics?.[0]}

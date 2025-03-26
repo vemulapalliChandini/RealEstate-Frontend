@@ -51,12 +51,7 @@ const AuctionCards = ({ showModalOnLoad }) => {
     console.log(bidLevel);
     return baseBid + (bidLevel * bidIncrement);
   };
-  const calculateInitialBid1 = (totalPrice) => {
-    const bidIncrement = 500;
-    const baseBid = 500;
-    const bidLevel = Math.floor(totalPrice / 50000);
-    return baseBid + (bidLevel * bidIncrement);
-  };
+
   useEffect(() => {
     console.log("called");
     if (selectedProperty) {

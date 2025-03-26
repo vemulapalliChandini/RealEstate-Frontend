@@ -1,0 +1,49 @@
+.call-container {
+    position: absolute;
+    top: 50%;
+    left: 77%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+  }
+  
+  .contact-box {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .request-callback-button {
+    background-color: #0d416b;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+  }
+  
+  .modal-subtitle {
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .call-card {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .callback-submit-button {
+    background-color: #0d416b;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-top: -20%;
+    margin-left: 15%;
+    border: none;
+  }
+  

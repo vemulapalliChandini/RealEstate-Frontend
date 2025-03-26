@@ -1,29 +1,35 @@
-import { Avatar, Modal, Spin, Table, Tooltip } from "antd";
-import React, { useEffect, useState } from "react";
+import { Avatar, Modal, Spin, Table } from "antd";
+import React, { useEffect, useState ,useCallback } from "react";
 import { _get } from "../../Service/apiClient";
-import { ClockCircleOutlined } from "@ant-design/icons";
 import { FaWhatsapp } from "react-icons/fa";
 
 const ShowViews = ({ viewProp, viewsModal, setViewsModal }) => {
   const [activeTab] = useState("buyerViews");
   const [totalBuyerViews, setTotalBuyerViews] = useState(null);
-  useEffect(() => {
-    showBuyersViews();
-    showBuyersBookings();
-  }, [activeTab, viewProp]);
-
-
-
-  const showBuyersBookings = async () => {
+  const showBuyersBookings = useCallback(async () => {
     try {
-      const response = await _get(
-        `booking/reqsCountFromABuyer/${viewProp._id}`
-      );
+      await _get(`booking/reqsCountFromABuyer/${viewProp._id}`);
+    } catch (error) {
+      console.error("Error fetching buyer bookings:", error);
+      setTotalBuyerViews([]);
+    }
+  }, [viewProp._id]);
+  
+  const showBuyersViews = useCallback(async () => {
+    try {
+      const response = await _get(`views/viewsFromABuyer/${viewProp._id}`);
+      console.log(response.data);
+      setTotalBuyerViews(response.data);
     } catch (error) {
       console.error("Error fetching buyer views:", error);
       setTotalBuyerViews([]);
     }
-  };
+  }, [viewProp._id]);
+  
+  useEffect(() => {
+    showBuyersViews();
+    showBuyersBookings();
+  }, [activeTab, viewProp, showBuyersViews, showBuyersBookings]);
   const formatPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return "";
     const cleaned = phoneNumber.replace(/\D/g, "");
@@ -33,16 +39,7 @@ const ShowViews = ({ viewProp, viewsModal, setViewsModal }) => {
     }
     return phoneNumber;
   };
-  const showBuyersViews = async () => {
-    try {
-      const response = await _get(`views/viewsFromABuyer/${viewProp._id}`);
-      console.log(response.data);
-      setTotalBuyerViews(response.data);
-    } catch (error) {
-      console.error("Error fetching buyer views:", error);
-      setTotalBuyerViews([]);
-    }
-  };
+ 
 
   const buyerColumns = [
     {
@@ -111,87 +108,7 @@ const ShowViews = ({ viewProp, viewsModal, setViewsModal }) => {
     },
   ];
 
-  const buyerBookings = [
-    {
-      title: "Buyer Name",
-      dataIndex: "buyerName",
-      key: "buyerName",
-      align: "center",
-    },
-    {
-      title: "Bookings Count",
-      dataIndex: "bookingsCount",
-      key: "bookingsCount",
-      render: (bookingsCount, record) => (
-        <span>
-          {bookingsCount}
-
-          <Tooltip
-            placement="right"
-            title={
-              new Date(record.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              }) ===
-                new Date(record.updatedAt).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true,
-                }) ? (
-                <>
-                  <strong>Recent Booking:</strong> <br></br>
-                  {new Date(record.updatedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
-                  })}
-                </>
-              ) : (
-                <>
-                  <strong>First Booking:</strong> <br></br>
-                  {new Date(record.createdAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
-                  })}
-                  <br />
-                  {bookingsCount > 1 && (
-                    <>
-                      <strong>Recent Booking:</strong> <br></br>
-                      {new Date(record.updatedAt).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      })}
-                    </>
-                  )}
-                </>
-              )
-            }
-          >
-            <ClockCircleOutlined style={{ marginLeft: 5 }} />
-          </Tooltip>
-        </span>
-      ),
-      align: "center",
-    },
-  ];
+ 
 
   return (
     <Modal

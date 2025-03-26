@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Form,
   Input,
@@ -53,7 +53,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const { useBreakpoint } = Grid;
 const { Option } = Select;
-const API_KEY = "AIzaSyCRouoqOUlbhszsbloBTJa7cR4hOZvFYi4";
+const API_KEY = process.env.API_KEY;
 function AddProperty({ setShowFormType }) {
   const screens = useBreakpoint();
   const { t } = useTranslation();
@@ -307,7 +307,7 @@ If no road type is clearly mentioned, return "None".
         roadType: extractedData.amenities?.roadType,
         boreWell: extractedData.amenities?.boreWell?.toLowerCase() === "yes" ? "Yes" : "No",
         storageFacility: extractedData.amenities?.storageFacility?.toLowerCase() === "yes" ? "Yes" : "No",
-       
+
       });
 
     } catch (error) {
@@ -358,7 +358,7 @@ If no road type is clearly mentioned, return "None".
     if (role) {
       setUserRole(parseInt(role, 10));
     }
-    console.log(videoUrl);
+
   }, []);
 
 
@@ -424,13 +424,17 @@ If no road type is clearly mentioned, return "None".
     // setisBoreFacility(checked);
     form.setFieldsValue({ boreWell: checked });
   };
+  const handleDocumentChange = (checked) => {
+    // setisBoreFacility(checked);
+    form.setFieldsValue({ documentsVerified: checked });
+  };
 
   const handleUnitChange = (value) => {
     // setType(form.getFieldValue("landsizeunit"));
 
     setUnit(value);
-    
-    
+
+
   };
   const handlePriceUnitChange = (value) => {
     setPriceUnit(value);
@@ -439,8 +443,8 @@ If no road type is clearly mentioned, return "None".
   const handleSizeChange = (data) => {
     // setLandMeasure(form.getFieldValue("size"));
 
-  
-   
+
+
   };
 
   const handleDistrictChange = async (value) => {
@@ -686,7 +690,7 @@ If no road type is clearly mentioned, return "None".
     uploadPics.push(imageUrl);
   });
 
-  
+
 
   const validateFieldsManually = (values) => {
     const errors = {};
@@ -728,28 +732,26 @@ If no road type is clearly mentioned, return "None".
 
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
+  const fetchAgentEmails = useCallback(async () => {
     try {
-      const response = await _get(
-        `/csr/getAssignedAgents/${csrId}`
-      );
+      const response = await _get(`/csr/getAssignedAgents/${csrId}`);
       console.log("Agent Emails:", response.data);
       setAgentEmails(response.data || []);
     } catch (error) {
       console.error("Error fetching agent emails:", error);
     }
-  };
+  }, [csrId]);
 
 
   useEffect(() => {
     fetchAgentEmails();
-  }, []);
+  }, [fetchAgentEmails]);
 
   const onFinish = async () => {
     const values = form.getFieldsValue();
     const validationErrors = validateFieldsManually(values);
     if (Object.keys(validationErrors).length > 0) {
-    
+
 
       const errorsToSet = Object.entries(validationErrors).map(
         ([field, error]) => ({
@@ -791,16 +793,19 @@ If no road type is clearly mentioned, return "None".
             conversionFactors[priceunit]
           ),
       landType: values.landType,
+      propertyOrigin: values.propertyOrigin,
       crops: selectedValues,
       litigation: isLitigation ? true : false,
       litigationDesc: values.litigationDesc,
       images: uploadPics,
       videos: videoUrl ? [videoUrl] : [],
+      documentsVerified: values.documentsVerified === undefined ? false : values.documentsVerified,
       propertyDesc:
         values.propertyDesc === undefined ? "" : values.propertyDesc,
     };
     const amenities = {
       boreWell: values.boreWell === undefined ? false : values.boreWell,
+     
       electricity:
         values.electricity === undefined ? false : values.electricity,
       distanceFromRoad: values.distanceFromRoad,
@@ -825,7 +830,6 @@ If no road type is clearly mentioned, return "None".
       },
       amenities,
     };
-
     setLoading(true);
     try {
       console.log(
@@ -900,8 +904,8 @@ If no road type is clearly mentioned, return "None".
 
   return (
     <>
-  <Col span={9}>
-  {/* <div>
+      <Col span={9}>
+        {/* <div>
       <Button
         onClick={handleSpeakerClick}
         type="primary"
@@ -929,54 +933,74 @@ If no road type is clearly mentioned, return "None".
         </video>
       )}
     </div> */}
-  <Button
-    type={isProcessing ? "danger" : "primary"}
-    onClick={handleSpeechInput}
-    block
-    style={{
-      width: "50%",
-      backgroundColor: "#0D4164",
-      fontWeight: "bold",
-      marginLeft: "80%"
-    }}
-  >
-    {isProcessing ? "Listening..." : <>
-      <FaMicrophone style={{ marginRight: 8,marginTop:2 }} /> Fill the form using Microphone
-    </>}
-  </Button>
-</Col>
+        <Button
+          type={isProcessing ? "danger" : "primary"}
+          onClick={handleSpeechInput}
+          block
+          style={{
+            width: "50%",
+            backgroundColor: "#0D4164",
+            fontWeight: "bold",
+            marginLeft: "80%"
+          }}
+        >
+          {isProcessing ? "Listening..." : <>
+            <FaMicrophone style={{ marginRight: 8, marginTop: 2 }} /> Fill the form using Microphone
+          </>}
+        </Button>
+      </Col>
 
-    <Form
-      form={form}
-      name="sectionedForm"
-      {...formItemLayout}
-      // layout="vertical"
-      onValuesChange={onFormVariantChange}
-      variant={componentVariant}
-      style={{
-        padding: "3%",
-        maxWidth: "auto",
-        borderRadius: "1%",
-        address,
-      }}
-      initialValues={{
-        variant: componentVariant,
-        state: "Andhra Pradesh",
-        country: "India",
-        landsizeunit: "acres",
-        pricesizeunit: "acres",
-      }}
-    >
+      <Form
+        form={form}
+        name="sectionedForm"
+        {...formItemLayout}
+        // layout="vertical"
+        onValuesChange={onFormVariantChange}
+        variant={componentVariant}
+        style={{
+          padding: "3%",
+          maxWidth: "auto",
+          borderRadius: "1%",
+          address,
+        }}
+        initialValues={{
+          variant: componentVariant,
+          state: "Andhra Pradesh",
+          country: "India",
+          landsizeunit: "acres",
+          pricesizeunit: "acres",
+        }}
+      >
 
-      {screens.xs ? (
-        <>
+        {screens.xs ? (
+          <>
 
-          <h2
-            className="custom-container"
-            style={{ fontSize: '20px', marginTop: '1%', textAlign: 'center', flex: 1 }}
-          >
-            {userRole === 5 && (
-              <button
+            <h2
+              className="custom-container"
+              style={{ fontSize: '20px', marginTop: '1%', textAlign: 'center', flex: 1 }}
+            >
+              {userRole === 5 && (
+                <button
+                  onClick={handleBackToCustomers}
+                  style={{
+                    marginTop: "3px",
+                    fontSize: "20px",
+                    backgroundColor: '#0D416B',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    float: "left",
+                    marginBottom: "5px",
+                  }}
+                ><FaArrowLeft style={{ marginTop: "5px" }} /> </button>)}Agriculture Land details
+            </h2>
+          </>
+        ) : (
+          <>
+
+            <h1 className="custom-container" style={{ textAlign: 'center', flex: 1 }}>
+              {userRole === 5 && (<button
                 onClick={handleBackToCustomers}
                 style={{
                   marginTop: "3px",
@@ -989,459 +1013,651 @@ If no road type is clearly mentioned, return "None".
                   float: "left",
                   marginBottom: "5px",
                 }}
-              ><FaArrowLeft style={{ marginTop: "5px" }} /> </button>)}Agriculture Land details
-          </h2>
-        </>
-      ) : (
-        <>
-
-          <h1 className="custom-container" style={{ textAlign: 'center', flex: 1 }}>
-            {userRole === 5 && (<button
-              onClick={handleBackToCustomers}
-              style={{
-                marginTop: "3px",
-                fontSize: "20px",
-                backgroundColor: '#0D416B',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                float: "left",
-                marginBottom: "5px",
-              }}
-            >
-              <FaArrowLeft style={{ marginTop: "5px" }} />
-            </button>)}Agriculture Land details
-          </h1>
-        </>
-      )}
-
-
-
-      <Collapse
-        accordion={false}
-        defaultActiveKey={[
-          "agentDetails",
-          "ownerDetails",
-          "landDetails",
-          "Address",
-          "Amenities",
-          "uploadPhotos",
-        ]}
-        onChange={handlePanelChange}
-      >
-        {/*  agents details */}
-
-
-        {/* displaying the CSR role 5 */}
-
-
-        {userRole === 5 && (
-          <Panel
-            style={{ backgroundColor: "rgb(13,65,107)" }}
-            header={
-              <span style={{ fontWeight: "bold", color: "white" }}>
-                Agent Details
-              </span>
-            }
-            key="agentDetails"
-          >
-            <Col xs={24} sm={12} md={8} xl={6}>
-              <Form.Item
-                label="Agent Email"
-                name="userId"
-                rules={[
-                  { required: true, message: "Please select an Agent Email!" },
-                ]}
-                labelCol={{ xs: { span: 8 } }}
-                wrapperCol={{ xs: { span: 16 } }}
               >
-                <Select
-                  placeholder="Select an Agent Email"
-                  style={{
-                    width: "80%",
-                    backgroundColor: "transparent",
-                    border: "1px solid lightgray",
-                  }}
-                  options={agentEmails.map((email) => ({
-                    value: email.email,
-                    label: email.email,
-                  }))}
-                />
-              </Form.Item>
-            </Col>
-
-          </Panel>
+                <FaArrowLeft style={{ marginTop: "5px" }} />
+              </button>)}Agriculture Land details
+            </h1>
+          </>
         )}
 
-        <Panel
-          style={{ backgroundColor: " rgb(13,65,107)" }}
-          header={
-            <span style={{ fontWeight: "bold", color: "white" }}>
-              Owner Details
-            </span>
-          }
-          key="ownerDetails"
+
+
+        <Collapse
+          accordion={false}
+          defaultActiveKey={[
+            "agentDetails",
+            "ownerDetails",
+            "landDetails",
+            "Address",
+            "Amenities",
+            "uploadPhotos",
+          ]}
+          onChange={handlePanelChange}
         >
-          <>
-            <Row style={{ marginTop: "2%" }}>
+          {/*  agents details */}
+
+
+          {/* displaying the CSR role 5 */}
+
+
+          {userRole === 5 && (
+            <Panel
+              style={{ backgroundColor: "rgb(13,65,107)" }}
+              header={
+                <span style={{ fontWeight: "bold", color: "white" }}>
+                  Agent Details
+                </span>
+              }
+              key="agentDetails"
+            >
               <Col xs={24} sm={12} md={8} xl={6}>
                 <Form.Item
-                  label="First Name"
-                  name="firstName"
+                  label="Agent Email"
+                  name="userId"
                   rules={[
-                    { required: true, message: "Please enter Owner Name!" },
-
-                    {
-                      pattern: /^[A-Za-z\s]+$/,
-                      message:
-                        "Owner Name can only contain letters and spaces!",
-                    },
-
-                    {
-                      max: 32,
-                      message: "Owner Name cannot exceed 32 characters!",
-                    },
+                    { required: true, message: "Please select an Agent Email!" },
                   ]}
                   labelCol={{ xs: { span: 8 } }}
                   wrapperCol={{ xs: { span: 16 } }}
                 >
-                  <Input
+                  <Select
+                    placeholder="Select an Agent Email"
                     style={{
                       width: "80%",
                       backgroundColor: "transparent",
                       border: "1px solid lightgray",
                     }}
-                  />
-                </Form.Item>
-
-              </Col>
-              <Col xs={24} sm={12} md={8} xl={6}>
-                <Form.Item
-                  label="Last Name"
-                  name="lastName"
-                  rules={[
-                    { required: true, message: "Please enter Owner Name!" },
-
-                    {
-                      pattern: /^[A-Za-z\s]+$/,
-                      message:
-                        "Owner Name can only contain letters and spaces!",
-                    },
-
-                    {
-                      max: 32,
-                      message: "Owner Name cannot exceed 32 characters!",
-                    },
-                  ]}
-                  labelCol={{ xs: { span: 8 } }}
-                  wrapperCol={{ xs: { span: 16 } }}
-                >
-                  <Input
-                    style={{
-                      width: "80%",
-                      backgroundColor: "transparent",
-                      border: "1px solid lightgray",
-                    }}
-                  />
-                </Form.Item>
-
-              </Col>
-              <Col xl={6} xs={24} sm={12} md={8}>
-                <Form.Item
-                  label={<>Contact No </>}
-                  name="phoneNumber"
-                  labelCol={{ xs: { span: 7 } }}
-                  wrapperCol={{ xs: { span: 16 } }}
-                  rules={[
-                    { required: true, message: "Please enter contact number!" },
-                    {
-                      validator: (_, value) => {
-                        const startPattern = /^[6-9]/;
-                        const fullPattern = /^[6-9]\d{9}$/;
-
-                        if (!value) {
-                          return Promise.resolve();
-                        }
-                        if (value && /[^0-9]/.test(value)) {
-                          return Promise.reject(
-                            new Error("Only numeric values are allowed!")
-                          );
-                        }
-                        if (!startPattern.test(value)) {
-                          return Promise.reject(
-                            new Error(
-                              "Contact number must start with 6, 7, 8, or 9!"
-                            )
-                          );
-                        }
-                        if (!fullPattern.test(value)) {
-                          return Promise.reject(
-                            new Error(
-                              "Contact number must be digits of length 10!"
-                            )
-                          );
-                        }
-
-                        return Promise.resolve(); // Valid number
-                      },
-                    },
-                  ]}
-                >
-                  <Input
-                    onKeyPress={(event) => {
-                      if (!/[0-9]/.test(event.key)) {
-                        event.preventDefault();
-                      }
-                    }}
-                    style={{
-                      width: "80%",
-                      backgroundColor: "transparent",
-                      border: "1px solid lightgray",
-                      marginLeft: screens.md && "4%",
-                    }}
+                    options={agentEmails.map((email) => ({
+                      value: email.email,
+                      label: email.email,
+                    }))}
                   />
                 </Form.Item>
               </Col>
 
+            </Panel>
+          )}
 
-
-
-              <Col xl={6} xs={24} sm={12} md={8}>
-                {" "}
-                <Form.Item
-                  labelCol={{ xs: { span: 10 } }}
-                  wrapperCol={{ xs: { span: 16 } }}
-                  label={
-                    <>
-                      <span
-                        style={{
-                          marginRight: screens.md && !screens.lg && "-2%",
-                        }}
-                      >
-                        Any Disputes?
-                      </span>
-                      <Tooltip
-                        placement="rightTop"
-                        // overlayStyle={{ maxWidth: "500px" }}
-                        title={
-                          <>
-                            <p>
-                              <strong>If you have any disputes like :</strong>
-                            </p>
-                            <ul>
-                              <li>
-                                <strong>Boundary Disputes:</strong>{" "}
-                              </li>
-                              <li>
-                                <strong>Title and Ownership Issues:</strong>
-                              </li>
-                              <li>
-                                <strong>Zoning Conflicts:</strong>
-                              </li>
-                              <li>
-                                <strong>Unauthorized Land Use:</strong>
-                              </li>
-                              <li>
-                                <strong>Fraudulent Transactions:</strong>
-                              </li>
-                            </ul>
-                            <p>
-                              If yes, toggle the dispute option, otherwise you
-                              can ignore this.
-                            </p>
-                          </>
-                        }
-                      >
-                        <InfoCircleOutlined />
-                      </Tooltip>
-                    </>
-                  }
-                  name="litigation"
-                  valuePropName="checked"
-                  style={{ margin: 0 }}
-                >
-                  <Switch
-                    onChange={handleLitigation}
-                    defaultChecked={false}
-                    style={{
-                    }}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            {isLitigation && (
-              <Row gutter={16}>
-                <Col xl={24} xs={24} sm={24} md={24}>
+          <Panel
+            style={{ backgroundColor: " rgb(13,65,107)" }}
+            header={
+              <span style={{ fontWeight: "bold", color: "white" }}>
+                Owner Details
+              </span>
+            }
+            key="ownerDetails"
+          >
+            <>
+              <Row style={{ marginTop: "2%" }}>
+                <Col xs={24} sm={12} md={8} xl={6}>
                   <Form.Item
-                    label="Describe about your dispute?"
-                    name="litigationDesc"
-                    labelCol={{ span: 8.5 }}
-                    wrapperCol={{ span: 24 }}
+                    label="First Name"
+                    name="firstName"
                     rules={[
+                      { required: true, message: "Please enter Owner Name!" },
+
                       {
-                        required: { isLitigation },
+                        pattern: /^[A-Za-z\s]+$/,
+                        message:
+                          "Owner Name can only contain letters and spaces!",
+                      },
+
+                      {
+                        max: 32,
+                        message: "Owner Name cannot exceed 32 characters!",
+                      },
+                    ]}
+                    labelCol={{ xs: { span: 8 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                  >
+                    <Input
+                      style={{
+                        width: "80%",
+                        backgroundColor: "transparent",
+                        border: "1px solid lightgray",
+                      }}
+                    />
+                  </Form.Item>
+
+                </Col>
+                <Col xs={24} sm={12} md={8} xl={6}>
+                  <Form.Item
+                    label="Last Name"
+                    name="lastName"
+                    rules={[
+                      { required: true, message: "Please enter Owner Name!" },
+
+                      {
+                        pattern: /^[A-Za-z\s]+$/,
+                        message:
+                          "Owner Name can only contain letters and spaces!",
+                      },
+
+                      {
+                        max: 32,
+                        message: "Owner Name cannot exceed 32 characters!",
+                      },
+                    ]}
+                    labelCol={{ xs: { span: 8 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                  >
+                    <Input
+                      style={{
+                        width: "80%",
+                        backgroundColor: "transparent",
+                        border: "1px solid lightgray",
+                      }}
+                    />
+                  </Form.Item>
+
+                </Col>
+                <Col xl={6} xs={24} sm={12} md={8}>
+                  <Form.Item
+                    label={<>Contact No </>}
+                    name="phoneNumber"
+                    labelCol={{ xs: { span: 7 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                    rules={[
+                      { required: true, message: "Please enter contact number!" },
+                      {
+                        validator: (_, value) => {
+                          const startPattern = /^[6-9]/;
+                          const fullPattern = /^[6-9]\d{9}$/;
+
+                          if (!value) {
+                            return Promise.resolve();
+                          }
+                          if (value && /[^0-9]/.test(value)) {
+                            return Promise.reject(
+                              new Error("Only numeric values are allowed!")
+                            );
+                          }
+                          if (!startPattern.test(value)) {
+                            return Promise.reject(
+                              new Error(
+                                "Contact number must start with 6, 7, 8, or 9!"
+                              )
+                            );
+                          }
+                          if (!fullPattern.test(value)) {
+                            return Promise.reject(
+                              new Error(
+                                "Contact number must be digits of length 10!"
+                              )
+                            );
+                          }
+
+                          return Promise.resolve(); // Valid number
+                        },
                       },
                     ]}
                   >
-                    <Input.TextArea
-                      className="input-box"
-                      placeholder="Describe about your dispute"
-                      minLength={20}
-                      maxLength={300}
-                      rows={2}
-                      cols={20}
-                      style={{ width: screens.xs ? "100%" : "90%" }}
+                    <Input
+                      onKeyPress={(event) => {
+                        if (!/[0-9]/.test(event.key)) {
+                          event.preventDefault();
+                        }
+                      }}
+                      style={{
+                        width: "80%",
+                        backgroundColor: "transparent",
+                        border: "1px solid lightgray",
+                        marginLeft: screens.md && "4%",
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+
+
+
+
+                <Col xl={6} xs={24} sm={12} md={8}>
+                  {" "}
+                  <Form.Item
+                    labelCol={{ xs: { span: 10 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                    label={
+                      <>
+                        <span
+                          style={{
+                            marginRight: screens.md && !screens.lg && "-2%",
+                          }}
+                        >
+                          Any Disputes?
+                        </span>
+                        <Tooltip
+                          placement="rightTop"
+                          // overlayStyle={{ maxWidth: "500px" }}
+                          title={
+                            <>
+                              <p>
+                                <strong>If you have any disputes like :</strong>
+                              </p>
+                              <ul>
+                                <li>
+                                  <strong>Boundary Disputes:</strong>{" "}
+                                </li>
+                                <li>
+                                  <strong>Title and Ownership Issues:</strong>
+                                </li>
+                                <li>
+                                  <strong>Zoning Conflicts:</strong>
+                                </li>
+                                <li>
+                                  <strong>Unauthorized Land Use:</strong>
+                                </li>
+                                <li>
+                                  <strong>Fraudulent Transactions:</strong>
+                                </li>
+                              </ul>
+                              <p>
+                                If yes, toggle the dispute option, otherwise you
+                                can ignore this.
+                              </p>
+                            </>
+                          }
+                        >
+                          <InfoCircleOutlined />
+                        </Tooltip>
+                      </>
+                    }
+                    name="litigation"
+                    valuePropName="checked"
+                    style={{ margin: 0 }}
+                  >
+                    <Switch
+                      onChange={handleLitigation}
+                      defaultChecked={false}
+                      style={{
+                      }}
                     />
                   </Form.Item>
                 </Col>
               </Row>
-            )}
-          </>
-        </Panel>
+              {isLitigation && (
+                <Row gutter={16}>
+                  <Col xl={24} xs={24} sm={24} md={24}>
+                    <Form.Item
+                      label="Describe about your dispute?"
+                      name="litigationDesc"
+                      labelCol={{ span: 8.5 }}
+                      wrapperCol={{ span: 24 }}
+                      rules={[
+                        {
+                          required: { isLitigation },
+                        },
+                      ]}
+                    >
+                      <Input.TextArea
+                        className="input-box"
+                        placeholder="Describe about your dispute"
+                        minLength={20}
+                        maxLength={300}
+                        rows={2}
+                        cols={20}
+                        style={{ width: screens.xs ? "100%" : "90%" }}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              )}
+            </>
+          </Panel>
 
-        <Panel
-          style={{ backgroundColor: " rgb(13,65,107)" }}
-          header={
-            <span style={{ fontWeight: "bold", color: "white" }}>
-              Land Details
-            </span>
-          }
-          key="landDetails"
-        >
-          <>
-            <Row>
-              <Col span={8} xs={24} lg={8} sm={8} xl={6} md={8} >
-                <Form.Item
-                  label={
-                    <>
-                      Land Type{" "}
-                      <Tooltip
-                        placement="rightTop"
-                        // overlayStyle={{ maxWidth: "500px" }}
-                        title={
-                          <div>
-                            <strong>Choose from Land Types Available:</strong>
-
-                            <ul>
-                              <li>
-                                <strong>Dry Land</strong>
-                              </li>
-                              <li>
-                                <strong>Wet Land</strong>
-                              </li>
-                              <li>
-                                <strong>Converted Land</strong>
-                              </li>
-                            </ul>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ paddingLeft: 5 }} />
-                      </Tooltip>
-                    </>
-                  }
-                  name="landType"
-                  rules={[
-                    { required: true, message: "Please select a land type!" },
-                  ]}
-                  labelCol={{ xs: { span: 9 } }}
-                  wrapperCol={{ xs: { span: 14 } }}
-                >
-                  <Select
-                    className="select-custom"
-                    placeholder="Select land type"
-                    // onChange={handleLandTypeChange}
-                  >
-                    <Option value="dryland">Dry land</Option>
-                    <Option value="wetland">Wet land</Option>
-                    <Option value="converted">Converted Land</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
-                <Form.Item
-                  label="Land Name"
-                  name="title"
-                  rules={[
-                    { required: true, message: "Please input Land Name" },
-                    {
-                      pattern: /^[A-Za-z' ]+$/,
-                      message: "Name should contain only alphabets",
-                    },
-                  ]}
-                  labelCol={{ xs: { span: 10 }, sm: { span: 8 } }}
-                  wrapperCol={{ xs: { span: 16 }, sm: { span: 16 } }}
-                >
-                  <Input
-                    className="input-box"
-                    style={{
-                      width: "80%",
-                    }}
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col span={8} xs={24} lg={8} xl={6} sm={12} md={12}>
-                <Form.Item
-                  label={
-                    <>
-                      Survey No
-                      <Tooltip
-                        placement="rightTop"
-                        title={
-                          <div>
-                            <p>
-                              <strong>Survey Number Format:</strong>a
-                              three-digit number, followed by a hyphen, then one
-                              digit, one alphabet character, and one digit.
-                              <p></p>
-                              <strong>Example : 123-4g6</strong>.
-                            </p>
-
-                            <p></p>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: "5px" }} />
-                      </Tooltip>
-                    </>
-                  }
-                  labelCol={{ xs: { span: 9 } }}
-                  wrapperCol={{ xs: { span: 16 } }}
-                  name="surveyNumber"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input Survey No",
-                    },
-                  ]}
-                >
-                  <Input
-                    className="input-box"
-                    style={{
-                      width: "80%",
-                    }}
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col span={8} xs={24} lg={8} xl={6} sm={12} md={12}>
-                <Input.Group compact>
+          <Panel
+            style={{ backgroundColor: " rgb(13,65,107)" }}
+            header={
+              <span style={{ fontWeight: "bold", color: "white" }}>
+                Land Details
+              </span>
+            }
+            key="landDetails"
+          >
+            <>
+              <Row>
+                <Col span={8} xs={24} lg={8} sm={8} xl={6} md={8} >
                   <Form.Item
                     label={
                       <>
-                        Land Size
+                        Land Type{" "}
+                        <Tooltip
+                          placement="rightTop"
+                          // overlayStyle={{ maxWidth: "500px" }}
+                          title={
+                            <div>
+                              <strong>Choose from Land Types Available:</strong>
+
+                              <ul>
+                                <li>
+                                  <strong>Dry Land</strong>
+                                </li>
+                                <li>
+                                  <strong>Wet Land</strong>
+                                </li>
+                                <li>
+                                  <strong>Converted Land</strong>
+                                </li>
+                              </ul>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ paddingLeft: 5 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="landType"
+                    rules={[
+                      { required: true, message: "Please select a land type!" },
+                    ]}
+                    labelCol={{ xs: { span: 9 } }}
+                    wrapperCol={{ xs: { span: 14 } }}
+                  >
+                    <Select
+                      className="select-custom"
+                      placeholder="Select land type"
+                    // onChange={handleLandTypeChange}
+                    >
+                      <Option value="dryland">Dry land</Option>
+                      <Option value="wetland">Wet land</Option>
+                      <Option value="converted">Converted Land</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
+                  <Form.Item
+                    label="Land Name"
+                    name="title"
+                    rules={[
+                      { required: true, message: "Please input Land Name" },
+                      {
+                        pattern: /^[A-Za-z' ]+$/,
+                        message: "Name should contain only alphabets",
+                      },
+                    ]}
+                    labelCol={{ xs: { span: 10 }, sm: { span: 8 } }}
+                    wrapperCol={{ xs: { span: 16 }, sm: { span: 16 } }}
+                  >
+                    <Input
+                      className="input-box"
+                      style={{
+                        width: "80%",
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col span={8} xs={24} lg={8} xl={6} sm={12} md={12}>
+                  <Form.Item
+                    label={
+                      <>
+                        Survey No
                         <Tooltip
                           placement="rightTop"
                           title={
                             <div>
                               <p>
-                                <strong>Enter the land size in acres.</strong>
+                                <strong>Survey Number Format:</strong>a
+                                three-digit number, followed by a hyphen, then one
+                                digit, one alphabet character, and one digit.
+                                <p></p>
+                                <strong>Example : 123-4g6</strong>.
                               </p>
+
+                              <p></p>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: "5px" }} />
+                        </Tooltip>
+                      </>
+                    }
+                    labelCol={{ xs: { span: 9 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                    name="surveyNumber"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input Survey No",
+                      },
+                    ]}
+                  >
+                    <Input
+                      className="input-box"
+                      style={{
+                        width: "80%",
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col span={8} xs={24} lg={8} xl={6} sm={12} md={12}>
+                  <Input.Group compact>
+                    <Form.Item
+                      label={
+                        <>
+                          Land Size
+                          <Tooltip
+                            placement="rightTop"
+                            title={
+                              <div>
+                                <p>
+                                  <strong>Enter the land size in acres.</strong>
+                                </p>
+                                <p>
+                                  <strong>1 acre = 43,560 square feet.</strong>
+                                </p>
+                              </div>
+                            }
+                          >
+                            <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                          </Tooltip>
+                        </>
+                      }
+                      name="size"
+                      rules={[
+                      
+                        {
+                          validator: (_, value) => {
+                            // If value is empty, let the required rule handle it.
+                            if (value === undefined || value === null || value === "") {
+                              return Promise.resolve();
+                            }
+                            // Regular expression to allow only numerics and decimals.
+                            const reg = /^[0-9]+(\.[0-9]+)?$/;
+                            if (!reg.test(value.toString())) {
+                              return Promise.reject(new Error("Only numerics and decimals are allowed"));
+                            }
+                            return Promise.resolve();
+                          },
+                        },
+                      ]}
+                      labelCol={{ xs: { span: 10 }, sm: { span: 8 } }}
+                      wrapperCol={{ xs: { span: 16 }, sm: { span: 24 } }}
+                    >
+                      <Form.Item name="size" noStyle>
+                        <InputNumber
+                          step={0.1}
+                          placeholder="0.1 acres to 1000 acres"
+                          onChange={handleSizeChange}
+                          style={{ width: "60%" }}
+                          min={0}
+                          max={99999}
+                        />
+                      </Form.Item>
+                      <Form.Item name="landsizeunit" noStyle>
+                        <Select
+                          defaultValue="acres"
+                          style={{ width: "40%" }}
+                          onChange={handleUnitChange}
+                        >
+                          <Option value="acres">Acres</Option>
+                          <Option value="sq. ft">Sq. Ft</Option>
+                          <Option value="sq.yards">Sq.Yards</Option>
+                          <Option value="sq.m">Sq.M</Option>
+                          <Option value="cents">Cents</Option>
+                        </Select>
+                      </Form.Item>
+                    </Form.Item>
+                  </Input.Group>
+                </Col>
+
+
+                <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
+                  {/*  Price */}
+                  <Input.Group compact>
+                    <Form.Item
+                      label="Price"
+                      name="price"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a Price",
+                        },
+                        {
+                          validator: (_, value) => {
+                            if (value && value.toString().length > 10) {
+                              return Promise.reject(new Error("Please enter a number with up to 10 digits"));
+                            }
+                            return Promise.resolve();
+                          },
+                        },
+                      ]}
+                      labelCol={{ xs: { span: 9 }, sm: { span: 8 } }}
+                      wrapperCol={{ xs: { span: 16 }, sm: { span: 24 } }}
+                    >
+                      <InputNumber
+                        step={0.1}
+                        type="number"
+                        placeholder="Enter price"
+                        onChange={(value) => {
+                          if (value < 0) {
+                            value = 0;
+                          }
+                          handlePriceChange(value);
+                        }}
+                        style={{ width: "120px", backgroundColor: "white" }}
+                        min={0}
+                      // addonAfter={`/${unit}`}
+                      />
+                    </Form.Item>
+                    <Form.Item name="pricesizeunit" noStyle>
+                      <Select
+                        defaultValue="acres"
+                        style={{ width: "80px" }}
+                        onChange={handlePriceUnitChange}
+                      >
+                        <Option value="acres">/acre</Option>
+                        <Option value="sq. ft">/sq. ft</Option>
+                        <Option value="sq.yards">/sq.yard</Option>
+                        <Option value="sq.m">/sq.m</Option>
+                        <Option value="cents">/cent</Option>
+                      </Select>
+                    </Form.Item>
+                  </Input.Group>
+                </Col>
+                {/*  Total Price */}
+
+                <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
+                  <Form.Item
+                    label="Total Price"
+                    labelCol={{ xs: { span: 8 } }}
+                    wrapperCol={{ xs: { span: 16 } }}
+                  >
+                    <>
+                      ₹{" "}
+                      {form.getFieldValue("price") && form.getFieldValue("size")
+                        ? formatPrice(
+                          priceunit === unit
+                            ? form.getFieldValue("price") * form.getFieldValue("size")
+                            : Math.ceil(
+                              (form.getFieldValue("size") / conversionFactors[unit]) *
+                              form.getFieldValue("price") *
+                              conversionFactors[priceunit]
+                            )
+                        )
+                        : "0"}
+                    </>
+                  </Form.Item>
+                </Col>
+                <Col span={8} xs={24} lg={8} sm={8} xl={6} md={8} >
+                  <Form.Item
+                    label={
+                      <>
+                        Property Origin{" "}
+                        <Tooltip
+                          placement="rightTop"
+                          // overlayStyle={{ maxWidth: "500px" }}
+                          title={
+                            <div>
+                              <strong>Choose from Property Origin Available:</strong>
+
+                              <ul>
+                                <li>
+                                  <strong>Ancestral Land</strong>
+                                </li>
+                                <li>
+                                  <strong>Purchased Land</strong>
+                                </li>
+                              </ul>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ paddingLeft: 5 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="propertyOrigin"
+                    rules={[
+                      { required: true, message: "Please select a Property Origin !" },
+                    ]}
+                    labelCol={{ xs: { span: 11 } }}
+                  // wrapperCol={{ xs: { span: 10 } }}
+                  >
+                    <Select
+                      className="select-custom"
+                      placeholder="Select Property Origin"
+                      // onChange={handleLandTypeChange}
+                      style={{ width: "80%" }}
+                    >
+                      <Option value="Ancestral Land">Ancestral Land</Option>
+                      <Option value="Purchased Land">Purchased land</Option>
+
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col
+                  span={6}
+                  xs={24}
+                  lg={8}
+                  sm={12}
+                  md={6}
+                  xl={6}
+
+
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        <span style={{ color: "#eb6565" }}>*</span> Verified Documents{" "}
+                        <Tooltip
+                          placement="rightbottom"
+                          title={
+                            <div>
                               <p>
-                                <strong>1 acre = 43,560 square feet.</strong>
+                                Veify all the below documents
                               </p>
+                              <ul>
+                                <li>
+                                  <strong>1B Form</strong>
+                                </li>
+                                <li>
+                                  <strong>SFAO</strong>
+                                </li>
+                                <li>
+                                  <strong>FCO</strong>
+                                </li>
+
+                              </ul>
                             </div>
                           }
                         >
@@ -1449,137 +1665,28 @@ If no road type is clearly mentioned, return "None".
                         </Tooltip>
                       </>
                     }
-                    name="size"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter the land size",
-                      },
-                      {
-                        validator: (_, value) => {
-                          // If value is empty, let the required rule handle it.
-                          if (value === undefined || value === null || value === "") {
-                            return Promise.resolve();
-                          }
-                          // Regular expression to allow only numerics and decimals.
-                          const reg = /^[0-9]+(\.[0-9]+)?$/;
-                          if (!reg.test(value.toString())) {
-                            return Promise.reject(new Error("Only numerics and decimals are allowed"));
-                          }
-                          return Promise.resolve();
-                        },
-                      },
-                    ]}
-                    labelCol={{ xs: { span: 10 }, sm: { span: 8 } }}
-                    wrapperCol={{ xs: { span: 16 }, sm: { span: 24 } }}
+                    name="documentsVerified"
+                    labelCol={{
+                      xs: { span: 14 },
+                      sm: { span: 8.5 },
+                      xl: { span: 13 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    valuePropName="checked"
                   >
-                    <Form.Item name="size" noStyle>
-                      <InputNumber
-                        step={0.1}
-                        placeholder="0.1 acres to 1000 acres"
-                        onChange={handleSizeChange}
-                        style={{ width: "60%" }}
-                        min={0}
-                        max={99999}
-                      />
-                    </Form.Item>
-                    <Form.Item name="landsizeunit" noStyle>
-                      <Select
-                        defaultValue="acres"
-                        style={{ width: "40%" }}
-                        onChange={handleUnitChange}
-                      >
-                        <Option value="acres">Acres</Option>
-                        <Option value="sq. ft">Sq. Ft</Option>
-                        <Option value="sq.yards">Sq.Yards</Option>
-                        <Option value="sq.m">Sq.M</Option>
-                        <Option value="cents">Cents</Option>
-                      </Select>
-                    </Form.Item>
+                    <Switch onChange={handleDocumentChange} defaultChecked={false} size="large" style={{ marginTop: "-12px" }} />
                   </Form.Item>
-                </Input.Group>
-              </Col>
+                </Col>
 
 
-              <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
-                {/*  Price */}
-                <Input.Group compact>
-                  <Form.Item
-                    label="Price"
-                    name="price"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter a Price",
-                      },
-                      {
-                        validator: (_, value) => {
-                          if (value && value.toString().length > 10) {
-                            return Promise.reject(new Error("Please enter a number with up to 10 digits"));
-                          }
-                          return Promise.resolve();
-                        },
-                      },
-                    ]}
-                    labelCol={{ xs: { span: 9 }, sm: { span: 8 } }}
-                    wrapperCol={{ xs: { span: 16 }, sm: { span: 24 } }}
-                  >
-                    <InputNumber
-                      step={0.1}
-                      type="number"
-                      placeholder="Enter price"
-                      onChange={(value) => {
-                        if (value < 0) {
-                          value = 0;
-                        }
-                        handlePriceChange(value);
-                      }}
-                      style={{ width: "120px", backgroundColor: "white" }}
-                      min={0}
-                    // addonAfter={`/${unit}`}
-                    />
-                  </Form.Item>
-                  <Form.Item name="pricesizeunit" noStyle>
-                    <Select
-                      defaultValue="acres"
-                      style={{ width: "80px" }}
-                      onChange={handlePriceUnitChange}
-                    >
-                      <Option value="acres">/acre</Option>
-                      <Option value="sq. ft">/sq. ft</Option>
-                      <Option value="sq.yards">/sq.yard</Option>
-                      <Option value="sq.m">/sq.m</Option>
-                      <Option value="cents">/cent</Option>
-                    </Select>
-                  </Form.Item>
-                </Input.Group>
-              </Col>
-              {/*  Total Price */}
-
-              <Col span={8} xs={24} lg={8} sm={12} md={12} xl={6}>
-                <Form.Item
-                  label="Total Price"
-                  labelCol={{ xs: { span: 8 } }}
-                  wrapperCol={{ xs: { span: 16 } }}
-                >
-                  <>
-                    ₹{" "}
-                    {form.getFieldValue("price") && form.getFieldValue("size")
-                      ? formatPrice(
-                        priceunit === unit
-                          ? form.getFieldValue("price") * form.getFieldValue("size")
-                          : Math.ceil(
-                            (form.getFieldValue("size") / conversionFactors[unit]) *
-                            form.getFieldValue("price") *
-                            conversionFactors[priceunit]
-                          )
-                      )
-                      : "0"}
-                  </>
-                </Form.Item>
-              </Col>
-
-              <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+              </Row>
+              <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                 <Form.Item
                   label={
                     <>
@@ -1603,7 +1710,7 @@ If no road type is clearly mentioned, return "None".
                     </>
                   }
                   name="propertyDesc"
-                  labelCol={{ xs: { span: 4 } }}
+                  labelCol={{ xs: { span: 2 } }}
                   wrapperCol={24}
                 >
                   <Input.TextArea
@@ -1611,147 +1718,172 @@ If no road type is clearly mentioned, return "None".
                     placeholder="Please provide details about the land"
                     maxLength={300}
                     rows={2}
+
                   />
                 </Form.Item>
               </Col>
-
-            </Row>
-
-          </>
-        </Panel>
+            </>
+          </Panel>
 
 
 
-        <Panel
-          style={{ backgroundColor: " rgb(13,65,107)" }}
-          header={
-            <span style={{ fontWeight: "bold", color: "white" }}>
-              Location
-            </span>
-          }
-          key="Address"
-        >
-          <Row>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="Country"
-                name="country"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-              >
-                <Input
-                  type="text"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #d9d9d9",
-                    backgroundColor: "white",
-                  }}
-                  readOnly
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="State"
-                name="state"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-              >
-                <Input
-                  type="text"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #d9d9d9",
-                    backgroundColor: "white",
-                  }}
-                  readOnly
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="Pincode"
-                name="pinCode"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-                rules={[
-                  {
-                    pattern: /^[0-9]{6}$/,
+          <Panel
+            style={{ backgroundColor: " rgb(13,65,107)" }}
+            header={
+              <span style={{ fontWeight: "bold", color: "white" }}>
+                Location
+              </span>
+            }
+            key="Address"
+          >
+            <Row>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  label="Country"
+                  name="country"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                >
+                  <Input
+                    type="text"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d9d9d9",
+                      backgroundColor: "white",
+                    }}
+                    readOnly
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  label="State"
+                  name="state"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                >
+                  <Input
+                    type="text"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d9d9d9",
+                      backgroundColor: "white",
+                    }}
+                    readOnly
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  label="Pincode"
+                  name="pinCode"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                  rules={[
+                    {
+                      pattern: /^[0-9]{6}$/,
 
-                    message: `${t(
-                      "registration.Only 6 digit code is allowed"
-                    )}`,
-                  },
-                ]}
-              >
-                <Input onChange={handlePincodeChange} placeholder=" " />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                style={{ marginBottom: pincode ? "10px" : "0px" }}
-                name="district"
-                label="District"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-                rules={[
-                  {
-                    pattern: /^[A-Za-z\s]+$/,
-                    message: `${t("registration.No digits allowed")}`,
-                  },
-                ]}
-              >
-                {pincode == null || pincode === "" ? (
-                  <div>
-                    {" "}
-                    <Select
-                      placeholder={t("registration.Select District")}
-                      value={addressDetails.district || undefined}
-                      onChange={(value) => handleDistrictChange(value)}
-                      className="floating-label"
-                    >
-                      <Option value="Visakhapatnam">
-                        {t("registration.Visakhapatnam")}
-                      </Option>
-                      <Option value="Vizianagaram">
-                        {t("registration.Vizianagaram")}
-                      </Option>
-                      <Option value="Srikakulam">
-                        {t("registration.Srikakulam")}
-                      </Option>
-                    </Select>
-                  </div>
-                ) : (
-                  <div>
-                    <Input
-                      placeholder={t("registration.Select District")}
-                      className="input-box"
-                      value={addressDetails.district}
-                      readOnly
-                    />
-                  </div>
-                )}
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="Mandal"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-              >
-                {pincode !== null || pincode !== "" ? (
-                  <div>
-                    {mandals.length === 1 ? (
-                      <div>
-                        {" "}
+                      message: `${t(
+                        "registration.Only 6 digit code is allowed"
+                      )}`,
+                    },
+                  ]}
+                >
+                  <Input onChange={handlePincodeChange} placeholder=" " />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  style={{ marginBottom: pincode ? "10px" : "0px" }}
+                  name="district"
+                  label="District"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                  rules={[
+                    {
+                      pattern: /^[A-Za-z\s]+$/,
+                      message: `${t("registration.No digits allowed")}`,
+                    },
+                  ]}
+                >
+                  {pincode == null || pincode === "" ? (
+                    <div>
+                      {" "}
+                      <Select
+                        placeholder={t("registration.Select District")}
+                        value={addressDetails.district || undefined}
+                        onChange={(value) => handleDistrictChange(value)}
+                        className="floating-label"
+                      >
+                        <Option value="Visakhapatnam">
+                          {t("registration.Visakhapatnam")}
+                        </Option>
+                        <Option value="Vizianagaram">
+                          {t("registration.Vizianagaram")}
+                        </Option>
+                        <Option value="Srikakulam">
+                          {t("registration.Srikakulam")}
+                        </Option>
+                      </Select>
+                    </div>
+                  ) : (
+                    <div>
+                      <Input
+                        placeholder={t("registration.Select District")}
+                        className="input-box"
+                        value={addressDetails.district}
+                        readOnly
+                      />
+                    </div>
+                  )}
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  label="Mandal"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                >
+                  {pincode !== null || pincode !== "" ? (
+                    <div>
+                      {mandals.length === 1 ? (
+                        <div>
+                          {" "}
+                          <Input
+                            className="input-box"
+                            value={addressDetails.mandal}
+                            readOnly
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <Select
+                            placeholder={
+                              selectedDistrict
+                                ? t("registration.Select Mandal")
+                                : t("registration.Select District First")
+                            }
+                            value={addressDetails.mandal || null}
+                            onChange={(value) => handleMandalChange1(value)}
+                          >
+                            {mandals.map((mandal) => (
+                              <Option key={mandal} value={mandal}>
+                                {mandal}
+                              </Option>
+                            ))}
+                          </Select>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {mandals.length === 1 ? (
                         <Input
                           className="input-box"
-                          value={addressDetails.mandal}
+                          value={mandals[0]}
                           readOnly
                         />
-                      </div>
-                    ) : (
-                      <div>
+                      ) : (
                         <Select
                           placeholder={
                             selectedDistrict
@@ -1759,898 +1891,871 @@ If no road type is clearly mentioned, return "None".
                               : t("registration.Select District First")
                           }
                           value={addressDetails.mandal || null}
-                          onChange={(value) => handleMandalChange1(value)}
+                          onChange={
+                            pincode != null
+                              ? (value) =>
+                                setAddressDetails((prev) => ({
+                                  ...prev,
+                                  mandal: value,
+                                }))
+                              : (value) => handleMandalChange(value)
+                          }
+                          className="select-custom"
                         >
+                          {mandals.length === 0 && selectedDistrict && (
+                            <Option disabled>
+                              {t("registration.No data available")}
+                            </Option>
+                          )}
+
                           {mandals.map((mandal) => (
                             <Option key={mandal} value={mandal}>
                               {mandal}
                             </Option>
                           ))}
                         </Select>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    {mandals.length === 1 ? (
-                      <Input
-                        className="input-box"
-                        value={mandals[0]}
-                        readOnly
-                      />
-                    ) : (
-                      <Select
-                        placeholder={
-                          selectedDistrict
-                            ? t("registration.Select Mandal")
-                            : t("registration.Select District First")
-                        }
-                        value={addressDetails.mandal || null}
-                        onChange={
-                          pincode != null
-                            ? (value) =>
+                      )}
+                    </div>
+                  )}
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                <Form.Item
+                  label="Village"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                >
+                  {pincode === null || pincode === "" ? (
+                    <div>
+                      {" "}
+                      {villages.length === 1 ? (
+                        <div>
+                          {" "}
+                          <Input
+                            className="input-box"
+                            value={addressDetails.village}
+                            readOnly
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <Select
+                            placeholder={
+                              selectedMandal
+                                ? t("registration.Select Village")
+                                : t("registration.Select Mandal First")
+                            }
+                            value={addressDetails.village || undefined}
+                            onChange={(value) =>
                               setAddressDetails((prev) => ({
                                 ...prev,
-                                mandal: value,
+                                village: value,
                               }))
-                            : (value) => handleMandalChange(value)
-                        }
-                        className="select-custom"
-                      >
-                        {mandals.length === 0 && selectedDistrict && (
-                          <Option disabled>
-                            {t("registration.No data available")}
-                          </Option>
-                        )}
-
-                        {mandals.map((mandal) => (
-                          <Option key={mandal} value={mandal}>
-                            {mandal}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </div>
-                )}
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="Village"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-              >
-                {pincode === null || pincode === "" ? (
-                  <div>
-                    {" "}
-                    {villages.length === 1 ? (
-                      <div>
-                        {" "}
-                        <Input
-                          className="input-box"
-                          value={addressDetails.village}
-                          readOnly
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <Select
-                          placeholder={
-                            selectedMandal
-                              ? t("registration.Select Village")
-                              : t("registration.Select Mandal First")
-                          }
-                          value={addressDetails.village || undefined}
-                          onChange={(value) =>
-                            setAddressDetails((prev) => ({
-                              ...prev,
-                              village: value,
-                            }))
-                          }
-                        >
-                          {villages.map((village) => (
-                            <Option key={village} value={village}>
-                              {village}
-                            </Option>
-                          ))}
-                        </Select>{" "}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="floating-label">
-                    {villages.length === 1 ? (
-                      <div className="floating-label">
-                        {" "}
-                        <Input
-                          className="input-box"
-                          value={villages[0]}
-                          readOnly
-                        />
-                      </div>
-                    ) : (
-                      <div className="floating-label">
-                        {" "}
-                        <Select
-                          style={{
-                            height: "37px",
-                          }}
-                          placeholder={
-                            selectedMandal
-                              ? t("registration.Select Village")
-                              : t("registration.Select Mandal First")
-                          }
-                          value={addressDetails.village || undefined}
-                          onChange={
-                            pincode !== null || pincode !== ""
-                              ? (value) =>
-                                setAddressDetails((prev) => ({
-                                  ...prev,
-                                  village: value,
-                                }))
-                              : (value) => handlevillageChange(value)
-                          }
-                        >
-                          {villages.map((village) => (
-                            <Option key={village} value={village}>
-                              {village}
-                            </Option>
-                          ))}
-                        </Select>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </Form.Item>
-            </Col>
-
-
-            <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item
-                label="Landmark"
-                name="landmark"
-                labelCol={{ xs: { span: 7 } }}
-                wrapperCol={{ xs: { span: 24 } }}
-                rules={[
-                  {
-                    required: true,
-                    message: "LandMark is Mandatory",
-                  },
-                  {
-                    pattern: /^[A-Za-z\s]+$/,
-                    message: "Please enter a valid landmark with only letters and spaces.",
-                  },
-                ]}
-              >
-                <Input
-                  type="text"
-                  value={landMark}
-                  onChange={handleLandMark}
-                  placeholder="Enter the landmark"
-                  style={{
-                    width: "90%",
-                    border: "1px solid #d9d9d9",
-                    backgroundColor: "white",
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            {/* Modal with the map */}
-            <Col xs={24} sm={12} md={12} lg={8} xl={6}>
-              <Form.Item
-                label={
-                  <>
-                    <span style={{ color: "red" }}>* </span> Choose Location:
-                  </>
-                }
-                style={{ marginBottom: "40px", }}
-                labelCol={{ xs: { span: 10 } }}
-
-              >
-
-                <Popconfirm
-                  title="Choose Current Location"
-
-                  onConfirm={confirm}
-                  onCancel={cancel}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  {" "}
-
-                  <EnvironmentOutlined style={{ fontSize: '24px', color: '#0D416B', marginRight: '50px' }} />
-
-                  {/* #1890ff */}
-                </Popconfirm>
-
-
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={12} xl={6}>
-              <Form.Item
-                label="Latitude"
-                labelCol={{ xs: { span: 5 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-                style={{
-                  marginBottom: "20px",
-                  width: "100%",
-                }}
-              >
-                <Input
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                  placeholder="Enter Latitude"
-                  type="number"
-                  readOnly
-                />
-              </Form.Item>
-            </Col>
-            {/*  Longitude from here... */}
-            <Col xs={24} sm={12} md={12} lg={12} xl={6}>
-              <Form.Item
-                label="Longitude"
-                labelCol={{ xs: { span: 6 } }}
-                wrapperCol={{ xs: { span: 16 } }}
-                style={{
-
-                  marginBottom: "-10px",
-                  width: "100%",
-                }}
-              >
-                <Input
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                  placeholder="Enter Longitude"
-                  type="number"
-                  readOnly
-                />
-              </Form.Item>
-
-
-              {/* current location updatecpooradates */}
-            </Col>
-
-            {isCurrentLocation ? (
-              <CurrentLocation onCoordinatesFetched={updateCoordinates} />
-            ) : (
-              <Modal
-                title={<span style={{ fontSize: "20px" }}>Map</span>}
-                visible={isModalVisible}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                width="60%"  // Adjust modal width
-                bodyStyle={{ padding: 0 }} // Remove any padding inside the modal body
-              >
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '400px',  // Set a specific height for the container
-                }}>
-                  <MapContainer
-                    center={[latitude || 20.5937, longitude || 78.9629]}
-                    zoom={5}
-                    style={{
-                      width: '100%',
-                      height: '100%' // Make sure the map fills the container
-                    }}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    <LocationMarker />
-                  </MapContainer>
-                </div>
-              </Modal>
-            )}
-          </Row>
-        </Panel>
-
-        {/*  new code from here for maps.....*/}
-
-        <Panel
-          style={{ backgroundColor: " rgb(13,65,107)" }}
-          header={
-            <span style={{ fontWeight: "bold", color: "white" }}>
-              Amenities
-            </span>
-          }
-          key="Amenities"
-        >
-          <>
-            <Row gutter={16}>
-              <Col
-                xs={24}
-                lg={8}
-                sm={12}
-                md={12}
-                xl={6}
-
-              >
-                <Form.Item
-                  label={
-                    <>
-                      Type of Electricity{" "}
-                      <Tooltip
-                        placement="rightBottom"
-                        title={
-                          <div>
-                            <p>
-                              <strong>Choose the type of electricity supply available for the property:</strong>
-                            </p>
-                            <ul>
-                              <li>
-                                <strong>Domestic:</strong> Electricity used for household purposes such as lighting, heating, and appliances.
-                              </li>
-                              <li>
-                                <strong>Industrial:</strong> High voltage electricity typically used in factories or manufacturing units for heavy machinery.
-                              </li>
-                              <li>
-                                <strong>Commercial:</strong> Electricity used in business establishments such as offices, shops, and malls.
-                              </li>
-                              <li>
-                                <strong>Residential:</strong> Electricity supplied to residential complexes or multi-family housing units.
-                              </li>
-                              <li>
-                                <strong>None:</strong> Indicates that no electricity supply is available for the property.
-                              </li>
-                            </ul>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: 2 }} />
-                      </Tooltip>
-                    </>
-                  }
-                  name="electricity"
-                  rules={[
-                    { required: true, message: "Please select a Electricity type!" },
-                  ]}
-                  labelCol={{
-                    xs: { span: 12 },
-                    sm: { span: 8.5 },
-                    xl: { span: 12 },
-                    lg: { span: 16 },
-                  }}
-                  wrapperCol={{
-                    xs: { span: 8 },
-                    sm: { span: 24 },
-                    xl: { span: 24 },
-                    lg: { span: 24 },
-                  }}
-                  className="road"
-                >
-                  <Select placeholder="Select Type of Electricity">
-                    <Option value="domestic">Domestic</Option>
-                    <Option value="industrial">Industrial</Option>
-                    <Option value="commercial">Commercial</Option>
-                    <Option value="residential">Residential</Option>
-                    <Option value="none">None</Option>
-                  </Select>
+                            }
+                          >
+                            {villages.map((village) => (
+                              <Option key={village} value={village}>
+                                {village}
+                              </Option>
+                            ))}
+                          </Select>{" "}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="floating-label">
+                      {villages.length === 1 ? (
+                        <div className="floating-label">
+                          {" "}
+                          <Input
+                            className="input-box"
+                            value={villages[0]}
+                            readOnly
+                          />
+                        </div>
+                      ) : (
+                        <div className="floating-label">
+                          {" "}
+                          <Select
+                            style={{
+                              height: "37px",
+                            }}
+                            placeholder={
+                              selectedMandal
+                                ? t("registration.Select Village")
+                                : t("registration.Select Mandal First")
+                            }
+                            value={addressDetails.village || undefined}
+                            onChange={
+                              pincode !== null || pincode !== ""
+                                ? (value) =>
+                                  setAddressDetails((prev) => ({
+                                    ...prev,
+                                    village: value,
+                                  }))
+                                : (value) => handlevillageChange(value)
+                            }
+                          >
+                            {villages.map((village) => (
+                              <Option key={village} value={village}>
+                                {village}
+                              </Option>
+                            ))}
+                          </Select>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </Form.Item>
               </Col>
 
 
-              <Col
-                span={6}
-                xs={24}
-                lg={5}
-                sm={12}
-                md={5}
-                xl={5}
-
-                style={{ marginBottom: "-25px" }}
-              >
+              <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                 <Form.Item
-                  label={
-                    <>
-                      Bore Facility{" "}
-                      <Tooltip
-                        placement="rightbottom"
-                        title={
-                          <div>
-                            <p>
-                              <strong>
-                                Confirm if there is a Bore Facility by toggling
-                                'Yes'.
-                              </strong>
-                            </p>
-                            <p>
-                              <strong>
-                                Types of Bore Facilities for Agricultural
-                                Fields:
-                              </strong>
-                            </p>
-                            <ul>
-                              <li>
-                                <strong>Tube Wells</strong>
-                              </li>
-                              <li>
-                                <strong>Open Wells</strong>
-                              </li>
-                              <li>
-                                <strong>Bore Wells</strong>
-                              </li>
-                              <li>
-                                <strong>Solar Bore Pumps</strong>
-                              </li>
-                            </ul>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: 2 }} />
-                      </Tooltip>
-                    </>
-                  }
-                  name="boreWell"
-                  labelCol={{
-                    xs: { span: 12 },
-                    sm: { span: 8.5 },
-                    xl: { span: 10 },
-                    lg: { span: 16 },
-                  }}
-                  wrapperCol={{
-                    xs: { span: 8 },
-                    sm: { span: 24 },
-                    xl: { span: 24 },
-                    lg: { span: 24 },
-                  }}
-                  valuePropName="checked"
-                >
-                  <Switch onChange={handleBoreChange} defaultChecked={false} size="large" />
-                </Form.Item>
-              </Col>
-
-              <Col
-
-                xs={24}
-                lg={6}
-                sm={12}
-                md={12}
-                xl={6}
-
-                style={{ marginBottom: "-25px" }}
-              >
-                <Form.Item
-                  label={
-                    <>
-                      Storage Facility{" "}
-                      <Tooltip
-                        placement="rightbottom"
-                        title={
-                          <div>
-                            <p>
-                              <strong>
-                                Confirm if there is a Storage Facility by
-                                toggling 'Yes'.
-                              </strong>
-                            </p>
-                            <p>
-                              <strong>
-                                Types of Storage Facilities for Agriculture:
-                              </strong>
-                            </p>
-                            <ul>
-                              <li>
-                                <strong>Warehouses</strong>
-                              </li>
-                              <li>
-                                <strong>Cold Storage</strong>
-                              </li>
-                              <li>
-                                <strong>Silos</strong>
-                              </li>
-                              <li>
-                                <strong>Godowns</strong>
-                              </li>
-                              <li>
-                                <strong>Refrigerated Containers</strong>
-                              </li>
-                            </ul>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: 2 }} />
-                      </Tooltip>
-                    </>
-                  }
-                  name="storageFacility"
-                  labelCol={{
-                    xs: { span: 12 },
-                    sm: { span: 8.5 },
-                    xl: { span: 10 },
-                    lg: { span: 16 },
-                  }}
-                  wrapperCol={{
-                    xs: { span: 8 },
-                    sm: { span: 24 },
-                    xl: { span: 24 },
-                    lg: { span: 24 },
-                  }}
-                  valuePropName="checked"
-                >
-                  <Switch defaultChecked={false} size="large" />
-                </Form.Item>
-              </Col>
-
-              <Col
-                xs={24}
-                lg={6}
-                sm={12}
-                md={12}
-                xl={6}
-
-              >
-                <Form.Item
-                  label={
-                    <>
-                      Road Proximity{" "}
-                      <Tooltip
-                        placement="rightbottom"
-                        title={
-                          <div>
-                            <p>
-                              <strong>Enter the Distance to Nearest Road in kilometers</strong>
-                            </p>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: 2 }} />
-                      </Tooltip>
-                    </>
-                  }
-                  name="distanceFromRoad"
+                  label="Landmark"
+                  name="landmark"
+                  labelCol={{ xs: { span: 7 } }}
+                  wrapperCol={{ xs: { span: 24 } }}
                   rules={[
                     {
                       required: true,
-                      message: "Please enter a size",
+                      message: "LandMark is Mandatory",
                     },
-
                     {
-                      validator: (_, value) => {
-                        if (value && value.toString().length > 2) {
-                          return Promise.reject(new Error("Please enter a number with up to 2 digits"));
-                        }
-                        return Promise.resolve();
-                      },
+                      pattern: /^[A-Za-z\s]+$/,
+                      message: "Please enter a valid landmark with only letters and spaces.",
                     },
                   ]}
-                  labelCol={{
-                    xs: { span: 12 },
-                    sm: { span: 8.5 },
-                    xl: { span: 12 },
-                    lg: { span: 16 },
-                  }}
-                  wrapperCol={{
-                    xs: { span: 8 },
-                    sm: { span: 24 },
-                    xl: { span: 24 },
-                    lg: { span: 24 },
-                  }}
-                  className="road"
                 >
                   <Input
-                    type="number"
-                    placeholder="Enter distance in Kms"
-                    addonAfter="/km"
+                    type="text"
+                    value={landMark}
+                    onChange={handleLandMark}
+                    placeholder="Enter the landmark"
+                    style={{
+                      width: "90%",
+                      border: "1px solid #d9d9d9",
+                      backgroundColor: "white",
+                    }}
                   />
                 </Form.Item>
-
               </Col>
 
-              <Col
-                xs={24}
-                lg={8}
-                sm={12}
-                md={12}
-                xl={6}
-
-              >
+              {/* Modal with the map */}
+              <Col xs={24} sm={12} md={12} lg={8} xl={6}>
                 <Form.Item
                   label={
                     <>
-                      Near By Type of Road
-                      <Tooltip
-                        placement="rightBottom"
-                        title={
-                          <div>
-                            <p>
-                              <strong>
-                                Select the type of road closest to the property.
-                              </strong>
-                            </p>
-                          </div>
-                        }
-                      >
-                        <InfoCircleOutlined style={{ marginLeft: 2 }} />
-                      </Tooltip>
+                      <span style={{ color: "red" }}>* </span> Choose Location:
                     </>
                   }
-                  name="roadType"
-                  rules={[
-                    { required: true, message: "Please select a road type!" },
-                  ]}
-                  labelCol={{
-                    xs: { span: 12 },
-                    sm: { span: 12 },
-                    xl: { span: 14 },
-                    lg: { span: 16 },
-                  }}
-                  wrapperCol={{
-                    xs: { span: 8 },
-                    sm: { span: 24 },
-                    xl: { span: 24 },
-                    lg: { span: 24 },
-                  }}
-                  className="road"
+                  style={{ marginBottom: "40px", }}
+                  labelCol={{ xs: { span: 10 } }}
+
                 >
-                  <Select placeholder="Select road proximity">
-                    <Option value="rnb"> R&B</Option>
-                    <Option value="highway">Highway</Option>
-                    <Option value="panchayat">Panchayat</Option>
-                    <Option value="village">Village</Option>
-                    <Option value="none">None</Option>
-                  </Select>
+
+                  <Popconfirm
+                    title="Choose Current Location"
+
+                    onConfirm={confirm}
+                    onCancel={cancel}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    {" "}
+
+                    <EnvironmentOutlined style={{ fontSize: '24px', color: '#0D416B', marginRight: '50px' }} />
+
+                    {/* #1890ff */}
+                  </Popconfirm>
+
+
                 </Form.Item>
               </Col>
-              <Col xs={24} lg={18} sm={24} md={24} xl={17}
-              >
-                {skills.map((skill) => (
-                  <Tag
-                    key={skill}
-                    closable
-                    onClose={() => handleRemoveSkill(skill)}
-                    style={{ marginBottom: "5px" }}
-                  >
-                    {skill}
-                  </Tag>
-                ))}
-                <div
+              <Col xs={24} sm={12} md={12} lg={12} xl={6}>
+                <Form.Item
+                  label="Latitude"
+                  labelCol={{ xs: { span: 5 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
                   style={{
-                    display: "flex",
+                    marginBottom: "20px",
+                    width: "100%",
                   }}
                 >
-                  <span style={{ marginRight: "10px" }}>
-                    Add Extra Amenities:
-                  </span>
-                  <Input.TextArea
-                    type="text"
-                    name="extraAmenities"
-                    placeholder="Add Extra Amenities"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onPressEnter={handleInputConfirm}
-                    rows={2}
-                    style={{ width: "1000px" }}
+                  <Input
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                    placeholder="Enter Latitude"
+                    type="number"
+                    readOnly
                   />
-                </div>
+                </Form.Item>
+              </Col>
+              {/*  Longitude from here... */}
+              <Col xs={24} sm={12} md={12} lg={12} xl={6}>
+                <Form.Item
+                  label="Longitude"
+                  labelCol={{ xs: { span: 6 } }}
+                  wrapperCol={{ xs: { span: 16 } }}
+                  style={{
+
+                    marginBottom: "-10px",
+                    width: "100%",
+                  }}
+                >
+                  <Input
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                    placeholder="Enter Longitude"
+                    type="number"
+                    readOnly
+                  />
+                </Form.Item>
+
+
+                {/* current location updatecpooradates */}
               </Col>
 
-
+              {isCurrentLocation ? (
+                <CurrentLocation onCoordinatesFetched={updateCoordinates} />
+              ) : (
+                <Modal
+                  title={<span style={{ fontSize: "20px" }}>Map</span>}
+                  visible={isModalVisible}
+                  onOk={handleOk}
+                  onCancel={handleCancel}
+                  width="60%"  // Adjust modal width
+                  bodyStyle={{ padding: 0 }} // Remove any padding inside the modal body
+                >
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '400px',  // Set a specific height for the container
+                  }}>
+                    <MapContainer
+                      center={[latitude || 20.5937, longitude || 78.9629]}
+                      zoom={5}
+                      style={{
+                        width: '100%',
+                        height: '100%' // Make sure the map fills the container
+                      }}
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <LocationMarker />
+                    </MapContainer>
+                  </div>
+                </Modal>
+              )}
             </Row>
-          </>
-        </Panel>
+          </Panel>
 
-        <Panel
-          style={{ backgroundColor: "rgb(13,65,107)" }}
-          header={
-            <span style={{ fontWeight: "bold", color: "white" }}>
-              Upload Photos/Video
-            </span>
-          }
-          key="uploadPhotos"
-        >
-          <>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                rowGap: "40px",
-                columnGap: "80px",
-                maxHeight: "200px",
-                overflowY: "auto",
-                padding: "10px",
-              }}
-            >
-              {imageUrls
-                .slice()
-                .reverse()
-                .map((url, index) => (
+          {/*  new code from here for maps.....*/}
+
+          <Panel
+            style={{ backgroundColor: " rgb(13,65,107)" }}
+            header={
+              <span style={{ fontWeight: "bold", color: "white" }}>
+                Amenities
+              </span>
+            }
+            key="Amenities"
+          >
+            <>
+              <Row gutter={16}>
+                <Col
+                  xs={24}
+                  lg={8}
+                  sm={12}
+                  md={12}
+                  xl={6}
+
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        Type of Electricity{" "}
+                        <Tooltip
+                          placement="rightBottom"
+                          title={
+                            <div>
+                              <p>
+                                <strong>Choose the type of electricity supply available for the property:</strong>
+                              </p>
+                              <ul>
+                                <li>
+                                  <strong>Domestic:</strong> Electricity used for household purposes such as lighting, heating, and appliances.
+                                </li>
+                                <li>
+                                  <strong>Industrial:</strong> High voltage electricity typically used in factories or manufacturing units for heavy machinery.
+                                </li>
+                                <li>
+                                  <strong>Commercial:</strong> Electricity used in business establishments such as offices, shops, and malls.
+                                </li>
+                                <li>
+                                  <strong>Residential:</strong> Electricity supplied to residential complexes or multi-family housing units.
+                                </li>
+                                <li>
+                                  <strong>None:</strong> Indicates that no electricity supply is available for the property.
+                                </li>
+                              </ul>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="electricity"
+                    rules={[
+                      { required: true, message: "Please select a Electricity type!" },
+                    ]}
+                    labelCol={{
+                      xs: { span: 12 },
+                      sm: { span: 8.5 },
+                      xl: { span: 12 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    className="road"
+                  >
+                    <Select placeholder="Select Type of Electricity">
+                      <Option value="domestic">Domestic</Option>
+                      <Option value="industrial">Industrial</Option>
+                      <Option value="commercial">Commercial</Option>
+                      <Option value="residential">Residential</Option>
+                      <Option value="none">None</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+
+                <Col
+                  span={6}
+                  xs={24}
+                  lg={5}
+                  sm={12}
+                  md={5}
+                  xl={5}
+
+                  style={{ marginBottom: "-25px" }}
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        Bore Facility{" "}
+                        <Tooltip
+                          placement="rightbottom"
+                          title={
+                            <div>
+                              <p>
+                                <strong>
+                                  Confirm if there is a Bore Facility by toggling
+                                  'Yes'.
+                                </strong>
+                              </p>
+                              <p>
+                                <strong>
+                                  Types of Bore Facilities for Agricultural
+                                  Fields:
+                                </strong>
+                              </p>
+                              <ul>
+                                <li>
+                                  <strong>Tube Wells</strong>
+                                </li>
+                                <li>
+                                  <strong>Open Wells</strong>
+                                </li>
+                                <li>
+                                  <strong>Bore Wells</strong>
+                                </li>
+                                <li>
+                                  <strong>Solar Bore Pumps</strong>
+                                </li>
+                              </ul>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="boreWell"
+                    labelCol={{
+                      xs: { span: 12 },
+                      sm: { span: 8.5 },
+                      xl: { span: 10 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    valuePropName="checked"
+                  >
+                    <Switch onChange={handleBoreChange} defaultChecked={false} size="large" />
+                  </Form.Item>
+                </Col>
+
+                <Col
+
+                  xs={24}
+                  lg={6}
+                  sm={12}
+                  md={12}
+                  xl={6}
+
+                  style={{ marginBottom: "-25px" }}
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        Storage Facility{" "}
+                        <Tooltip
+                          placement="rightbottom"
+                          title={
+                            <div>
+                              <p>
+                                <strong>
+                                  Confirm if there is a Storage Facility by
+                                  toggling 'Yes'.
+                                </strong>
+                              </p>
+                              <p>
+                                <strong>
+                                  Types of Storage Facilities for Agriculture:
+                                </strong>
+                              </p>
+                              <ul>
+                                <li>
+                                  <strong>Warehouses</strong>
+                                </li>
+                                <li>
+                                  <strong>Cold Storage</strong>
+                                </li>
+                                <li>
+                                  <strong>Silos</strong>
+                                </li>
+                                <li>
+                                  <strong>Godowns</strong>
+                                </li>
+                                <li>
+                                  <strong>Refrigerated Containers</strong>
+                                </li>
+                              </ul>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="storageFacility"
+                    labelCol={{
+                      xs: { span: 12 },
+                      sm: { span: 8.5 },
+                      xl: { span: 10 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    valuePropName="checked"
+                  >
+                    <Switch defaultChecked={false} size="large" />
+                  </Form.Item>
+                </Col>
+
+                <Col
+                  xs={24}
+                  lg={6}
+                  sm={12}
+                  md={12}
+                  xl={6}
+
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        Road Proximity{" "}
+                        <Tooltip
+                          placement="rightbottom"
+                          title={
+                            <div>
+                              <p>
+                                <strong>Enter the Distance to Nearest Road in kilometers</strong>
+                              </p>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="distanceFromRoad"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter a size",
+                      },
+
+                      {
+                        validator: (_, value) => {
+                          if (value && value.toString().length > 2) {
+                            return Promise.reject(new Error("Please enter a number with up to 2 digits"));
+                          }
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
+                    labelCol={{
+                      xs: { span: 12 },
+                      sm: { span: 8.5 },
+                      xl: { span: 12 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    className="road"
+                  >
+                    <Input
+                      type="number"
+                      placeholder="Enter distance in Kms"
+                      addonAfter="/km"
+                    />
+                  </Form.Item>
+
+                </Col>
+
+                <Col
+                  xs={24}
+                  lg={8}
+                  sm={12}
+                  md={12}
+                  xl={6}
+
+                >
+                  <Form.Item
+                    label={
+                      <>
+                        Near By Type of Road
+                        <Tooltip
+                          placement="rightBottom"
+                          title={
+                            <div>
+                              <p>
+                                <strong>
+                                  Select the type of road closest to the property.
+                                </strong>
+                              </p>
+                            </div>
+                          }
+                        >
+                          <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                        </Tooltip>
+                      </>
+                    }
+                    name="roadType"
+                    rules={[
+                      { required: true, message: "Please select a road type!" },
+                    ]}
+                    labelCol={{
+                      xs: { span: 12 },
+                      sm: { span: 12 },
+                      xl: { span: 14 },
+                      lg: { span: 16 },
+                    }}
+                    wrapperCol={{
+                      xs: { span: 8 },
+                      sm: { span: 24 },
+                      xl: { span: 24 },
+                      lg: { span: 24 },
+                    }}
+                    className="road"
+                  >
+                    <Select placeholder="Select road proximity">
+                      <Option value="rnb"> R&B</Option>
+                      <Option value="highway">Highway</Option>
+                      <Option value="panchayat">Panchayat</Option>
+                      <Option value="village">Village</Option>
+                      <Option value="none">None</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} lg={18} sm={24} md={24} xl={17}
+                >
+                  {skills.map((skill) => (
+                    <Tag
+                      key={skill}
+                      closable
+                      onClose={() => handleRemoveSkill(skill)}
+                      style={{ marginBottom: "5px" }}
+                    >
+                      {skill}
+                    </Tag>
+                  ))}
                   <div
-                    key={index}
                     style={{
-                      position: "relative",
-                      width: "25%",
                       display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      flexDirection: "column",
                     }}
                   >
-                    <img
-                      src={url}
-                      alt={`Uploaded ${imageUrls.length - 1 - index}`}
+                    <span style={{ marginRight: "10px" }}>
+                      Add Extra Amenities:
+                    </span>
+                    <Input.TextArea
+                      type="text"
+                      name="extraAmenities"
+                      placeholder="Add Extra Amenities"
+                      value={inputValue}
+                      onChange={handleInputChange}
+                      onPressEnter={handleInputConfirm}
+                      rows={2}
+                      style={{ width: "1000px" }}
+                    />
+                  </div>
+                </Col>
+
+
+              </Row>
+            </>
+          </Panel>
+
+          <Panel
+            style={{ backgroundColor: "rgb(13,65,107)" }}
+            header={
+              <span style={{ fontWeight: "bold", color: "white" }}>
+                Upload Photos/Video
+              </span>
+            }
+            key="uploadPhotos"
+          >
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  rowGap: "40px",
+                  columnGap: "80px",
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  padding: "10px",
+                }}
+              >
+                {imageUrls
+                  .slice()
+                  .reverse()
+                  .map((url, index) => (
+                    <div
+                      key={index}
                       style={{
-                        width: "45%",
-                        height: screens.xs ? "40px" : "50px",
+                        position: "relative",
+                        width: "25%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <img
+                        src={url}
+                        alt={`Uploaded ${imageUrls.length - 1 - index}`}
+                        style={{
+                          width: "45%",
+                          height: screens.xs ? "40px" : "50px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                      />
+
+                      <DeleteOutlined
+                        style={{
+                          color: "red",
+                          position: "absolute",
+                          top: "5px",
+                          right: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          deletingImage(imageUrls.length - 1 - index);
+                        }}
+                      />
+                    </div>
+                  ))}
+              </div>
+              {console.log("Video URL:", videoUrl)}
+              {videoUrl && (
+                <>
+                  {console.log("Video URL:", videoUrl)}
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "flex",
+
+                    }}
+                  >
+                    <video
+                      src={videoUrl}
+                      controls
+                      alt="Video Not Found"
+                      style={{
+                        width: "50%",
+                        height: screens.xs ? "80px" : "120px", // Adjust for video height
                         objectFit: "cover",
                         borderRadius: "8px",
                       }}
                     />
-
                     <DeleteOutlined
                       style={{
                         color: "red",
                         position: "absolute",
                         top: "5px",
-                        right: "5px",
+                        right: "500px", // Position the delete icon near the top-right of the video
                         cursor: "pointer",
+                        zIndex: 1, // Ensure it appears above the video
                       }}
                       onClick={() => {
-                        deletingImage(imageUrls.length - 1 - index);
+                        deletingVideo();
                       }}
                     />
                   </div>
-                ))}
-            </div>
-            {console.log("Video URL:", videoUrl)}
-            {videoUrl && (
-              <>
-                {console.log("Video URL:", videoUrl)}
-                <div
-                  style={{
-                    position: "relative",
-                    display: "flex",
+                </>
+              )}
+              {isUploading && (
+                <>
+                  <Progress
+                    percent={uploadProgress}
+                    status={uploadProgress < 100 ? "active" : "success"}
+                    style={{
+                      marginTop: "10px",
+                      width: "200px",
+                      alignItems: "center",
+                    }}
+                  />
+                  <span>Please wait, Image is uploading...</span>
+                </>
+              )}
 
-                  }}
-                >
-                  <video
-                    src={videoUrl}
-                    controls
-                    alt="Video Not Found"
-                    style={{
-                      width: "50%",
-                      height: screens.xs ? "80px" : "120px", // Adjust for video height
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <DeleteOutlined
-                    style={{
-                      color: "red",
-                      position: "absolute",
-                      top: "5px",
-                      right: "500px", // Position the delete icon near the top-right of the video
-                      cursor: "pointer",
-                      zIndex: 1, // Ensure it appears above the video
-                    }}
-                    onClick={() => {
-                      deletingVideo();
-                    }}
-                  />
-                </div>
-              </>
-            )}
-            {isUploading && (
-              <>
-                <Progress
-                  percent={uploadProgress}
-                  status={uploadProgress < 100 ? "active" : "success"}
-                  style={{
-                    marginTop: "10px",
-                    width: "200px",
-                    alignItems: "center",
-                  }}
-                />
-                <span>Please wait, Image is uploading...</span>
-              </>
-            )}
-
-            <Row gutter={16} style={{ marginTop: "10px" }}>
-              <Col span={12}>
-                <label htmlFor="upload-input">
-                  <input
-                    id="upload-input"
-                    type="file"
-                    onChange={handleImageUpload1}
-                    accept="image/jpeg, image/png, image/jpg, image/gif,video/mp4, video/mkv, video/avi, video/webm"
-                    style={{
-                      width: "1px",
-                      height: "1px",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      document.getElementById("upload-input").click()
-                    }
-                    style={{ cursor: "pointer" }}
-                  >
-                    <UploadOutlined /> Upload Image / Video
-                  </button>
-                  <Tooltip
-                    title={
-                      <>
-                        <strong>Allowed Formats:</strong>
-                        <ul style={{ paddingLeft: 20 }}>
-                          <li>JPEG</li>
-                          <li>PNG</li>
-                          <li>JPG</li>
-                          <li>GIF</li>
-                          <li>mp4</li>
-                        </ul>
-                      </>
-                    }
-                  >
-                    <InfoCircleOutlined
-                      style={{ marginLeft: 8, cursor: "pointer" }}
+              <Row gutter={16} style={{ marginTop: "10px" }}>
+                <Col span={12}>
+                  <label htmlFor="upload-input">
+                    <input
+                      id="upload-input"
+                      type="file"
+                      onChange={handleImageUpload1}
+                      accept="image/jpeg, image/png, image/jpg, image/gif,video/mp4, video/mkv, video/avi, video/webm"
+                      style={{
+                        width: "1px",
+                        height: "1px",
+                      }}
                     />
-                  </Tooltip>
-                </label>
-              </Col>
-
-              <Row justify="center" align="middle" style={{ marginBottom: "4%" }}>
-                <Col>
-                  <Button onClick={isRecording ? stopRecording : startRecording} className={`px-6 py-3 rounded-lg font-medium ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white transition`}>
-                    {isRecording ? "Stop Recording" : "Start Recording"}
-                  </Button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        document.getElementById("upload-input").click()
+                      }
+                      style={{ cursor: "pointer" }}
+                    >
+                      <UploadOutlined /> Upload Image / Video
+                    </button>
+                    <Tooltip
+                      title={
+                        <>
+                          <strong>Allowed Formats:</strong>
+                          <ul style={{ paddingLeft: 20 }}>
+                            <li>JPEG</li>
+                            <li>PNG</li>
+                            <li>JPG</li>
+                            <li>GIF</li>
+                            <li>mp4</li>
+                          </ul>
+                        </>
+                      }
+                    >
+                      <InfoCircleOutlined
+                        style={{ marginLeft: 8, cursor: "pointer" }}
+                      />
+                    </Tooltip>
+                  </label>
                 </Col>
+
+                <Row justify="center" align="middle" style={{ marginBottom: "4%" }}>
+                  <Col>
+                    <Button onClick={isRecording ? stopRecording : startRecording} className={`px-6 py-3 rounded-lg font-medium ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white transition`}>
+                      {isRecording ? "Stop Recording" : "Start Recording"}
+                    </Button>
+                  </Col>
+                </Row>
+                {audioURL && (
+                  <div className="mt-10">
+                    <audio controls src={audioURL} className="w-full"></audio>
+                    {/* <a href={audioURL} download={`${form.getFieldValue("userName") || "recording"}.wav`} className="block text-blue-600 underline text-center mt-2">Download Recording</a> */}
+                  </div>
+                )}
+                {(audioURL || cloudinaryURL) && (
+                  <Button onClick={clearRecording} className="mt-5 w-full px-4 py-2 bg-gray-500 text-white rounded-lg" style={{ marginLeft: "70%" }}>
+                    Clear Recording
+                  </Button>
+                )}
               </Row>
-              {audioURL && (
-                <div className="mt-10">
-                  <audio controls src={audioURL} className="w-full"></audio>
-                  {/* <a href={audioURL} download={`${form.getFieldValue("userName") || "recording"}.wav`} className="block text-blue-600 underline text-center mt-2">Download Recording</a> */}
-                </div>
-              )}
-              {(audioURL || cloudinaryURL) && (
-                <Button onClick={clearRecording} className="mt-5 w-full px-4 py-2 bg-gray-500 text-white rounded-lg" style={{ marginLeft: "70%" }}>
-                  Clear Recording
-                </Button>
-              )}
-            </Row>
 
-          </>
-        </Panel>
+            </>
+          </Panel>
 
-      </Collapse>
-     
+        </Collapse>
 
-      <div style={{ marginTop: "2%", display: "flex", gap: "20px", float: "right", marginRight: "120px" }}>
-        <div>
-          <Form.Item>
-            <Button
-              onClick={onFinish}
-              style={{
-                backgroundColor: "#0D416B",
-                color: "white",
-                marginLeft: "20%",
-              }}
-              loading={loading} // Add loading state to the button
-            >
-              submit{/* Optional: Display spinner inside the button */}
-            </Button>
 
-          </Form.Item>
+        <div style={{ marginTop: "2%", display: "flex", gap: "20px", float: "right", marginRight: "120px" }}>
+          <div>
+            <Form.Item>
+              <Button
+                onClick={onFinish}
+                style={{
+                  backgroundColor: "#0D416B",
+                  color: "white",
+                  marginLeft: "20%",
+                }}
+                loading={loading} // Add loading state to the button
+              >
+                submit{/* Optional: Display spinner inside the button */}
+              </Button>
+
+            </Form.Item>
+          </div>
+          <div>
+            <Form.Item>
+              <Button
+
+                onClick={() => setShowFormType(null)}
+                style={{
+                  backgroundColor: "lightgray"
+                }}
+              >
+                Cancel
+              </Button>
+            </Form.Item>
+          </div>
         </div>
-        <div>
-          <Form.Item>
-            <Button
-
-              onClick={() => setShowFormType(null)}
-              style={{
-                backgroundColor: "lightgray"
-              }}
-            >
-              Cancel
-            </Button>
-          </Form.Item>
-        </div>
-      </div>
-    </Form >
+      </Form >
     </>
   );
 }
 
-export default AddProperty;
+export default AddProperty; 

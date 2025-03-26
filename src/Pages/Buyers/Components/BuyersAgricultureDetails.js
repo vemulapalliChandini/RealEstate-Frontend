@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback} from "react";
 import { Row, Col, Carousel, Card, Button, Modal, Tooltip, Grid, Spin, Form, Input } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import moment from "moment";
@@ -78,12 +78,13 @@ const BuyersAgricultureDetails = () => {
   }, []);
 
   const navigate = useNavigate();
+  const role1=localStorage.getItem("role");
   useEffect(() => {
     const role = localStorage.getItem("role");
     setRole(Number(role));
 
 
-  }, [localStorage.getItem("role")]);
+  }, [role1]);
   const [showBalloons, setShowBalloons] = useState(true);
 
   useEffect(() => {
@@ -93,21 +94,7 @@ const BuyersAgricultureDetails = () => {
 
     return () => clearTimeout(timer);
   }, []);
-  const fetchData = async (id) => {
-    setLoading(true);
-    try {
-      const response = await _get(`/deal/customerInterest/${id}`);
-      console.log(response.data.data[0]);
-      const data = response.data.data[0];
-      console.log(data);
-      setProperties(data);
-      setShownInterest(data.interestIn);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
   // const handleShowInterest = async () => {
   //   setShowInterestButton(false); // Temporarily disable the button
@@ -266,10 +253,59 @@ const BuyersAgricultureDetails = () => {
     setIsAuctionViewModalVisible(false);
     setSelectedProperty(null);
   };
+
+  const fetchData = useCallback(async (id) => {
+    setLoading(true);
+    try {
+      const response = await _get(`/deal/customerInterest/${id}`);
+      console.log(response.data.data[0]);
+      const data = response.data.data[0];
+      console.log(data);
+      setProperties(data);
+      setShownInterest(data.interestIn);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading, setProperties, setShownInterest]);
+const fetchProperty = useCallback(async () => {
+  try {
+    const response = await _get(`/property/getpropbyid/Agricultural/${id}`);
+    setUserId(response.data.userId);
+    console.log("get", response.data);
+    setProperty(response.data);
+
+    // Check if auctionData exists and has at least one element before accessing its properties
+    if (response.data?.auctionData && response.data.auctionData.length > 0) {
+      const endDate = response.data.auctionData[0].endDate;
+      const nextDay = moment(endDate).add(1, "days");
+      const today = moment();
+
+      if (today.isBefore(nextDay)) {
+        setShowNextDay(true);
+        console.log("✅ Showing balloons");
+      } else {
+        setShowNextDay(false);
+        console.log("❌ Hiding balloons");
+      }
+    } else {
+      console.log("Auction data not available or empty");
+    }
+
+    setShownInterest(response.data.interestedIn);
+    setIsPropertyOnHold(response.data.propertyOnHold);
+    console.log(response.data.propertyOnHold);
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching property:", error);
+    setLoading(false);
+  }
+}, [id, setUserId, setProperty, setShowNextDay, setShownInterest, setIsPropertyOnHold, setLoading]);
   const toggleWishlist = async (item) => {
     console.log(properties);
     console.log(item);
-    let res = "";
+    // let res = "";
     try {
       let propertyType = "Agricultural land";
 
@@ -299,7 +335,7 @@ const BuyersAgricultureDetails = () => {
 
 
       // Send the request
-      const res = await _post(
+    await _post(
         "/deal/createDeal",
         payload,
         `${item.landDetails.title} added to wishlist`, // Success message
@@ -327,27 +363,48 @@ const BuyersAgricultureDetails = () => {
       console.error("Error assigning agents:", error);
     }
   };
-  useEffect(() => {
-    // Always call fetchProperty
-    fetchProperty();
+  const [agentrole, setAgentRole] = useState(null);
 
-    // Conditionally call fetchData if role is 3
-    if (role === 3 || agentrole === 11) {
-      fetchData();
-    }
-
-    // Logging for debugging purposes
+  const countViews = useCallback(async () => {
+    console.log("I am still in this page");
     console.log(id);
-    console.log(properties);
+  
+    try {
+      const response = await _put(`views/updateViewCount`, {
+        propertyId: id,
+        propertyType: "Agriculture",
+      });
+  
+      if (response.data) {
+        setViewsCount(response.data.viewsCount || 0); // Update the views count in state
+      }
+  
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error updating view count:", error);
+    }
+  }, [id, setViewsCount]);
+useEffect(() => {
+  // Always call fetchProperty
+  fetchProperty();
 
-    // Set up the interval for counting views
-    const interval = setTimeout(() => {
-      countViews();
-    }, 2);
+  // Conditionally call fetchData if role is 3 or agentrole is 11
+  if (role === 3 || agentrole === 11) {
+    fetchData();
+  }
 
-    // Clean up the interval
-    return () => clearInterval(interval);
-  }, [role]); // Add role as a dependency if it can change
+  // Logging for debugging purposes
+  console.log(id);
+  console.log(properties);
+
+  // Set up the timeout for counting views
+  const timeout = setTimeout(() => {
+    countViews();
+  }, 2);
+
+  // Clean up the timeout
+  return () => clearTimeout(timeout);
+}, [role, agentrole, id, properties, fetchProperty, fetchData, countViews]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -357,69 +414,21 @@ const BuyersAgricultureDetails = () => {
     return () => clearTimeout(timer);
   }, []);
   console.log(ShownInterest);
-  const countViews = async () => {
-    console.log("I am still in this page");
-    console.log(id);
+ 
 
-    try {
-      const response = await _put(`views/updateViewCount`, {
-        propertyId: id,
-        propertyType: "Agriculture",
-      });
-
-      if (response.data) {
-        setViewsCount(response.data.viewsCount || 0); // Update the views count in state
-      }
-
-      console.log(response.data);
-    } catch (error) { }
-  };
-
-  const fetchProperty = async () => {
-    try {
-      const response = await _get(`/property/getpropbyid/Agricultural/${id}`);
-      setUserId(response.data.userId);
-      console.log("get", response.data);
-      setProperty(response.data);
-
-      // Check if auctionData exists and has at least one element before accessing its properties
-      if (response.data?.auctionData && response.data.auctionData.length > 0) {
-        const endDate = response.data.auctionData[0].endDate;
-        const nextDay = moment(endDate).add(1, "days");
-        const today = moment();
-
-        if (today.isBefore(nextDay)) {
-          setShowNextDay(true);
-          console.log("✅ Showing balloons");
-        } else {
-          setShowNextDay(false);
-          console.log("❌ Hiding balloons");
-        }
-      } else {
-        console.log("Auction data not available or empty");
-      }
-
-      setShownInterest(response.data.interestedIn);
-      setIsPropertyOnHold(response.data.propertyOnHold);
-      console.log(response.data.propertyOnHold);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching property:", error);
-      setLoading(false);
-    }
-  };
+ 
 
   const fetchCropDetails = () => {
     const details = `This land is capable to cultivate crops like ${property.landDetails.crops}`;
     setCropDetails(details);
   };
-  const [agentrole, setAgentRole] = useState(null);
+  const role2=localStorage.getItem("agentrole");
   useEffect(() => {
     const storedRole = localStorage.getItem("agentrole");
     if (storedRole) {
       setAgentRole(parseInt(storedRole));  // Parse and store the agent role
     }
-  }, [localStorage.getItem("agentrole")]);
+  }, [role2]);
   if (loading) return <div>Loading...</div>;
   const updatedAt = property?.createdAt;
   console.log("Deepika", updatedAt
@@ -810,7 +819,7 @@ const BuyersAgricultureDetails = () => {
                   }}
 
                   extra={
-                    (role == 3 || agentrole === 11) && (
+                    (role === 3 || agentrole === 11) && (
                       <>
                         {isPropertyOnHold === "no" ? (
                           <Button

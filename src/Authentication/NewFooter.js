@@ -70,7 +70,8 @@ const FooterPage = () => {
               <ul>
                 {col.links.map((link, idx) => (
                   <li key={idx}>
-                    <a href="#">{t(link)}</a> 
+                    {/* <a href="#">{t(link)}</a>  */}
+                    <p>{t(link)}</p>
                   </li>
                 ))}
               </ul>
@@ -80,9 +81,13 @@ const FooterPage = () => {
             <h4>{t("footer.Follow Us")}</h4>
             <div className="socialLinks">
               {socialLinks.map((social, idx) => (
-                <a href="#" aria-label={social.label} key={idx}>
-                  <FontAwesomeIcon icon={social.icon} />
-                </a>
+                // <a href="#" aria-label={social.label} key={idx}>
+                //   <FontAwesomeIcon icon={social.icon} />
+                // </a>
+                <p aria-label={social.label} key={idx}>
+  <FontAwesomeIcon icon={social.icon} />
+</p>
+
               ))}
             </div>
             <div className="footerImages">

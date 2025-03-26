@@ -92,7 +92,7 @@ const CurrentLocation = ({ onCoordinatesFetched }) => {
         } else {
             setError("Geolocation is not supported by your browser.");
         }
-    }, []); // Only run once on mount
+    }, [onCoordinatesFetched]); // Only run once on mount
 
     return (
         <div style={{ textAlign: "center", padding: "0px" }}>

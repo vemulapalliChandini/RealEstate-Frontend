@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Row,
   Col,
@@ -10,7 +10,7 @@ import {
   Grid,
   Tooltip,
   Pagination,
-  Form, Input
+  Form, Input,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -55,14 +55,13 @@ const { useBreakpoint } = Grid;
 export default function BuyersLayoutDetails() {
   const agentsRef = useRef(null);
   const screens = useBreakpoint();
-    const [layout, setLayout] = useState(null);
+  const [layout, setLayout] = useState(null);
   const [findAgents] = useState(false);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
   const [isModalVis, setIsModalVis] = useState(false);
   const [agentId, setAgentId] = useState(null);
-  const [currentPage] = useState(1);
   const [wishlist, setWishlist] = useState("");
   const [properties, setProperties] = useState(null);
   const [showInterestButton, setShowInterestButton] = useState(false);
@@ -75,6 +74,8 @@ export default function BuyersLayoutDetails() {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [viewsCount, setViewsCount] = useState(0);
+
   const [agentrole] = useState(null);
   const [isPropertyOnHold, setIsPropertyOnHold] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
@@ -89,16 +90,16 @@ export default function BuyersLayoutDetails() {
   const [showBalloons, setShowBalloons] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  const userId=localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId");
   // Update the window size on resize
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
     };
-    
+
     window.addEventListener('resize', handleResize);
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -110,8 +111,7 @@ export default function BuyersLayoutDetails() {
 
     return () => clearTimeout(timer);
   }, []);
-    const role = localStorage.getItem("role");
-  const pageSize = 4;
+  const role = localStorage.getItem("role");
   const fetchData = async (id) => {
     setLoading(true);
     try {
@@ -127,6 +127,35 @@ export default function BuyersLayoutDetails() {
       setLoading(false);
     }
   };
+  const fetchLayout = useCallback(async () => {
+    try {
+      const response = await _get(`/property/getpropbyid/Layout/${id}`);
+      console.log(response.data);
+      setLayout(response.data);
+      setIsPropertyOnHold(response.data.propertyOnHold);
+      setShownInterest(response.data.interestedIn);
+      setLoading(false);
+      if (response.data?.auctionData[0]?.endDate) {
+        const endDate = response.data?.auctionData?.[0].endDate;
+        const nextDay = moment(endDate).add(1, "days");
+        const today = moment();
+
+
+        if (today.isBefore(nextDay)) {
+          setShowNextDay(true);
+          console.log("✅ Showing balloons");
+        } else {
+          setShowNextDay(false);
+          console.log("❌ Hiding balloons");
+        }
+      }
+
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching layout:", error);
+      setLoading(false);
+    }
+  }, [id]);
   const handleHoldOnPropertyClick = () => {
 
 
@@ -223,7 +252,25 @@ export default function BuyersLayoutDetails() {
       return price.toString(); // Display as is for smaller values
     }
   };
+  const countViews = useCallback(async () => {
+    console.log("I am still in this page");
+    console.log(id);
 
+    try {
+      const response = await _put(`views/updateViewCount`, {
+        propertyId: id,
+        propertyType: "Layout",
+      });
+
+      if (response.data) {
+        setViewsCount(response.data.viewsCount || 0); // Update the views count in state
+      }
+
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error updating view count:", error);
+    }
+  }, [id, setViewsCount]);
   useEffect(() => {
     fetchLayout();
     fetchData();
@@ -232,7 +279,7 @@ export default function BuyersLayoutDetails() {
     }, 10000); //10 seconds interval
 
     return () => clearInterval(interval);
-  }, []);
+  }, [countViews, fetchLayout]);
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowInterestButton(true);
@@ -242,7 +289,6 @@ export default function BuyersLayoutDetails() {
   }, []);
   const toggleWishlist = async (layout) => {
     try {
-      let propertyType = "Layout";
       if (wishlist.includes(layout._id)) {
         await _delete(
           `/wishlist/delete/${layout._id}`,
@@ -253,18 +299,6 @@ export default function BuyersLayoutDetails() {
       } else {
         // handleShowInterest();
         setisLoading(true);
-        const payload = {
-          properties: [
-            {
-              propertyId: layout._id,
-              propertyType: propertyType,
-              propertyName: layout.layoutDetails.layoutTitle,
-              agentId: layout.userId,
-            },
-          ],
-          interestIn: "1",
-          comments: "Iam intersted in this Property",
-        };
 
         // Send the request
 
@@ -291,7 +325,7 @@ export default function BuyersLayoutDetails() {
 
       const amount = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
-        :selectedProperty?.auctionData?.[0]?.amount;
+        : selectedProperty?.auctionData?.[0]?.amount;
 
       const initialBid = selectedProperty?.auctionData?.[0]?.buyers?.length > 0
         ? selectedProperty?.auctionData?.[0]?.buyers[0].bidAmount
@@ -425,45 +459,8 @@ export default function BuyersLayoutDetails() {
     setIsAuctionViewModalVisible(false);
     setSelectedProperty(null);
   };
-  const countViews = async () => {
-    console.log("I am still in this page");
-    console.log(id);
-    try {
-      const response = await _put(`views/updateViewCount`, {
-        propertyId: id,
-        propertyType: "Layout",
-      });
-    } catch (error) { }
-  };
-
-  const fetchLayout = async () => {
-    try {
-      const response = await _get(`/property/getpropbyid/Layout/${id}`);
-      setLayout(response.data);
-      setIsPropertyOnHold(response.data.propertyOnHold);
-      setShownInterest(response.data.interestedIn);
-      setLoading(false);
-      if (response.data?.auctionData[0]?.endDate) {
-        const endDate = response.data?.auctionData?.[0].endDate;
-        const nextDay = moment(endDate).add(1, "days");
-        const today = moment();
 
 
-        if (today.isBefore(nextDay)) {
-          setShowNextDay(true);
-          console.log("✅ Showing balloons");
-        } else {
-          setShowNextDay(false);
-          console.log("❌ Hiding balloons");
-        }
-      }
-      
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching layout:", error);
-      setLoading(false);
-    }
-  };
 
   const handleCloseBookAppointmentModal = () => {
     setIsModalVis(false);
@@ -489,24 +486,16 @@ export default function BuyersLayoutDetails() {
     return <p>Property not found</p>;
   }
 
-  const { ownerDetails, layoutDetails, amenities, uploadPics } = layout;
+  const { layoutDetails, amenities, uploadPics } = layout;
 
   const updatedAt = layout.createdAt;
 
   const daysSinceCreated = moment().diff(moment(updatedAt), "days");
 
-  const getStarColor = () => "#f5d03d";
 
-  const Star = ({ isHalf }) => (
-    <span style={{ color: getStarColor(), fontSize: "20px" }}>
-      {isHalf ? "☆" : "★"}
-    </span>
-  );
 
-  const averageRating = layout.rating || 0;
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
+
 
   const formatNumberWithCommas = (num) => {
     return new Intl.NumberFormat("en-IN").format(num);
@@ -525,13 +514,42 @@ export default function BuyersLayoutDetails() {
           </h1>
         </div>)}
       <div
-        onClick={() => navigate(-1)}
         style={{
-          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <ArrowLeftOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+        {/* Back Button on the Left */}
+        <div
+          onClick={() => navigate(-1)}
+          style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
+          <ArrowLeftOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+        </div>
+
+        {/* Download Brochure Button on the Right */}
+        {layout.layoutDetails.brochure && (
+          <div>
+            <Button
+              style={{ backgroundColor: "#0D416B", color: "white",fontWeight:"bold" }}
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = layout.layoutDetails.brochure;
+                link.download = "Brochure.pdf";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+            >
+              Download Brochure
+            </Button>
+          </div>
+        )}
       </div>
+
+
       {layout.auctionStatus && layout.auctionStatus.toLowerCase() === "active" && (
 
         <Button
@@ -605,7 +623,7 @@ export default function BuyersLayoutDetails() {
                     ).map((photo, index) => (
                       <div key={index}>
                         <img
-                          alt={`Layout Photo ${index + 1}`}
+                          alt={`Layout  ${index + 1}`}
                           src={
                             photo ||
                             "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"
@@ -619,6 +637,20 @@ export default function BuyersLayoutDetails() {
                       </div>
                     ))}
                   </Carousel>
+                </Col>
+              </Row>
+              <Row style={{ marginTop: "10px" }}>
+                <Col span={24}>
+                  <div
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      color: "#333",
+                      textAlign: "center",
+                    }}
+                  >
+                    Total Views: {viewsCount}
+                  </div>
                 </Col>
               </Row>
             </Card>
@@ -644,7 +676,7 @@ export default function BuyersLayoutDetails() {
                 border: "0px solid gray",
               }}
               extra={
-                (role == 3 || agentrole === 11) && (
+                (role === 3 || agentrole === 11) && (
                   <>
                     {isPropertyOnHold === "no" ? (
                       <Button
@@ -1382,81 +1414,84 @@ export default function BuyersLayoutDetails() {
               {layoutDetails.plots.map((plot) => (
 
                 // {currentData.map((plot) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={plot.plotId}>
+                <Col xs={24} sm={12} md={12} lg={12} key={plot.plotId}>
                   <Card
-                    title={
-                      <div
-                        style={{
-                          backgroundColor: "#0d416b",
-                          color: "#fff",
-                          padding: "5px",
-                          borderRadius: "4px",
-                          width: "30%",
-                        }}
-                      >
-                        {`Plot ${plot.plotId}`}
-                        <div
-                          style={{
-                            position: "absolute",
-                            zIndex: "1",
-                            backgroundColor: "gold",
-                            color: "black",
-                            fontSize: "15px",
-                            fontWeight: "bold",
-                            padding: "5px",
-                            marginLeft: "70%",
-                            marginTop: "-10%",
-                          }}
-                        >
-                          ₹ {formatPrice(plot.plotAmount)}
-                        </div>
-                      </div>
-                    }
                     bordered={true}
                     style={{
                       textAlign: "center",
                       backgroundColor: "rgba(159, 159, 167, 0.23)",
+                      position: "relative",
+                      padding: "0px"
                     }}
                   >
-                    {/* <Carousel autoplay arrows> */}
-
-                    {(uploadPics.length > 0
-                      ? uploadPics
-                      : [
+                    {/* Image Section with Overlay Text */}
+                    <div style={{ position: "relative", textAlign: "center" }}>
+                      {(uploadPics.length > 0 ? uploadPics : [
                         "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png",
-                      ]
-                    ).map((photo, index) => (
-                      <div key={index}>
-                        <img
-                          alt={`Layout Photo ${index + 1}`}
-                          src={
-                            photo ||
-                            "https://res.cloudinary.com/ds1qogjpk/image/upload/v1735582521/commercial_qqcdbt.png"
-                          }
-                          style={{
-                            width: "100%",
-                            height: "300px",
-                            objectFit: "cover",
-                            height: "20%",
-                            width: "40%",
-                            marginLeft: "-65%",
-                          }}
-                        />
-                      </div>
-                    ))}
-                    {/* </Carousel> */}
-                    <div style={{ marginTop: "-30%", marginLeft: "40%" }}>
+                      ]).map((photo, index) => (
+                        <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                          <img
+                            alt={`Layout ${index + 1}`}
+                            src={photo}
+                            style={{
+                              objectFit: "cover",
+                              width: "100%",
+                              height: "150px",
+                              borderRadius: "8px",
+                            }}
+                          />
+                          {/* Overlay for Plot Size on Image */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "0px",
+                              right: "0px",
+                              backgroundColor: "rgba(0, 0, 0, 0.6)",
+                              color: "white",
+                              padding: "5px",
+                              borderRadius: "4px",
+                              fontSize: "14px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {plot.plotLength
+                            } * {plot.plotWidth}
+                          </div>
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "0px",
+                              left: "0px",
+                              backgroundColor: "#0d416b",
+                              color: "#fff",
+                              padding: "5px",
+                              borderRadius: "4px",
 
-                      <p style={{ marginTop: "10%" }}>
+                            }}
+                          >
+                            <strong>{`Plot ${plot.plotId}`}</strong>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Plot ID and Price Section */}
+
+
+                    {/* Price Tag */}
+
+                    {/* Size and Price Info Below Image */}
+                    <div style={{ marginTop: "10px", textAlign: "left", padding: "0 10px" }}>
+                      <p>
                         <strong>Size:</strong> {plot.plotSize} {plot.sizeUnit}
                       </p>
                       <p>
-                        <strong>Price:</strong> ₹{plot.plotAmount} per{" "}
-                        {plot.sizeUnit}
+                        <strong>Price:</strong> ₹ {formatPrice(plot.plotAmount)} per {plot.sizeUnit}
                       </p>
                     </div>
                   </Card>
                 </Col>
+
               ))}
             </Row>
             <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -1579,7 +1614,7 @@ export default function BuyersLayoutDetails() {
                     if (!/^\d+0$/.test(value)) {
                       return Promise.reject('Bid amount should end in 00 (e.g., 1200, 5350, 8950)');
                     }
-            
+
                   },
                 },
               ]}
@@ -1661,7 +1696,7 @@ export default function BuyersLayoutDetails() {
 
         </div>
       )}
-       {layout?.auctionData?.[0]?.auctionWinner === userId && showBalloons && (
+      {layout?.auctionData?.[0]?.auctionWinner === userId && showBalloons && (
         <Confetti
           width={windowWidth}
           height={windowHeight}

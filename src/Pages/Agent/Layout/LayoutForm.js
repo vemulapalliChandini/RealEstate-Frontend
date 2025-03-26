@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Button,
   Form,
@@ -9,7 +9,7 @@ import {
   Col,
   Switch,
   Select,
-  
+
   Tooltip,
   Collapse,
   Progress,
@@ -62,7 +62,6 @@ const LayoutForm = ({ setShowFormType }) => {
   const { t } = useTranslation();
   const [componentVariant, setComponentVariant] = useState("filled");
   const [amount] = useState(0);
-  const [hasPincode, setHasPincode] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMandal, setSelectedMandal] = useState("");
   const [mandals, setMandals] = useState([]);
@@ -81,11 +80,12 @@ const LayoutForm = ({ setShowFormType }) => {
   const fileInputRef = useRef(null);
   const [landMark, setlandMark] = useState("");
   const [isCurrentLocation, setIsCurrentLocation] = useState(false);
+  const [brochureUrl, setBrochureUrl] = useState("");
 
   //  clusters.....
 
   const [plots, setPlots] = useState([
-    { plotNumber: "", size: "", unit: "sq. ft", price: "" }, // Initial empty plot
+    { plotNumber: "", size: "", unit: "sq. ft", price: "", length: "", width: "" }, // Initial empty plot
   ]);
 
   const [isModalVisibles, setIsModalVisibles] = useState(false);
@@ -143,7 +143,7 @@ const LayoutForm = ({ setShowFormType }) => {
   };
 
   const handleBatchAdd1 = () => {
-    const { start, end, size, price, unit } = batchRanges[batchRanges.length - 1];
+    const { start, end, size, price, unit, length, width } = batchRanges[batchRanges.length - 1];
     console.log(start);
     console.log(end);
     console.log(size);
@@ -151,7 +151,7 @@ const LayoutForm = ({ setShowFormType }) => {
     // Generate the new plots based on the input range
     const newPlots = [];
     for (let i = start; i <= end; i++) {
-      newPlots.push({ plotNumber: i, size, unit, price });
+      newPlots.push({ plotNumber: i, size, unit, price, length, width });
     }
 
     setPlots((prevPlots) => [
@@ -161,7 +161,7 @@ const LayoutForm = ({ setShowFormType }) => {
 
     // ✅ Corrected: Reset batchRanges with an array of objects, not numbers
     setBatchRanges([
-      { start: 1, end: 1, size: 0, price: 0, unit: "sq. ft" }
+      { start: 1, end: 1, size: 0, price: 0, unit: "sq. ft", length: 0, width: 0 }
     ]);
 
     setIsModalVisibles(false);
@@ -174,7 +174,7 @@ const LayoutForm = ({ setShowFormType }) => {
 
     // Ensure it's modifying an object, not a number
     if (typeof newBatchRanges[index] !== "object") {
-      newBatchRanges[index] = { start: 1, end: 1, size: 0, price: 0, unit: "sq. ft" };
+      newBatchRanges[index] = { start: 1, end: 1, size: 0, price: 0, unit: "sq. ft", length: 0, width: 0 };
     }
 
     newBatchRanges[index][field] = value;
@@ -185,7 +185,7 @@ const LayoutForm = ({ setShowFormType }) => {
   const handleAddCustomPlot = () => {
     setPlots([
       ...plots,
-      { plotNumber: "", size: "", unit: "sq. ft", price: "" }, // Add new empty plot
+      { plotNumber: "", size: "", unit: "sq. ft", price: "", length: 0, width: 0 }, // Add new empty plot
     ]);
   };
   // const columns = [
@@ -328,6 +328,26 @@ const LayoutForm = ({ setShowFormType }) => {
       }
     }
   };
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    const fileType = file.type;
+  
+    if (fileType === "application/pdf") {
+      setIsUploading(true);
+      setUploadProgress(0);
+  
+      const url = await Upload(file, (progress) => setUploadProgress(progress), "raw");
+  
+      console.log("Brochure PDF URL:", url);
+      setBrochureUrl(url);
+      setIsUploading(false);
+    } else {
+      console.log("Uploaded file is not an image, video, or PDF.");
+    }
+  };
+  
   const formatPrice = (price) => {
     if (price == null || isNaN(price)) {
       return "N/A"; // Handle invalid prices
@@ -362,7 +382,7 @@ const LayoutForm = ({ setShowFormType }) => {
 
   const [agentEmails, setAgentEmails] = useState([]);
   const csrId = localStorage.getItem("userId");
-  const fetchAgentEmails = async () => {
+  const fetchAgentEmails = useCallback(async () => {
     try {
       const response = await _get(`/csr/getAssignedAgents/${csrId}`);
       console.log("Agent Emails:", response.data);
@@ -370,15 +390,17 @@ const LayoutForm = ({ setShowFormType }) => {
     } catch (error) {
       console.error("Error fetching agent emails:", error);
     }
-  };
+  }, [csrId]);
+
+  useEffect(() => {
+    fetchAgentEmails();
+  }, [fetchAgentEmails]); 
+
   const updateCoordinates = (lat, long) => {
     setLatitude(lat);
     setLongitude(long);
   };
 
-  useEffect(() => {
-    fetchAgentEmails();
-  }, []);
 
   //  for map...
 
@@ -595,17 +617,6 @@ const LayoutForm = ({ setShowFormType }) => {
     }
   };
 
-  const handlePincodeChange1 = () => {
-    setHasPincode(!hasPincode);
-    setPincode(null);
-    setAddressDetails({
-      district: "",
-      mandal: "",
-      village: "",
-    });
-    setMandals([]);
-    setVillages([]);
-  };
 
   const handlePincodeChange = async (e) => {
     const pincodeValue = e.target.value;
@@ -808,14 +819,14 @@ const LayoutForm = ({ setShowFormType }) => {
         tlpApproved: values.tlpApproved || false,
         flpApproved: values.flpApproved || false,
         layoutTitle: values.layoutTitle,
-        description: values.description === undefined ? "" : values.description,
+        ...(values.description && { description: values.description }),
         plotCount: values.plotCount,
         availablePlots: values.availablePlots,
         plotSize: values.plotSize * conversionFactors[values.landsizeunit],
         sizeUnit: values.landsizeunit || "sq. ft",
         priceUnit: values.pricesizeunit || "sq. ft",
         plotPrice: values.plotPrice / conversionFactors[values.landsizeunit],
-
+        brochure:brochureUrl,
         totalAmount: Math.ceil(
           (form.getFieldValue("plotSize") *
             conversionFactors[unit] *
@@ -834,7 +845,6 @@ const LayoutForm = ({ setShowFormType }) => {
           longitude: longitude ? longitude.toString() : "",
           landMark: landMark?.toString() || "",
         },
-        description: values.description,
 
 
 
@@ -843,6 +853,8 @@ const LayoutForm = ({ setShowFormType }) => {
           plotSize: plot.size,
           sizeUnit: plot.unit,
           plotAmount: plot.price,
+          plotLength: plot.length,
+          plotWidth: plot.width,
         })),
 
       };
@@ -916,6 +928,10 @@ const LayoutForm = ({ setShowFormType }) => {
 
   const deletingImage = (index) => {
     setImageUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
+    setBrochureUrl(null);
+  };
+  const deletingBrochure = () => {
+    setBrochureUrl(null);
   };
   const [form] = Form.useForm();
   const [skills, setSkills] = useState([]);
@@ -961,7 +977,7 @@ const LayoutForm = ({ setShowFormType }) => {
         landsizeunit: "sq. ft",
         state: "Andhra Pradesh",
         country: "India",
-        landsizeunit: "sq. ft",
+
         pricesizeunit: "sq. ft",
       }}
     >
@@ -2208,7 +2224,7 @@ const LayoutForm = ({ setShowFormType }) => {
                     </Tooltip>
                   </>
                 }
-                labelCol={{ xs: { span: 8 } }}
+                labelCol={{ xs: { span: 12 } }}
                 wrapperCol={{ xs: { span: 12 } }}
                 rules={[{ required: true, message: "Please enter plot size!" }]}
               >
@@ -2244,7 +2260,7 @@ const LayoutForm = ({ setShowFormType }) => {
               <Form.Item wrapperCol={{ xs: { span: 24 } }}>
                 <Input.Group compact>
                   <Form.Item
-                    label="Total Layout Price"
+                    label="Total Price"
                     name="plotPrice"
                     wrapperCol={{ xs: { span: 24 } }}
                     rules={[
@@ -2334,18 +2350,92 @@ const LayoutForm = ({ setShowFormType }) => {
 
           {/* <Row gutter={[16, 16]}> */}
           {/* <Col xs={24} sm={12} md={8} lg={6} xl={6}> */}
-          <Form layout="vertical">
-            <Form.Item>
-              <Button
-                style={{
-                  backgroundColor: "#0d416b",
-                  color: "white",
-                }}
-                onClick={() => setIsModalVisibles(true)}
-              >
-                + Add Plots
-              </Button>
-            </Form.Item>
+          <Row gutter={16} align="middle">
+  {/* Left Column: Add Plots Button */}
+  <Col span={6}>
+    <Form layout="vertical">
+      <Form.Item>
+        <Button
+          style={{
+            backgroundColor: "#0d416b",
+            color: "white",
+          }}
+          onClick={() => setIsModalVisibles(true)}
+        >
+          + Add Plots
+        </Button>
+      </Form.Item>
+    </Form>
+  </Col>
+
+  {/* Right Column: Upload Section */}
+  <Col span={12} style={{ display: "flex", alignItems: "center" }}>
+    <label htmlFor="upload-input">
+      <input
+        id="upload-input"
+        type="file"
+        onChange={handleFileUpload}
+        accept="application/pdf"
+        style={{
+          width: "1px",
+          height: "1px",
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => document.getElementById("upload-input").click()}
+        style={{ cursor: "pointer" }}
+      >
+        <UploadOutlined /> Upload brochure
+      </button>
+      <Tooltip
+        title={
+          <>
+            <strong>Allowed Formats:</strong>
+            <ul style={{ paddingLeft: 20 }}>
+              <li>PDF</li>
+            </ul>
+          </>
+        }
+      >
+        <InfoCircleOutlined style={{ marginLeft: 8, cursor: "pointer" }} />
+      </Tooltip>
+    </label>
+
+    {/* Show Uploaded Brochure */}
+    {brochureUrl && (
+      <div style={{ display: "flex", alignItems: "center", marginLeft: "15px" }}>
+        <a href={brochureUrl} target="_blank" rel="noopener noreferrer">
+          <span>View Brochure</span>
+        </a>
+        <DeleteOutlined
+          style={{
+            color: "red",
+            marginLeft: "10px",
+            cursor: "pointer",
+          }}
+          onClick={deletingBrochure}
+        />
+      </div>
+    )}
+  </Col>
+</Row>
+
+{/* Upload Progress */}
+{isUploading && (
+  <>
+    <Progress
+      percent={uploadProgress}
+      status={uploadProgress < 100 ? "active" : "success"}
+      style={{ marginTop: "10px", width: "200px" }}
+    />
+    <span>Please wait, file is uploading...</span>
+  </>
+)}
+
+            {/* <Upload {...props}>
+    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+  </Upload> */}
 
             {/* Modal for Bulk Input */}
             <Modal
@@ -2380,211 +2470,286 @@ const LayoutForm = ({ setShowFormType }) => {
                   border: "1px solid #0D416B",
                 },
               }}
-              width={700}
+              width={1000}
             >
               <Form layout="vertical">
                 <Collapse defaultActiveKey={['1']}>
-               
-                    <Collapse.Panel
-                      header="Add Range of Plots"
-                      key="1"
-                     
-                      
-                    >
 
-<Button
-                          type="dashed"
-                          onClick={handleBatchAdd}
+                  <Collapse.Panel
+                    header="Add Range of Plots"
+                    key="1"
+
+
+                  >
+
+                    <Button
+                      type="dashed"
+                      onClick={handleBatchAdd}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        border: "2px solid black",
+                        fontSize: "14px",
+                        marginLeft: "85%",
+                      }}
+                    >
+                      + Add New Range
+                    </Button>
+                    <div>
+                      {batchRanges.map((range, index) => (
+                        <div key={index} style={{ marginBottom: "20px" }}>
+                          <Row gutter={[16, 16]}>
+                            <Col span={5}>
+                              <Form.Item label={<strong>Range of Plot Numbers</strong>}>
+                                <InputNumber
+                                  min={1}
+                                  placeholder="Start"
+                                  value={range.start}
+                                  onChange={(value) => handleRangeChange(index, "start", value)}
+                                  style={{ width: "20%" }}
+                                />
+                                {" - "}
+                                <InputNumber
+                                  min={1}
+                                  placeholder="End"
+                                  value={range.end}
+                                  onChange={(value) => handleRangeChange(index, "end", value)}
+                                  style={{ width: "20%" }}
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col span={5}>
+                              <Form.Item label={<strong>Size</strong>}>
+                                <InputNumber
+                                  min={1}
+                                  placeholder="Enter size"
+                                  value={range.size}
+                                  onChange={(value) => handleRangeChange(index, "size", value)}
+                                  style={{ width: "50%" }}
+                                />
+                                <Select
+                                  value={range.unit}
+                                  onChange={(value) => handleRangeChange(index, "unit", value)}
+                                  style={{ width: "50%" }}
+                                >
+                                  {landMeasurementOptions.map((option) => (
+                                    <Select.Option key={option} value={option}>
+                                      {option}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col span={5}>
+                              <Form.Item label={<strong>Price</strong>}>
+                                <InputNumber
+                                  min={1}
+                                  placeholder="Enter price"
+                                  value={range.price}
+                                  onChange={(value) => handleRangeChange(index, "price", value)}
+                                  style={{ width: "43%" }}
+                                />
+                                <Select
+                                  value={range.unit}
+                                  onChange={(value) => handleRangeChange(index, "unit", value)}
+                                  style={{ width: "50%" }}
+                                >
+                                  {landMeasurementOptions.map((option) => (
+                                    <Select.Option key={option} value={option}>
+                                      {option}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col span={5}>
+                              <Form.Item label={<strong>Length</strong>}>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                  <InputNumber
+                                    min={1}
+                                    placeholder="Length of plot"
+                                    value={range.length}
+                                    onChange={(value) => handleRangeChange(index, "length", value)}
+                                    style={{ width: "40%" }}
+                                  />
+                                  <span style={{ marginLeft: "8px", fontSize: "12px", color: "black" }}>In meters</span>
+                                </div>
+                              </Form.Item>
+                            </Col>
+
+                            <Col span={4}>
+                              <Form.Item label={<strong>Width</strong>}>
+                                <InputNumber
+                                  min={1}
+                                  placeholder="Width of plot"
+                                  value={range.width}
+                                  onChange={(value) => handleRangeChange(index, "width", value)}
+                                  style={{ width: "50%" }}
+                                />
+                                <span style={{ marginLeft: "8px", fontSize: "12px", color: "black" }}>In meters</span>
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </div>
+                      ))}
+                    </div>
+                  </Collapse.Panel>
+
+
+
+                  {/* Panel for Adding Individual Plots */}
+                  <Collapse.Panel
+                    header="Add Individual Plot"
+                    key="2"
+
+                  >
+
+                    <Button
+                      type="dashed"
+                      onClick={handleAddCustomPlot}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        border: "2px solid black",
+                        marginBottom: "2%",
+                        float: "right"
+                      }}
+                    >
+                      + Add a New Plot
+                    </Button>
+
+                    <Table
+                      columns={[
+                        {
+                          title: "Plot Number",
+                          dataIndex: "plotNumber",
+                          render: (text, record, index) => (
+                            <InputNumber
+                              value={record.plotNumber}
+                              key={`plotNumber-${index}`}
+                              onChange={(value) => handlePlotChange(index, "plotNumber", value)}
+                            // onBlur={() => forceUpdate()}
+                            />
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+                        {
+                          title: "Size",
+                          dataIndex: "size",
+                          render: (text, record, index) => (
+
+                            <InputNumber
+                              value={record.size}
+                              key={`size-${index}`}
+                              onChange={(value) => handlePlotChange(index, "size", value)}
+                            />
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+
+                        {
+                          title: "Price",
+                          dataIndex: "price",
+                          render: (text, record, index) => (
+                            <InputNumber
+                              value={record.price}
+                              key={`price-${index}`}
+                              onChange={(value) => handlePlotChange(index, "price", value)}
+                            />
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+                        {
+                          title: "Unit",
+                          dataIndex: "unit",
+                          render: (text, record, index) => (
+                            <Select
+                              value={record.unit}
+                              key={`unit-${index}`}
+                              onChange={(value) => handlePlotChange(index, "unit", value)}
+                            >
+                              {landMeasurementOptions.map((option) => (
+                                <Select.Option key={option} value={option}>
+                                  {option}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+                        {
+                          title: "Length",
+                          dataIndex: "length",
+                          render: (text, record, index) => (
+                            <>
+                              <InputNumber
+                                value={record.length}
+                                key={`length-${index}`}
+                                style={{ width: "50%" }}
+                                onChange={(value) => handlePlotChange(index, "length", value)}
+                              />
+                              <span style={{ marginLeft: "8px", fontSize: "12px", color: "black" }}>In meters</span>
+                            </>
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+                        {
+                          title: "Width",
+                          dataIndex: "width",
+                          render: (text, record, index) => (
+                            <>
+                              <InputNumber
+                                value={record.width}
+                                key={`width-${index}`}
+                                style={{ width: "50%" }}
+                                onChange={(value) => handlePlotChange(index, "width", value)}
+                              />
+                              <span style={{ marginLeft: "8px", fontSize: "12px", color: "black" }}>In meters</span>
+                            </>
+                          ),
+                          onHeaderCell: () => ({
+                            style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
+                          }),
+                        },
+                      ]}
+
+
+                      dataSource={plots}
+                      rowKey={(record) => `${record.plotNumber}-${Math.random()}`}
+                      pagination={false}
+                      scroll={{ y: 300 }} // Add vertical scroll with a height of 300px
+                      footer={() => (
+                        <div
                           style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            border: "2px solid black",
-                            fontSize: "12px",
-                          marginLeft:"75%",
+                            textAlign: "right", // Align the button to the right
+                            marginTop: "10px", // Add some space from the table
                           }}
                         >
-                          + Add New Range
-                        </Button>
-                      <div>
-                        {batchRanges.map((range, index) => (
-                          <div key={index} style={{ marginBottom: "20px" }}>
-                            <Row gutter={[16, 16]}>
-                              <Col span={8}>
-                                <Form.Item label={<strong>Range of Plot Numbers</strong>}>
-                                  <InputNumber
-                                    min={1}
-                                    placeholder="Start"
-                                    value={range.start}
-                                    onChange={(value) => handleRangeChange(index, "start", value)}
-                                    style={{ width: "20%" }}
-                                  />
-                                  {" - "}
-                                  <InputNumber
-                                    min={1}
-                                    placeholder="End"
-                                    value={range.end}
-                                    onChange={(value) => handleRangeChange(index, "end", value)}
-                                    style={{ width: "20%" }}
-                                  />
-                                </Form.Item>
-                              </Col>
-                              <Col span={8}>
-                                <Form.Item label={<strong>Size</strong>}>
-                                  <InputNumber
-                                    min={1}
-                                    placeholder="Enter size"
-                                    value={range.size}
-                                    onChange={(value) => handleRangeChange(index, "size", value)}
-                                    style={{ width: "50%" }}
-                                  />
-                                  <Select
-                                    value={range.unit}
-                                    onChange={(value) => handleRangeChange(index, "unit", value)}
-                                    style={{ width: "50%" }}
-                                  >
-                                    {landMeasurementOptions.map((option) => (
-                                      <Select.Option key={option} value={option}>
-                                        {option}
-                                      </Select.Option>
-                                    ))}
-                                  </Select>
-                                </Form.Item>
-                              </Col>
-                              <Col span={8}>
-                                <Form.Item label={<strong>Price</strong>}>
-                                  <InputNumber
-                                    min={1}
-                                    placeholder="Enter price"
-                                    value={range.price}
-                                    onChange={(value) => handleRangeChange(index, "price", value)}
-                                    style={{ width: "43%" }}
-                                  />
-                                </Form.Item>
-                              </Col>
-                            </Row>
-                          </div>
-                        ))}
-                      </div>
-                    </Collapse.Panel>
 
+                        </div>
+                      )}
+                    />
+                  </Collapse.Panel>
+                </Collapse>
 
-
-                    {/* Panel for Adding Individual Plots */}
-                    <Collapse.Panel
-                     header="Add Individual Plot"
-                     key="2"
-                     
-                    >
-                  
-                        <Button
-                              type="dashed"
-                              onClick={handleAddCustomPlot}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                border: "2px solid black",
-                                marginBottom:"2%",
-                                float:"right"
-                              }}
-                            >
-                              + Add a New Plot
-                            </Button>
-                      
-                      <Table
-                        columns={[
-                          {
-                            title: "Plot Number",
-                            dataIndex: "plotNumber",
-                            render: (text, record, index) => (
-                              <InputNumber
-                                value={record.plotNumber}
-                                key={`plotNumber-${index}`}
-                                onChange={(value) => handlePlotChange(index, "plotNumber", value)}
-                              // onBlur={() => forceUpdate()}
-                              />
-                            ),
-                            onHeaderCell: () => ({
-                              style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
-                            }),
-                          },
-                          {
-                            title: "Size",
-                            dataIndex: "size",
-                            render: (text, record, index) => (
-
-                              <InputNumber
-                                value={record.size}
-                                key={`size-${index}`}
-                                onChange={(value) => handlePlotChange(index, "size", value)}
-                              />
-                            ),
-                            onHeaderCell: () => ({
-                              style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
-                            }),
-                          },
-                          {
-                            title: "Unit",
-                            dataIndex: "unit",
-                            render: (text, record, index) => (
-                              <Select
-                                value={record.unit}
-                                key={`unit-${index}`}
-                                onChange={(value) => handlePlotChange(index, "unit", value)}
-                              >
-                                {landMeasurementOptions.map((option) => (
-                                  <Select.Option key={option} value={option}>
-                                    {option}
-                                  </Select.Option>
-                                ))}
-                              </Select>
-                            ),
-                            onHeaderCell: () => ({
-                              style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
-                            }),
-                          },
-                          {
-                            title: "Price",
-                            dataIndex: "price",
-                            render: (text, record, index) => (
-                              <InputNumber
-                                value={record.price}
-                                key={`price-${index}`}
-                                onChange={(value) => handlePlotChange(index, "price", value)}
-                              />
-                            ),
-                            onHeaderCell: () => ({
-                              style: { backgroundColor: "#0D416B", color: "white", fontWeight: "bold" },
-                            }),
-                          },
-                        ]}
-
-
-                        dataSource={plots}
-                        rowKey={(record) => `${record.plotNumber}-${Math.random()}`}
-                        pagination={false}
-                        scroll={{ y: 300 }} // Add vertical scroll with a height of 300px
-                        footer={() => (
-                          <div
-                            style={{
-                              textAlign: "right", // Align the button to the right
-                              marginTop: "10px", // Add some space from the table
-                            }}
-                          >
-                            
-                          </div>
-                        )}
-                      />
-                    </Collapse.Panel>
-                  </Collapse>
-
-                  {/* Form to add Size and Price for batch */}
+                {/* Form to add Size and Price for batch */}
 
               </Form>
 
 
             </Modal>
 
-          </Form>
+          
 
 
 
@@ -2852,7 +3017,7 @@ const LayoutForm = ({ setShowFormType }) => {
                           }
                           value={addressDetails.village || undefined}
                           onChange={
-                            pincode != null || pincode != ""
+                            pincode !== null || pincode !== ""
                               ? (value) =>
                                 setAddressDetails((prev) => ({
                                   ...prev,

@@ -1,13 +1,13 @@
 
 import axios from "axios";
 
-const Upload = async (imageFile, onProgress, resourceType) => {
-  console.log("shesjhshjshjsjhjsjsj");
-  console.log("shehsej", resourceType);
+const Upload = async (file, onProgress, resourceType) => {
+  console.log("Uploading file of type:", resourceType);
+
   const url = `https://api.cloudinary.com/v1_1/ds1qogjpk/${resourceType}/upload`;
 
   const formData = new FormData();
-  formData.append("file", imageFile);
+  formData.append("file", file);
   formData.append("upload_preset", "ml_default");
 
   try {
@@ -20,8 +20,10 @@ const Upload = async (imageFile, onProgress, resourceType) => {
     return response.data.secure_url;
   } catch (error) {
     console.log("Upload error:", error);
+    return null;
   }
 };
+
 
 export default Upload;
 

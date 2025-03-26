@@ -12,7 +12,7 @@ import {
 } from "antd";
 import showMessage from "../../../MessageHandler";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Arrow.css";
 import {
   UserOutlined,
@@ -45,7 +45,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
   const [searchText] = useState(["", "", ""]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const [pageSize, setPageSize] = useState(6);
   const [plotCount, setPlotCount] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -167,12 +167,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
       return price.toString(); // Display as is for smaller values
     }
   };
-  useEffect(() => {
-    maxsizefromAPI();
-    fetchData();
-    // fetchVillages();
-    // maxPricefromAPI();
-  }, [sold, rating, plotCount, filters, filters1]);
+
 
   // const maxPricefromAPI = async () => {
   //   try {
@@ -197,54 +192,38 @@ const GetLayout = ({ path, filters, filters1 }) => {
   //     console.error("Error fetching village data:", error);
   //   }
   // };
-  let data2;
-  const fetchLocation = async () => {
+ const dataRef = useRef(null);
+ 
+  const fetchLocation = useCallback(async () => {
     try {
       let type = "";
-
       let searchText = "";
+  
       if (filters !== undefined) {
         searchText = filters.searchText;
       } else {
         searchText = filters1.searchText;
       }
-      if (searchText === null) {
+  
+      if (!searchText) {
         searchText = "all";
       }
+  
       if (path === "getlayouts") {
         type = localStorage.getItem("mtype");
-        const response = await _get(
-          `/property/mypropslocation/${type}/${searchText}`
-        );
-        data2 = response.data;
+        const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
+        dataRef.current = response.data;
       } else {
         type = localStorage.getItem("type");
         const response = await _get(`/property/location/${type}/${searchText}`);
-        data2 = response.data;
+        dataRef.current = response.data; 
       }
     } catch (error) {
-      setFilteredData("");
+      setFilteredData([]);
     }
-  };
-  const fetchData = async () => {
-    try {
-      const response = await _get(`/layout/${path}`);
-      console.log(response.data);
-      setData(response.data);
-      setFilteredData(response.data);
-      applyFilters(
-        checkedValues,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
-        response.data,
-
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  }, [filters, filters1, path]); 
+  
+  
   const handleCardClick = (property) => {
     setPropertyId(property._id);
     setSelectedProperty(property);
@@ -304,84 +283,99 @@ const GetLayout = ({ path, filters, filters1 }) => {
   };
 
   const [checkedValues] = useState(["sold", "unSold"]);
-
-  const applyFilters = async (
-    checkedValues,
-    searchText,
-    priceRange,
-    sizeRange,
-    propertyName,
-    data
-  ) => {
-    if (filters != null) {
-      checkedValues = filters.checkedValues;
-      searchText = filters.searchText;
-      priceRange = filters.priceRange;
-      sizeRange = filters.sizeRange;
-      propertyName = filters.propertyName;
-    }
-    if (filters1 != null) {
-      checkedValues = filters1.checkedValues;
-      searchText = filters1.searchText;
-      priceRange = filters1.priceRange;
-      sizeRange = filters1.sizeRange;
-      propertyName = filters1.propertyName;
-    }
-    let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
-    const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
-
-    if (searchText !== "") {
-      await fetchLocation();
-      data = data2;
-    }
-    console.log("datasss", data);
-    let filtered = Array.isArray(data) ? data : [];
-    console.log("filyet", filtered);
-    if (checkedValues.length === "All") {
-      setFilteredData(data);
-      return;
-    }
-    if (checkedValues === "All") {
-      filtered = data;
-    } else if (checkedValues === "Sold") {
-      filtered = data.filter((property) => property.status === 1);
-    } else if (checkedValues === "Unsold") {
-      filtered = data.filter((property) => property.status === 0);
-    }
-
-    if (priceRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.layoutDetails.totalAmount) >= priceRange[0] &&
-          Number(property.layoutDetails.totalAmount) <= priceRange[1]
-      );
-    }
-
-    if (sizeRange) {
-      filtered = filtered.filter(
-        (property) =>
-          Number(property.layoutDetails.plotSize) >= sizeRange[0] &&
-          Number(property.layoutDetails.plotSize) <= sizeRange[1]
-      );
-    }
-
-    if (nameSearch2 !== "") {
-      filtered = filtered.filter((property) => {
-        console.log("propertyId:", property.propertyId);
-        console.log("layoutTitle:", property.layoutDetails.layoutTitle);
-
-        const nameMatch2 = isPropertyIdSearch
-          ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-          : property.layoutDetails.layoutTitle && property.layoutDetails.layoutTitle.toLowerCase().includes(nameSearch2);
-
-        console.log("nameMatch2:", nameMatch2); // Logs the match result
-        return nameMatch2;
-      });
-    }
-
-    setFilteredData(filtered);
-    localStorage.setItem("isLoading", false);
-  };
+  const applyFilters = useCallback(
+    async (
+      checkedValues,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName,
+      data
+    ) => {
+      if (filters != null) {
+        checkedValues = filters.checkedValues;
+        searchText = filters.searchText;
+        priceRange = filters.priceRange;
+        sizeRange = filters.sizeRange;
+        propertyName = filters.propertyName;
+      }
+      if (filters1 != null) {
+        checkedValues = filters1.checkedValues;
+        searchText = filters1.searchText;
+        priceRange = filters1.priceRange;
+        sizeRange = filters1.sizeRange;
+        propertyName = filters1.propertyName;
+      }
+  
+      let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
+  
+      if (searchText !== "" && searchText !== "all") {
+        if (!dataRef.current) { // ✅ Prevents unnecessary API calls
+          await fetchLocation();
+        }
+        data = dataRef.current;
+      }
+  
+      console.log("datasss", data);
+      let filtered = Array.isArray(data) ? data : [];
+      console.log("filyet", filtered);
+  
+      if (checkedValues.length === "All") {
+        setFilteredData(data);
+        return;
+      }
+      if (checkedValues === "All") {
+        filtered = data;
+      } else if (checkedValues === "Sold") {
+        filtered = data.filter((property) => property.status === 1);
+      } else if (checkedValues === "Unsold") {
+        filtered = data.filter((property) => property.status === 0);
+      }
+  
+      if (priceRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.layoutDetails.totalAmount) >= priceRange[0] &&
+            Number(property.layoutDetails.totalAmount) <= priceRange[1]
+        );
+      }
+  
+      if (sizeRange) {
+        filtered = filtered.filter(
+          (property) =>
+            Number(property.layoutDetails.plotSize) >= sizeRange[0] &&
+            Number(property.layoutDetails.plotSize) <= sizeRange[1]
+        );
+      }
+  
+      if (nameSearch2 !== "") {
+        filtered = filtered.filter((property) => {
+          console.log("propertyId:", property.propertyId);
+          console.log("layoutTitle:", property.layoutDetails.layoutTitle);
+  
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId &&
+              property.propertyId.toString().toLowerCase().includes(nameSearch2)
+            : property.layoutDetails.layoutTitle &&
+              property.layoutDetails.layoutTitle.toLowerCase().includes(nameSearch2);
+  
+          console.log("nameMatch2:", nameMatch2); // Logs the match result
+          return nameMatch2;
+        });
+      }
+  
+      setFilteredData(filtered);
+      localStorage.setItem("isLoading", false);
+    },
+    [
+      filters,
+      filters1,
+      fetchLocation,
+      setFilteredData, // Include set state functions in dependency array
+    ]
+  );
+  
   const [priceRange] = useState([0, Infinity]);
   const [sizeRange, setSizeRange] = useState(0, Infinity);
   const handleInputChange = (value, totalcount) => {
@@ -442,8 +436,48 @@ const GetLayout = ({ path, filters, filters1 }) => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
-  const maxsizefromAPI = async () => {
+  const filterValuesRef = useRef({
+      checkedValues: [],
+     
+      searchText: "",
+      priceRange: [],
+      sizeRange: [],
+      propertyName: "",
+    });
+    
+    useEffect(() => {
+      filterValuesRef.current = {
+        checkedValues,
+        searchText,
+        priceRange,
+        sizeRange,
+        propertyName,
+      };
+    }, [ checkedValues,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName]);
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await _get(`/layout/${path}`);
+      console.log(response.data);
+      setData(response.data);
+      setFilteredData(response.data);
+      applyFilters(
+        filterValuesRef.current.checkedValues,
+        filterValuesRef.current.searchText,
+        filterValuesRef.current.priceRange,
+        filterValuesRef.current.sizeRange,
+        filterValuesRef.current.propertyName,
+        response.data
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [path,applyFilters]);
+  
+  const maxsizefromAPI = useCallback(async () => {
     try {
       const first = checkedValues.includes("sold") ? "sold" : "@";
       const second = checkedValues.includes("unSold") ? "unsold" : "@";
@@ -451,16 +485,18 @@ const GetLayout = ({ path, filters, filters1 }) => {
         `property/maxSize/layout/@/@/@/@/@/${first}/${second}`
       );
       const data = await response.data.maxSize;
-
-      // setMaxSize(data);
-      // setMaxSizeAPIvalue(data);
-      // setSliderRangesize([0, data]);
       setSizeRange([0, data]);
     } catch (error) {
       console.error("Error fetching village data:", error);
     }
-  };
-
+  }, [checkedValues]);
+  
+  useEffect(() => {
+    maxsizefromAPI();
+    fetchData();
+  }, [maxsizefromAPI, fetchData, sold, rating, plotCount, filters, filters1]); // ✅ Now all dependencies are listed
+  
+ 
   return (
     <div ref={targetCardRef}>
       {data !== null ? (
@@ -851,7 +887,7 @@ const GetLayout = ({ path, filters, filters1 }) => {
                                   >
                                     <EditFilled
                                       visible={
-                                        property.status == 0 ? true : false
+                                        property.status === 0 ? true : false
                                       }
                                       style={{ fontSize: "16px" }}
                                       onClick={() => {

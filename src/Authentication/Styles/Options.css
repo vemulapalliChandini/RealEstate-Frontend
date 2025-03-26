@@ -1,0 +1,46 @@
+/* Badge Styles */
+.badge {
+  background-color: rgb(33, 101, 155);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  position: relative;
+  margin-top: -18px;
+  animation: slideBackForth 2s ease-in-out infinite;
+  padding: 7px;
+  border: solid 2px;
+}
+
+/* Keyframe Animation */
+@keyframes slideBackForth {
+  0% {
+      transform: translateX(0);
+  }
+  50% {
+      transform: translateX(10px); /* Move slightly to the right */
+  }
+  100% {
+      transform: translateX(0); /* Return to the original position */
+  }
+}
+/* Container for the loading section */
+.loading-container {
+  width: 8%;
+  margin: -2% 0% 0% 3%;
+}
+
+/* Inner div when land details are empty */
+.loading-box {
+  text-align: center;
+  padding: 10px;
+  margin-top: 20%;
+  height: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.vertical-banner-item {
+  margin-bottom: -60px;
+  margin-right: 50px;
+  width: 300%;
+}
+

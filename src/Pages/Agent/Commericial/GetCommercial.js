@@ -16,7 +16,7 @@ Button,
   TimePicker,
   Menu,
 } from "antd";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useCallback} from "react";
 import {
   UserOutlined,
   AppstoreOutlined,
@@ -40,7 +40,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sold, setSold] = useState(false);
   const [searchText] = useState(["", "", ""]);
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
@@ -53,12 +53,8 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   const [form] = Form.useForm();
   const [propertyId, setPropertyId] = useState(null);
     const [hoursDifference, setHoursDifference] = useState(0);
-  useEffect(() => {
-    maxsizefromAPI();
-    fetchData();
-    // fetchVillages();
-    maxpricefromAPI();
-  }, [sold, rating, filters, checkedTypes, filters1]);
+    const [sizeRange, setSizeRange] = useState([0, Infinity]);
+
   const formatPrice = (price) => {
     if (price >= 1_00_00_000) {
       return (price / 1_00_00_000).toFixed(1) + "Cr"; // Convert to Crores
@@ -175,30 +171,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
     setIsAuctionViewModalVisible(false);
     setSelectedProperty(null);
   };
-  const maxpricefromAPI = async () => {
-    const types = ["@", "@", "@"];
-
-    if (checkedTypes.includes("sell")) {
-      types[0] = "sell";
-    }
-    if (checkedTypes.includes("rent")) {
-      types[1] = "rent";
-    }
-    if (checkedTypes.includes("lease")) {
-      types[2] = "lease";
-    }
-    // try {
-    //   const response = await _get(
-    //     `property/maxPrice/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
-    //   );
-    //   const data = await response.data.maxPrice;
-    //   setMaxPrice(data);
-    //   setMaxPriceAPI(data);
-    //   // setSliderRange([0, data]);
-    // } catch (error) {
-    //   console.error("Error fetching village data:", error);
-    // }
-  };
+ 
   const handlePaymentSuccess = async () => {
     await fetchData(); // Fetch data first
   };
@@ -230,55 +203,37 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   //     console.error("Error fetching village data:", error);
   //   }
   // };
-  let data2;
-  const fetchLocation = async () => {
-    try {
-      let type = "";
+ const dataRef = useRef(null);
 
-      let searchText = "";
-      if (filters !== undefined) {
-        searchText = filters.searchText;
-      } else {
-        searchText = filters1.searchText;
-      }
-      if (searchText === null) {
-        searchText = "all";
-      }
-      if (path === "getcommercial") {
-        type = localStorage.getItem("mtype");
-        const response = await _get(
-          `/property/mypropslocation/${type}/${searchText}`
-        );
-        data2 = response.data;
-      } else {
-        type = localStorage.getItem("type");
-        const response = await _get(`/property/location/${type}/${searchText}`);
-        data2 = response.data;
-      }
-    } catch (error) {
-      setFilteredData("");
-    }
-  };
-  const fetchData = async () => {
-    try {
-      const response = await _get(`/commercials/${path}`);
-      console.log(response.data);
-      setData(response.data);
-      setFilteredData(response.data);
-      applyFilters(
-        checkedValues,
-        checkedTypes,
-        checkedFeatureTypes,
-        searchText,
-        priceRange,
-        sizeRange,
-        propertyName,
-        response.data
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+ const fetchLocation = useCallback(async () => {
+   try {
+     let type = "";
+     let searchText = "";
+ 
+     if (filters !== undefined) {
+       searchText = filters.searchText;
+     } else {
+       searchText = filters1.searchText;
+     }
+ 
+     if (!searchText) {
+       searchText = "all";
+     }
+ 
+     if (path === "getlayouts") {
+       type = localStorage.getItem("mtype");
+       const response = await _get(`/property/mypropslocation/${type}/${searchText}`);
+       dataRef.current = response.data; // ✅ Store data in ref instead of state
+     } else {
+       type = localStorage.getItem("type");
+       const response = await _get(`/property/location/${type}/${searchText}`);
+       dataRef.current = response.data; // ✅ Store data in ref instead of state
+     }
+   } catch (error) {
+     setFilteredData([]);
+   }
+ }, [filters, filters1, path]); // ✅ Dependencies remain the same
+ 
   const handleCardClick = (property) => {
     setPropertyId(property._id);
     setSelectedProperty(property);
@@ -291,7 +246,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
       status: status === 0 ? 1 : 0,
     };
     try {
-      const res = await _put(
+      await _put(
         "/property/markassold",
         finalObject,
         status === 0 ? "Marked as Sold" : "Marked as UnSold",
@@ -310,139 +265,184 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   };
 
 
-  const [checkedValues, setCheckedValues] = useState(["sold", "unSold"]);
+  const [checkedValues] = useState(["sold", "unSold"]);
 
 
-  const [priceRange, setPriceRange] = useState([0, Infinity]);
-
-  const applyFilters = async (
-    checkedValues,
-    checkedTypes,
-    checkedFeatureTypes,
-    searchText,
-    priceRange,
-    sizeRange,
-    propertyName,
-    data
-  ) => {
-    if (filters !== null) {
-      checkedValues = filters.checkedValues;
-      checkedFeatureTypes = filters.checkedFeatureTypes;
-      searchText = filters.searchText;
-      priceRange = filters.priceRange;
-      sizeRange = filters.sizeRange;
-      propertyName = filters.propertyName;
-      if (filters.checkedTypes?.length > 0) {
-        checkedTypes = filters.checkedTypes;
+  const [priceRange] = useState([0, Infinity]);
+  const filterValuesRef = useRef({
+    checkedValues: [],
+    checkedTypes: [],
+    checkedFeatureTypes: [],
+    searchText: "",
+    priceRange: [],
+    sizeRange: [],
+    propertyName: "",
+  });
+  
+  useEffect(() => {
+    filterValuesRef.current = {
+      checkedValues,
+      checkedTypes,
+      checkedFeatureTypes,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName,
+    };
+  }, [checkedValues,   checkedTypes,
+    checkedFeatureTypes,searchText, priceRange, sizeRange, propertyName]);
+    const applyFilters = useCallback(async (
+      checkedValues,
+      checkedTypes,
+      checkedFeatureTypes,
+      searchText,
+      priceRange,
+      sizeRange,
+      propertyName,
+      data
+    ) => {
+     
+    
+      if (filters !== null || filters !== undefined) {
+        checkedValues = filters.checkedValues;
+        checkedFeatureTypes = filters.checkedFeatureTypes;
+        searchText = filters.searchText;
+        priceRange = filters.priceRange;
+        sizeRange = filters.sizeRange;
+        propertyName = filters.propertyName;
+        if (filters.checkedTypes?.length > 0) {
+          checkedTypes = filters.checkedTypes;
+        }
       }
-    }
-    if (filters1 !== null) {
-      checkedValues = filters1.checkedValues;
-      checkedFeatureTypes = filters1.checkedFeatureTypes;
-      searchText = filters1.searchText;
-      priceRange = filters1.priceRange;
-      sizeRange = filters1.sizeRange;
-      propertyName = filters1.propertyName;
-      checkedTypes = filters1.checkedTypes;
-    }
-
-    let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
-    const isPropertyIdSearch = /\d/.test(nameSearch2); // Matches property ID or property name
-
-    if (searchText !== "" && searchText !== "all") {
-      await fetchLocation();
-      data = data2;
-    }
-    let filtered = data;
-
-    if (checkedValues.length === 0) {
-      setFilteredData(data);
-      return;
-    }
-
-    if (checkedValues === "All") {
-      filtered = data;
-    } else if (checkedValues === "Sold") {
-      filtered = data.filter((property) => property.status === 1);
-    } else if (checkedValues === "Unsold") {
-      filtered = data.filter((property) => property.status === 0);
-    }
-
-    if (checkedTypes === "Sell" || checkedTypes === "Rent" || checkedTypes === "Lease") {
-      filtered = filtered.filter((property) =>
-        property.propertyDetails.landDetails[checkedTypes.toLowerCase()]?.plotSize !== null
-      );
-    }
-    if (checkedFeatureTypes && checkedFeatureTypes.length > 0) {
-      // If checkedFeatureTypes is "All", return all data
-      if (checkedFeatureTypes === "All") {
-        filtered = data;  // Set filtered data to the original data
-      } else {
-        // Ensure checkedFeatureTypes is always an array
-        const featureTypesArray = Array.isArray(checkedFeatureTypes) ? checkedFeatureTypes : [checkedFeatureTypes];
-
+      if (filters1 !== null && filters1 !== undefined) { 
+        checkedValues = filters1.checkedValues;
+        checkedFeatureTypes = filters1.checkedFeatureTypes;
+        searchText = filters1.searchText;
+        priceRange = filters1.priceRange;
+        sizeRange = filters1.sizeRange;
+        propertyName = filters1.propertyName;
+        checkedTypes = filters1.checkedTypes;
+      }
+    
+      let nameSearch2 = propertyName ? propertyName.toLowerCase() : "";
+      const isPropertyIdSearch = /\d/.test(nameSearch2);
+    
+      if (searchText !== "" && searchText !== "all") {
+        if (!dataRef.current) { 
+          await fetchLocation();
+        }
+        data = dataRef.current;
+      }
+      let filtered = data;
+    
+      if (checkedValues.length === 0) {
+        setFilteredData(data);
+        return;
+      }
+    
+      if (checkedValues === "All") {
+        filtered = data;
+      } else if (checkedValues === "Sold") {
+        filtered = data.filter((property) => property.status === 1);
+      } else if (checkedValues === "Unsold") {
+        filtered = data.filter((property) => property.status === 0);
+      }
+    
+      if (checkedTypes === "Sell" || checkedTypes === "Rent" || checkedTypes === "Lease") {
+        filtered = filtered.filter((property) =>
+          property.propertyDetails.landDetails[checkedTypes.toLowerCase()]?.plotSize !== null
+        );
+      }
+      if (checkedFeatureTypes && checkedFeatureTypes.length > 0) {
+        if (checkedFeatureTypes === "All") {
+          filtered = data;
+        } else {
+          const featureTypesArray = Array.isArray(checkedFeatureTypes) ? checkedFeatureTypes : [checkedFeatureTypes];
+    
+          filtered = filtered.filter((property) => {
+            const landUsageTypes = [
+              ...property.propertyDetails.landDetails.sell.landUsage,
+              ...property.propertyDetails.landDetails.rent.landUsage,
+              ...property.propertyDetails.landDetails.lease.landUsage,
+            ];
+            console.log("Land Usage Types: ", landUsageTypes);
+            console.log("Checked Feature Types: ", featureTypesArray);
+            return featureTypesArray.some((type) => landUsageTypes.includes(type));
+          });
+        }
+      }
+      console.log("rppr",priceRange)
+      if (priceRange) {
+        filtered = filtered.filter((property) =>
+          property.propertyDetails.landDetails.rent.totalAmount
+            ? Number(property.propertyDetails.landDetails.rent.totalAmount) >= priceRange[0] &&
+              Number(property.propertyDetails.landDetails.rent.totalAmount) <= priceRange[1]
+            : property.propertyDetails.landDetails.lease.totalAmount
+              ? Number(property.propertyDetails.landDetails.lease.totalAmount) >= priceRange[0] &&
+                Number(property.propertyDetails.landDetails.lease.totalAmount) <= priceRange[1]
+              : Number(property.propertyDetails.landDetails.sell.totalAmount) >= priceRange[0] &&
+                Number(property.propertyDetails.landDetails.sell.totalAmount) <= priceRange[1]
+        );
+      }
+    
+      if (nameSearch2 !== "") {
         filtered = filtered.filter((property) => {
-          // Collect all land usage types from sell, rent, and lease
-          const landUsageTypes = [
-            ...property.propertyDetails.landDetails.sell.landUsage,
-            ...property.propertyDetails.landDetails.rent.landUsage,
-            ...property.propertyDetails.landDetails.lease.landUsage,
-          ];
-
-          console.log("Land Usage Types: ", landUsageTypes);
-          console.log("Checked Feature Types: ", featureTypesArray);
-
-          // Check if any of the feature types match the land usage types
-          return featureTypesArray.some((type) =>
-            landUsageTypes.includes(type)  // Check if the type exists in the landUsageTypes array
-          );
+          const nameMatch2 = isPropertyIdSearch
+            ? property.propertyId &&
+              property.propertyId.toString().toLowerCase().includes(nameSearch2)
+            : property.landDetails.title &&
+              property.landDetails.title.toLowerCase().includes(nameSearch2);
+    
+          return nameMatch2;
         });
       }
-    }
-
-
-
-
-
-    if (priceRange) {
-      filtered = filtered.filter((property) =>
-        property.propertyDetails.landDetails.rent.totalAmount
-          ? Number(property.propertyDetails.landDetails.rent.totalAmount) >= priceRange[0] &&
-          Number(property.propertyDetails.landDetails.rent.totalAmount) <= priceRange[1]
-          : property.propertyDetails.landDetails.lease.totalAmount
-            ? Number(property.propertyDetails.landDetails.lease.totalAmount) >= priceRange[0] &&
-            Number(property.propertyDetails.landDetails.lease.totalAmount) <= priceRange[1]
-            : Number(property.propertyDetails.landDetails.sell.totalAmount) >= priceRange[0] &&
-            Number(property.propertyDetails.landDetails.sell.totalAmount) <= priceRange[1]
+    
+      if (sizeRange) {
+        filtered = filtered.filter((property) =>
+          property.propertyDetails.landDetails.rent.plotSize
+            ? Number(property.propertyDetails.landDetails.rent.plotSize) >= sizeRange[0] &&
+              Number(property.propertyDetails.landDetails.rent.plotSize) <= sizeRange[1]
+            : property.propertyDetails.landDetails.lease.plotSize
+              ? Number(property.propertyDetails.landDetails.lease.plotSize) >= sizeRange[0] &&
+                Number(property.propertyDetails.landDetails.lease.plotSize) <= sizeRange[1]
+              : Number(property.propertyDetails.landDetails.sell.plotSize) >= sizeRange[0] &&
+                Number(property.propertyDetails.landDetails.sell.plotSize) <= sizeRange[1]
+        );
+      }
+    
+      setFilteredData(filtered);
+      localStorage.setItem("isLoading", false);
+    }, [
+      filters,
+      filters1,
+      fetchLocation,  // include if fetchLocation is defined outside
+      setFilteredData // usually stable if it's from useState
+    ]);
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await _get(`/commercials/${path}`);
+      console.log(response.data);
+      setData(response.data);
+      setFilteredData(response.data);
+      applyFilters(
+        filterValuesRef.current.checkedValues,
+        filterValuesRef.current.checkedTypes,
+        filterValuesRef.current.checkedFeatureTypes,
+        filterValuesRef.current.searchText,
+        filterValuesRef.current.priceRange,
+        filterValuesRef.current.sizeRange,
+        filterValuesRef.current.propertyName,
+        response.data
       );
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
+  }, [
+    path,applyFilters
+      ]);
+   
 
-    if (nameSearch2 !== "") {
-      filtered = filtered.filter((property) => {
-        const nameMatch2 = isPropertyIdSearch
-          ? property.propertyId && property.propertyId.toString().toLowerCase().includes(nameSearch2)
-          : property.landDetails.title && property.landDetails.title.toLowerCase().includes(nameSearch2);
-
-        return nameMatch2;
-      });
-    }
-
-    if (sizeRange) {
-      filtered = filtered.filter((property) =>
-        property.propertyDetails.landDetails.rent.plotSize
-          ? Number(property.propertyDetails.landDetails.rent.plotSize) >= sizeRange[0] &&
-          Number(property.propertyDetails.landDetails.rent.plotSize) <= sizeRange[1]
-          : property.propertyDetails.landDetails.lease.plotSize
-            ? Number(property.propertyDetails.landDetails.lease.plotSize) >= sizeRange[0] &&
-            Number(property.propertyDetails.landDetails.lease.plotSize) <= sizeRange[1]
-            : Number(property.propertyDetails.landDetails.sell.plotSize) >= sizeRange[0] &&
-            Number(property.propertyDetails.landDetails.sell.plotSize) <= sizeRange[1]
-      );
-    }
-
-    setFilteredData(filtered);
-    localStorage.setItem("isLoading", false);
-  };
 
   const handleStartAuction = (property) => {
     console.log(property);
@@ -476,8 +476,60 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   };
 
 
-  const [sizeRange, setSizeRange] = useState([0, Infinity]);
-
+ 
+  const maxsizefromAPI = useCallback(async () => {
+    try {
+      const first = checkedValues.includes("sold") ? "sold" : "@";
+      const second = checkedValues.includes("unSold") ? "unsold" : "@";
+      const response = await _get(
+        `property/maxSize/commercial/@/@/@/@/@/${first}/${second}`
+      );
+      const data = await response.data.maxSize;
+      setSizeRange([0, data]);
+    } catch (error) {
+      console.error("Error fetching village data:", error);
+    }
+  }, [checkedValues]); // add any other dependencies if needed
+  
+  const maxpricefromAPI = useCallback(async () => {
+    const types = ["@", "@", "@"];
+    if (checkedTypes.includes("sell")) {
+      types[0] = "sell";
+    }
+    if (checkedTypes.includes("rent")) {
+      types[1] = "rent";
+    }
+    if (checkedTypes.includes("lease")) {
+      types[2] = "lease";
+    }
+    // Uncomment and implement as needed:
+    // try {
+    //   const response = await _get(
+    //     `property/maxPrice/commercial/${types[0]}/${types[1]}/${types[2]}/@/@`
+    //   );
+    //   const data = await response.data.maxPrice;
+    //   setMaxPrice(data);
+    //   setMaxPriceAPI(data);
+    // } catch (error) {
+    //   console.error("Error fetching village data:", error);
+    // }
+  }, [checkedTypes]);
+  
+  // Now include the callback functions in the useEffect dependency array
+  useEffect(() => {
+    maxsizefromAPI();
+    fetchData();
+    maxpricefromAPI();
+  }, [
+    sold,
+    rating,
+    filters,
+    checkedTypes,
+    filters1,
+    maxsizefromAPI,
+    fetchData,
+    maxpricefromAPI,
+  ]);
 
 
 
@@ -498,22 +550,7 @@ const GetCommercial = ({ path, filters, filters1 }) => {
   );
 
 
-  const maxsizefromAPI = async () => {
-    try {
-      const first = checkedValues.includes("sold") ? "sold" : "@";
-      const second = checkedValues.includes("unSold") ? "unsold" : "@";
-      const response = await _get(
-        `property/maxSize/commercial/@/@/@/@/@/${first}/${second}`
-      );
-      const data = await response.data.maxSize;
-      // setMaxSize(data);
-      // setMaxSizeAPIvalue(data);
-      // setSliderRangesize([0, data]);
-      setSizeRange([0, data]);
-    } catch (error) {
-      console.error("Error fetching village data:", error);
-    }
-  };
+  
 
   return (
     <div ref={targetCardRef}>
@@ -561,10 +598,10 @@ const GetCommercial = ({ path, filters, filters1 }) => {
                         bodyStyle={{ padding: 0 }}
                         // onClick={() => handleCardClick(property)}
                         extra={
-                          path === "getcommercial" && property.status == 0 ? (
+                          path === "getcommercial" && property.status === 0 ? (
                             <button
                               style={{
-                                color: property.status == 0 ? "green" : "red",
+                                color: property.status === 0 ? "green" : "red",
                                 flexWrap: "wrap",
                                 float: "right",
                                 width: "100%",

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { notification } from "antd";
 
-const BASE_URL = "http://172.17.15.189:3000";
+const BASE_URL = "http://172.17.14.155:3000";
 // const BASE_URL = " http://real-estate-back-end-s5bk-ooqntcx6c-pindu123s-projects.vercel.app/";
 
 console.log(BASE_URL);

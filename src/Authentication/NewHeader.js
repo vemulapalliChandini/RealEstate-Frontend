@@ -1,32 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Switch, Col, Typography, Row, Popover, Card } from "antd";
-import "./Styles/NewHeader.css";
 import { UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Content } from "antd/es/layout/layout";
 import NewFooter from "./NewFooter";
 import LoginPage from "./LoginPage";
+import "./Styles/NewHeader.css"; // External CSS import
+
+
 const { Header } = Layout; 
+
 function HeaderPage() {
   const { Text } = Typography;
+  
   useEffect(() => {
     localStorage.setItem("language", "en");
   }, []);
+
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
+
   const changeLanguage = (checked) => {
     const newLanguage = checked ? "te" : "en";
     i18n.changeLanguage(newLanguage);
   };
+
   const handleLoginClose = () => {
     setIsLoginVisible(false);
   };
+
+  // Popover content definitions
   const buyInfo = (
     <Card title="You can buy:" style={{ width: 300 }}>
       <ul>
-      <li>A Home</li>
+        <li>A Home</li>
         <li>Land/Plot</li>
         <li>Agricultural Land</li>
         <li>Flats</li>
@@ -34,14 +43,16 @@ function HeaderPage() {
       </ul>
     </Card>
   );
+
   const agentInfo = (
     <Card title="You can Contact Agents For:" style={{ width: 300 }}>
       <ul>
-      <li>Helping You to Buy the expected properties for a reasonable Price with all the expected features</li>
+        <li>Helping You to Buy the expected properties for a reasonable Price with all the expected features</li>
         <li>Sell Your Properties as soon as possible for the expected Price</li>   
       </ul>
     </Card>
   );
+
   const sellInfo = (
     <Card title="You can Contact Agents For:" style={{ width: 400 }}>
       <ul>
@@ -54,15 +65,15 @@ function HeaderPage() {
       </ul>
     </Card>
   );
-  const Help = (
+
+  const helpInfo = (
     <Card title="If you find any difficulties:" style={{ width: 300 }}>
       <ul>
-      <li>Feel free to reach out to us at +91 7373733783</li>
-       
-       
+        <li>Feel free to reach out to us at +91 7373733783</li>
       </ul>
     </Card>
   );
+
   return (
     <Layout>
       <LoginPage
@@ -86,15 +97,11 @@ function HeaderPage() {
             md={8}
             lg={8}
             xl={8}
-            justify="start"
             style={{ marginLeft: "20px" }}
           >
-            <Text
-              className="heading responsive-heading"
-              style={{ color: "white" }}
-            >
+            <Text className="heading responsive-heading">
               {t("landing.Real Estate Lokam")}
-            </Text>{" "}
+            </Text>
           </Col>
           <Col
             xs={12}
@@ -113,42 +120,42 @@ function HeaderPage() {
                   style: { marginRight: "1%" },
                   label: (
                     <span
-                      style={{ color: "white", fontSize: "15px" }}
+                      className="menu-item-label"
                       onClick={() => navigate("/")}
                     >
-                      <b style={{fontSize:"16px"}}>{t("dashboard.Home")}</b>
+                      <b className="menu-item-bold">{t("dashboard.Home")}</b>
                     </span>
                   ),
                 },
                 {
                   key: "1",
-                  style: { marginRight: "1%" }, // Add marginRight style here
+                  style: { marginRight: "1%" },
                   label: (
                     <span
-                      style={{ color: "white", fontSize: "15px" }}
+                      className="menu-item-label"
                       onClick={() => navigate("/Buy")}
                     >
-                     <Popover content={buyInfo}>
-                      <span style={{ color: "white", fontSize: "15px" }}>
-                        <b style={{fontSize:"16px"}}>{t("header.buy")}</b>
-                      </span>
-                    </Popover>
+                      <Popover content={buyInfo}>
+                        <span className="menu-item-label">
+                          <b className="menu-item-bold">{t("header.buy")}</b>
+                        </span>
+                      </Popover>
                     </span>
                   ),
                 },
                 {
                   key: "2",
-                  style: { marginRight: "1%" }, // Add marginRight style here
+                  style: { marginRight: "1%" },
                   label: (
                     <span
-                      style={{ color: "white", fontSize: "15px" }}
+                      className="menu-item-label"
                       onClick={() => navigate("/sell")}
                     >
-                     <Popover content={sellInfo}>
-                      <span style={{ color: "white", fontSize: "15px" }}>
-                        <b style={{fontSize:"16px"}}>{t("header.Sell")}</b>
-                      </span>
-                    </Popover>
+                      <Popover content={sellInfo}>
+                        <span className="menu-item-label">
+                          <b className="menu-item-bold">{t("header.Sell")}</b>
+                        </span>
+                      </Popover>
                     </span>
                   ),
                 },
@@ -157,14 +164,14 @@ function HeaderPage() {
                   style: { marginRight: "1%" },
                   label: (
                     <span
-                      style={{ color: "white", fontSize: "15px" }}
+                      className="menu-item-label"
                       onClick={() => navigate("/findanagent")}
                     >
                       <Popover content={agentInfo}>
-                      <span style={{ color: "white", fontSize: "15px" }}>
-                        <b style={{fontSize:"16px"}}>{t("header.FindAgent")}</b>
-                      </span>
-                    </Popover>
+                        <span className="menu-item-label">
+                          <b className="menu-item-bold">{t("header.FindAgent")}</b>
+                        </span>
+                      </Popover>
                     </span>
                   ),
                 },
@@ -173,28 +180,21 @@ function HeaderPage() {
                   style: { marginRight: "30%" },
                   label: (
                     <span
-                      style={{ color: "white", fontSize: "15px" }}
+                      className="menu-item-label"
                       onClick={() => navigate("/help")}
                     >
-                                            <Popover content={Help}>
-                      <span style={{ color: "white", fontSize: "15px" }}>
-                        <b style={{fontSize:"18px"}}>{t("header.Help")}</b>
-                      </span>
-                    </Popover>
-                     
+                      <Popover content={helpInfo}>
+                        <span className="menu-item-label">
+                          <b className="menu-item-bold help-bold">{t("header.Help")}</b>
+                        </span>
+                      </Popover>
                     </span>
                   ),
                 },
                 {
                   key: "5",
                   label: (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginTop: "22px",
-                      }}
-                    >
+                    <div className="language-switch-container">
                       {!isLoginVisible && (
                         <Switch
                           checkedChildren="తెలుగు"
@@ -207,18 +207,13 @@ function HeaderPage() {
                 },
                 {
                   icon: (
-                    <UserOutlined
-                      style={{ fontSize: "17px", color: "white", marginTop: "4px" }}
-                    />
+                    <UserOutlined className="user-icon" />
+
                   ),
                   key: "6",
                   label: (
                     <span
-                      style={{
-                        fontSize: "17px",
-                        color: "white",
-                        marginLeft: "-5%",
-                      }}
+                      className="menu-item-label user-label"
                       onClick={() => setIsLoginVisible(true)}
                     >
                       <b>{t("landing.Sign In")}</b>
@@ -228,11 +223,10 @@ function HeaderPage() {
               ]}
               className="menuStyle"
             />
-
           </Col>
         </Row>
       </Header>
-      <Content style={{ marginTop: "30px" }}>
+      <Content >
         <Outlet />
       </Content>
       <NewFooter />

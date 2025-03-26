@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Input,
   Table,
@@ -30,12 +30,7 @@ const MarketingAgentsList = ({ role, title }) => {
   const [searchLocation, setSearchLocation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8);
-
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  const fetchAgents = async () => {
+  const fetchAgents = useCallback(async () => {
     try {
       const response = await _get(`admin/csrOrMarketingAgents/6`);
       setAgents(response.data);
@@ -43,8 +38,12 @@ const MarketingAgentsList = ({ role, title }) => {
     } catch (error) {
       console.error(`Error fetching ${title} agents:`, error);
     }
-  };
+  }, [title]);
+  useEffect(() => {
+    fetchAgents();
+  }, [fetchAgents]);
 
+ 
   const handleSearch = () => {
     const filtered = agents.filter((agent) => {
       const fullName = `${agent.firstName} ${agent.lastName}`.toLowerCase();

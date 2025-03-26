@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback} from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -120,6 +120,53 @@ const Dashboard = () => {
 
   const userId = localStorage.getItem("userId");
 
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const response = await _get(`/activity/getNotifications`);
+      if (response && response.data) {
+        const filteredNotifications = response.data.filter(
+          (notification) => notification.receiverId === userId
+        );
+        setNotificationCount(filteredNotifications.length);
+      } else {
+        console.log("No data received from the API.");
+        setNotificationCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      setNotificationCount(0);
+    }
+  }, [userId]);
+
+  // Fetch Recent Winner Data
+  const fetchRecent = useCallback(async () => {
+    try {
+      const response = await _get(`/auction/getWinnerData`);
+      if (response && response.data) {
+        setWinnerDetails(response.data.data);
+        if (response.data[0]?.auctionData?.endDate) {
+          const endDate = response.data[0]?.auctionData?.endDate;
+          const nextDay = moment(endDate).add(1, "days");
+          const today = moment();
+
+          if (today.isBefore(nextDay)) {
+            setShowNextDay(true);
+            console.log("✅ Showing balloons");
+          } else {
+            setShowNextDay(false);
+            console.log("❌ Hiding balloons");
+          }
+        }
+      } else {
+        console.log("No data received from the API.");
+        setNotificationCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching winner data:", error);
+      setNotificationCount(0);
+    }
+  }, []);
+
   useEffect(() => {
     if (agentrole === 12) {
       setIsSellerAgent(true);
@@ -128,7 +175,7 @@ const Dashboard = () => {
     }
     fetchNotifications();
     fetchRecent();
-  }, []);
+  }, [agentrole, fetchNotifications, fetchRecent]);
   const handleToggleChange = (checked) => {
     console.log("Current isSellerAgent:", isSellerAgent);
     setIsLoading(true);
@@ -146,57 +193,7 @@ const Dashboard = () => {
     }, 2000);
   };
 
-  const fetchRecent = async () => {
-    try {
-      const response = await _get(`/auction/getWinnerData`);
-      if (response && response.data) {
-        setWinnerDetails(response.data.data);
-        if (response.data[0]?.auctionData?.endDate) {
-          const endDate = response.data[0]?.auctionData?.endDate;
-          const nextDay = moment(endDate).add(1, "days");
-          const today = moment();
-
-
-          if (today.isBefore(nextDay)) {
-            setShowNextDay(true);
-            console.log("✅ Showing balloons");
-          } else {
-            setShowNextDay(false);
-            console.log("❌ Hiding balloons");
-          }
-        }
-
-      } else {
-        console.log("No data received from the API.");
-        setNotificationCount(0);
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      setNotificationCount(0);
-    }
-  };
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await _get(`/activity/getNotifications`);
-      if (response && response.data) {
-
-        const filteredNotifications = response.data.filter(
-          (notification) => notification.receiverId === userId
-        );
-
-        setNotificationCount(filteredNotifications.length);
-      } else {
-        console.log("No data received from the API.");
-        setNotificationCount(0);
-      }
-
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      setNotificationCount(0);
-    }
-  };
-
+ 
   const handleProfileClick = () => {
     if (role === 1) navigate("/dashboard/agent/profile");
     if (role === 2) navigate("/dashboard/seller/profile");
@@ -860,7 +857,6 @@ const Dashboard = () => {
       }
 
       if (url.includes("/dashboard/buyer/agriculture/details") || url.includes("/dashboard/buyer/commercial/details") || url.includes("/dashboard/buyer/layout/details") || url.includes("/dashboard/buyer/residential/details")) {
-        const detailId = url.split("/").pop(); // Extract the dynamic ID from the URL
         return (
           <Breadcrumb.Item
             key={url}

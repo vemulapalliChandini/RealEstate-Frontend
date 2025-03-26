@@ -173,7 +173,7 @@ const BuyerRequests = ({ path }) => {
         console.log(userId);
       }
     }
-  }, []);
+  }, [userId]);
 
   const handleSendMessage = () => {
     if (typedMessage.trim() !== "") {

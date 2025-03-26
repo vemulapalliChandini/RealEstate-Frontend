@@ -2,84 +2,66 @@ import React, { useState, useRef, useEffect } from "react";
 import { Tabs, Card, Row, Col, Button } from "antd";
 import Call from "./Call";
 import { useTranslation } from "react-i18next";
+import "./Styles/HeaderWithTabs.css"; // Import external CSS file
+
 const { TabPane } = Tabs;
+
 const TabContent = ({ title, content, isVisible }) => {
   return (
     isVisible && (
-      <Card
-        style={{
-          marginTop: "10%",
-          padding: "10px",
-          borderRadius: "12px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          width: "250px",
-          height: "150px",
-          backdropFilter: "blur(15px)",
-          backgroundColor: "rgba(255, 255, 255, 0.3)",
-          color: "black",
-        }}
-      >
-        <h3
-          style={{
-            fontFamily: "Arial, sans-serif",
-            fontSize: "16px",
-            fontWeight: "bold",
-            color: "black",
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          style={{
-            fontFamily: "Arial, sans-serif",
-            fontSize: "14px",
-            color: "black",
-            lineHeight: "1.5",
-          }}
-        >
-          {content}
-        </p>
+      <Card className="tab-content-card">
+        <h3 className="tab-content-card__title">{title}</h3>
+        {content && <p className="tab-content-card__content">{content}</p>}
       </Card>
     )
   );
 };
+
 const HeaderWithTabs = ({ setIsVisible }) => {
   const { t, i18n } = useTranslation();
+
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("language") || 'en';
+    const savedLanguage = localStorage.getItem("language") || "en";
     i18n.changeLanguage(savedLanguage);
   }, [i18n]);
+
   const [hoveredTab, setHoveredTab] = useState(null);
   const [isIconClicked, setIsIconClicked] = useState(false);
-  const containerRef = useRef(null); 
+  const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(null);
-  const [isBackButtonVisible, setIsBackButtonVisible] = useState(false); 
+  const [isBackButtonVisible, setIsBackButtonVisible] = useState(false);
+
   const handleTabChange = (key) => {
     setActiveTab(key);
-    setIsVisible(false); 
-    setIsBackButtonVisible(true); 
+    setIsVisible(false);
+    setIsBackButtonVisible(true);
   };
+
   const handleTabHover = (key) => {
     setHoveredTab(key);
   };
+
   const handleTabLeave = () => {
     setHoveredTab(null);
   };
+
   const handleIconClicks = () => {
     setIsIconClicked((prev) => !prev);
   };
+
   const handleIconClick = () => {
-    setIsIconClicked(false); 
-    setIsVisible(true); 
+    setIsIconClicked(false);
+    setIsVisible(true);
     setActiveTab(null);
     setIsBackButtonVisible(false);
   };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setIsIconClicked(false);
         setActiveTab(null);
-        setIsBackButtonVisible(false); 
+        setIsBackButtonVisible(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -87,31 +69,17 @@ const HeaderWithTabs = ({ setIsVisible }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
-    <div style={{ padding: "0px", marginTop: "-7%" }} ref={containerRef}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          position: "relative",
-          float: "right",
-          marginRight: "2%",
-          marginTop: "1%",
-        }}
-      >
+    <div className="header-container" ref={containerRef}>
+      <div className="header-top">
         <img
           src="https://img.freepik.com/premium-psd/call-center-support-assistant-transparent-background_986960-118551.jpg?ga=GA1.1.786688213.1732196452&semt=ais_tags_boosted"
           alt="Call Icon"
           onClick={handleIconClicks}
-          style={{
-            width: "40px",
-            height: "40px",
-            cursor: "pointer",
-            borderRadius: "50%",
-            border: "2px solid #0d416b",
-          }}
+          className="header-icon"
         />
-       <h2 style={{ color: "white" }}>{t("help.Help")}</h2> 
+        <h2 className="header-title">{t("help.Help")}</h2>
       </div>
       {isIconClicked && <Call />}
       <Tabs
@@ -120,27 +88,12 @@ const HeaderWithTabs = ({ setIsVisible }) => {
         tabPosition="top"
         centered
         size="large"
-        style={{
-          marginBottom: "20px",
-          borderRadius: "16px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          backgroundColor: "rgba(0, 0, 0, 0.6)",
-          color:"white",
-          width: "70%",
-          marginLeft: "15%",
-        }}
+        className="custom-tabs"
         onTabClick={handleTabChange}
       >
         <TabPane
           tab={
-            <span
-              style={{
-                backgroundColor: activeTab === "1" ? "#0d416b" : "",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                color: activeTab === "1" ? "#fff" : "white",
-              }}
-            >
+            <span className={`custom-tab ${activeTab === "1" ? "custom-tab--active" : ""}`}>
               <strong>{t("header.Buyers")}</strong>
             </span>
           }
@@ -171,14 +124,7 @@ const HeaderWithTabs = ({ setIsVisible }) => {
         </TabPane>
         <TabPane
           tab={
-            <span
-              style={{
-                backgroundColor: activeTab === "2" ? "#0d416b" : "",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                color: activeTab === "2" ? "#fff" : "white",
-              }}
-            >
+            <span className={`custom-tab ${activeTab === "2" ? "custom-tab--active" : ""}`}>
               <strong>{t("header.Tenants")}</strong>
             </span>
           }
@@ -209,14 +155,7 @@ const HeaderWithTabs = ({ setIsVisible }) => {
         </TabPane>
         <TabPane
           tab={
-            <span
-              style={{
-                backgroundColor: activeTab === "3" ? "#0d416b" : "",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                color: activeTab === "3" ? "#fff" : "white", 
-              }}
-            >
+            <span className={`custom-tab ${activeTab === "3" ? "custom-tab--active" : ""}`}>
               <strong>{t("header.Dealers/Builders")}</strong>
             </span>
           }
@@ -247,14 +186,7 @@ const HeaderWithTabs = ({ setIsVisible }) => {
         </TabPane>
         <TabPane
           tab={
-            <span
-              style={{
-                backgroundColor: activeTab === "4" ? "#0d416b" : "",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                color: activeTab === "4" ? "#fff" : "white",
-              }}
-            >
+            <span className={`custom-tab ${activeTab === "4" ? "custom-tab--active" : ""}`}>
               <strong>{t("header.Agents")}</strong>
             </span>
           }
@@ -285,24 +217,8 @@ const HeaderWithTabs = ({ setIsVisible }) => {
         </TabPane>
       </Tabs>
       {isBackButtonVisible && (
-        <span
-          style={{
-            fontSize: "20px",
-            color: "black",
-            cursor: "pointer",
-            marginLeft: "20px",
-          }}
-          onClick={handleIconClick}
-        >
-          <Button
-            style={{
-              color: "white",
-              backgroundColor: "#0D416B",
-              fontWeight: "bold",
-            }}
-          >
-            Close
-          </Button>
+        <span className="header-back-button" onClick={handleIconClick}>
+          <Button className="header-close-btn">Close</Button>
         </span>
       )}
     </div>
